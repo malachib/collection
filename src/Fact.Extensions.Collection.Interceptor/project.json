@@ -1,0 +1,23 @@
+﻿{
+  "version": "1.0.0-*",
+  "authors": [ "Malachi Burke" ],
+  "description": "Castle interceptors for Caching",
+  "packOptions": {
+    "releaseNotes": ""
+  },
+
+  "dependencies": {
+    "Castle.Core": "4.0.0-beta002",
+    "Fact.Extensions.Caching": "1.0.0-*",
+    "NETStandard.Library": "1.6.0"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [ "NETCORE" ]
+      },
+      "imports": "dnxcore50"
+    }
+  }
+}
