@@ -9,6 +9,13 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection.
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection.Tests", "Fact.Extensions.Collection.Tests\Fact.Extensions.Collection.Tests.xproj", "{CBA21DBC-1140-4717-968F-7014CE53BD26}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{00900FD9-475E-47E0-B728-AC3F3A474456}"
+	ProjectSection(SolutionItems) = preProject
+		setenv.sh = setenv.sh
+		upload_all.sh = upload_all.sh
+		upload_project.sh = upload_project.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -1,13 +1,32 @@
 ﻿{
   "version": "1.0.0-*",
+  "authors": [ "Malachi Burke" ],
+  "description": "Utility interfaces to consolidate different bag-like targets in .NET Core, such as caching",
+  "packOptions": {
+    "releaseNotes": "Initial release"
+  },
 
   "dependencies": {
-    "NETStandard.Library": "1.6.0"
   },
 
   "frameworks": {
+    "netstandard1.3": {
+      "buildOptions": {
+        "define": [
+          "NETSTANDARD1_3"
+        ]
+      },
+
+      "dependencies": {
+        "System.IO": "4.1.0",
+        "System.Threading.Tasks.Parallel": "4.*"
+      }
+      //"imports": "dnxcore50"
+    },
     "netstandard1.6": {
-      "imports": "dnxcore50"
+      "dependencies": {
+        "NETStandard.Library": "1.6.0"
+      }
     }
   }
 }
