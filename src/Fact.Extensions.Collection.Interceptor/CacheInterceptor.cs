@@ -10,6 +10,20 @@ namespace Fact.Extensions.Collection.Interceptor
 {
     public class CacheInterceptor : PropertyInterceptor
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serviceToCache"></param>
+        /// <param name="cache"></param>
+        /// <param name="prefix"></param>
+        /// <returns></returns>
+        public static T Intercept<T>(T serviceToCache, IBag cache, string prefix = null)
+            where T: class
+        {
+            return AssemblyGlobal.Proxy.CreateClassProxyWithTarget(serviceToCache, new CacheInterceptor(cache, prefix));
+        }
+
         readonly IBag cache;
         readonly IRemover cacheRemover;
         readonly ITryGetter cacheTryGet;
@@ -71,7 +85,8 @@ namespace Fact.Extensions.Collection.Interceptor
                 else
                 {
                     invocation.Proceed();
-                    // FAIL :(
+
+                    //cache.Set(key, invocation.ReturnValue, type);
                     cache[key, type] = invocation.ReturnValue;
                 }
             }
@@ -80,8 +95,9 @@ namespace Fact.Extensions.Collection.Interceptor
 
 
     /// <summary>
-    /// Marks this operation as something the cache interceptor should pick up
+    /// Cache output (output parameters not yet supported)
     /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
     public class OperationCacheAttribute : Attribute
     {
     }

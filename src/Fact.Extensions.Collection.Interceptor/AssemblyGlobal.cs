@@ -8,7 +8,7 @@ namespace Fact.Extensions.Collection.Interceptor
 {
     internal class AssemblyGlobal
     {
-        static readonly ProxyGenerator Proxy = new ProxyGenerator();
+        internal static readonly ProxyGenerator Proxy = new ProxyGenerator();
 
         static AssemblyGlobal()
         {
