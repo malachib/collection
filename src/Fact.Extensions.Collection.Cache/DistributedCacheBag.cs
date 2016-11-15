@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
+using Fact.Extensions.Serialization;
 
 namespace Fact.Extensions.Collection.Cache
 {
@@ -11,6 +12,8 @@ namespace Fact.Extensions.Collection.Cache
     {
         readonly IDistributedCache cache;
         readonly ISerializationManager serializationManager;
+
+        public event Action<string, DistributedCacheEntryOptions> Setting;
 
         public DistributedCacheBag(ISerializationManager serializationManager, IDistributedCache cache)
         {
@@ -35,11 +38,16 @@ namespace Fact.Extensions.Collection.Cache
 
         public void Set(string key, object value, Type type = null)
         {
-            cache.Set(key, serializationManager.Serialize(value, type));
+            var options = new DistributedCacheEntryOptions();
+            Setting?.Invoke(key, options);
+            cache.Set(key, serializationManager.Serialize(value, type), options);
         }
 
         public async Task SetAsync(string key, object value, Type type = null)
         {
+            var options = new DistributedCacheEntryOptions();
+            Setting?.Invoke(key, options);
+
             byte[] serializedValue;
 
             if (serializationManager is ISerializationManagerAsync)
@@ -47,7 +55,7 @@ namespace Fact.Extensions.Collection.Cache
             else
                 serializedValue = serializationManager.Serialize(value, type);
 
-            await cache.SetAsync(key, serializedValue);
+            await cache.SetAsync(key, serializedValue, options);
         }
     }
 }

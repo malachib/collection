@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Fact.Extensions.Serialization;
 
 namespace Fact.Extensions.Collection.Cache
 {
@@ -11,6 +12,8 @@ namespace Fact.Extensions.Collection.Cache
         // serializationManager is a NOOP right now and should be null
         readonly ISerializationManager serializationManager;
         readonly IMemoryCache cache;
+
+        public event Action<ICacheEntry> CreatingEntry;
 
         public MemoryCacheBag(ISerializationManager serializationManager, IMemoryCache cache)
         {
@@ -27,6 +30,7 @@ namespace Fact.Extensions.Collection.Cache
         {
             using (var cacheEntry = cache.CreateEntry(key))
             {
+                CreatingEntry?.Invoke(cacheEntry);
                 cacheEntry.SetSlidingExpiration(TimeSpan.FromSeconds(120));
                 cacheEntry.SetValue(value);
             }

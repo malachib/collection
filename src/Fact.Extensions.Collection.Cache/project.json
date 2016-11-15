@@ -3,7 +3,7 @@
   "authors": [ "Malachi Burke" ],
   "description": "Caching wrappers for Fact.Extensions.Collection: Handles IMemoryCache and IDistributedCache",
   "packOptions": {
-    "releaseNotes": "Initial release"
+    "releaseNotes": ""
   },
 
   "dependencies": {

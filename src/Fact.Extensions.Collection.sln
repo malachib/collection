@@ -12,9 +12,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{00900FD9-475E-47E0-B728-AC3F3A474456}"
 	ProjectSection(SolutionItems) = preProject
 		setenv.sh = setenv.sh
+		setenv_windows.sh = setenv_windows.sh
 		upload_all.sh = upload_all.sh
 		upload_project.sh = upload_project.sh
 	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serialization", "Fact.Extensions.Serialization\Fact.Extensions.Serialization.xproj", "{3294BCB2-602F-4C65-AAE6-62BEE99FB329}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serialization.Newtonsoft", "Fact.Extensions.Serialization.Newtonsoft\Fact.Extensions.Serialization.Newtonsoft.xproj", "{3CF2291A-675D-4880-A5A8-CF6E960E5FF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +39,14 @@ Global
 		{CBA21DBC-1140-4717-968F-7014CE53BD26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBA21DBC-1140-4717-968F-7014CE53BD26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBA21DBC-1140-4717-968F-7014CE53BD26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3294BCB2-602F-4C65-AAE6-62BEE99FB329}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3294BCB2-602F-4C65-AAE6-62BEE99FB329}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3294BCB2-602F-4C65-AAE6-62BEE99FB329}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3294BCB2-602F-4C65-AAE6-62BEE99FB329}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CF2291A-675D-4880-A5A8-CF6E960E5FF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CF2291A-675D-4880-A5A8-CF6E960E5FF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CF2291A-675D-4880-A5A8-CF6E960E5FF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CF2291A-675D-4880-A5A8-CF6E960E5FF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

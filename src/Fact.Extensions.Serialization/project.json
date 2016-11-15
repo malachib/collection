@@ -1,13 +1,12 @@
 ﻿{
   "version": "1.0.0-*",
   "authors": [ "Malachi Burke" ],
-  "description": "Utility interfaces to consolidate different bag-like targets in .NET Core, such as caching",
+  "description": "Utility interface abstractions for serialization",
   "packOptions": {
     "releaseNotes": ""
   },
 
   "dependencies": {
-    "Fact.Extensions.Serialization": "1.0.0-*"
   },
 
   "frameworks": {

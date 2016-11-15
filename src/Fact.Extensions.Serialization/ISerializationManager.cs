@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Fact.Extensions.Collection
+namespace Fact.Extensions.Serialization
 {
     public interface ISerializationManager
     {
