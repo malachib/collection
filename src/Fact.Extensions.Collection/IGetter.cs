@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Fact.Apprentice.Collection
+namespace Fact.Extensions.Collection
 {
     public interface IGetter<TKey, TValue>
     {
@@ -14,4 +14,7 @@ namespace Fact.Apprentice.Collection
     {
         Task<TValue> GetAsync(TKey key, Type type);
     }
+
+    public interface IGetter : IGetter<string, object> { }
+    public interface IGetterAsync : IGetterAsync<string, object> { }
 }
