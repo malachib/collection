@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Fact.Extensions.Serialization;
 
-namespace Fact.Extensions.Collection.Cache
+namespace Fact.Extensions.Caching
 {
     public class DistributedCacheBag : IBag, IBagAsync, IRemover, IRemoverAsync
     {

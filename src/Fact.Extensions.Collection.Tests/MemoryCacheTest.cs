@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Fact.Extensions.Collection.Cache;
+using Fact.Extensions.Caching;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Fact.Extensions.Collection.Tests

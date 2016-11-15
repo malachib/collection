@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Fact.Extensions.Collection;
 using Fact.Extensions.Serialization;
 
-namespace Fact.Extensions.Collection.Cache
+namespace Fact.Extensions.Caching
 {
     public class MemoryCacheIndexer : 
         ITryGetter<object>, 
