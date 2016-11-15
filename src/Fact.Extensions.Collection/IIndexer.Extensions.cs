@@ -26,14 +26,59 @@ namespace Fact.Extensions.Collection
             }
         }
 
-		public static IBag<TKey, TValue> ToBag<TKey, TValue>(this IIndexer<TKey, TValue> indexer)
+
+        public static IBag<TKey, TValue> ToBag<TKey, TValue>(this IIndexer<TKey, TValue> indexer)
         {
             return new BagWrapper<TKey, TValue>(indexer);
         }
 
-        public static IBag<string, TValue> ToNamedBag<TKey, TValue>(this IIndexer<TKey, TValue> indexer)
+
+#if !NETSTANDARD1_1
+//#if NETSTANDARD1_6
+        /// <summary>
+        /// TEMPORARY
+        /// until we get pluggable/composables up, fiddle with this layer
+        /// </summary>
+        internal class NamedBagWrapper<TKey> : IBag, IRemover, ITryGetter
         {
-            return null;
+            readonly IIndexer<TKey, object> indexer;
+
+            internal NamedBagWrapper(IIndexer<TKey, object> indexer)
+            {
+                this.indexer = indexer;
+            }
+
+            public object this[string key, Type type]
+            {
+                set
+                {
+                    var k = (TKey)Convert.ChangeType(key, typeof(TKey));
+                    indexer[k] = value;
+                }
+            }
+
+            public object Get(string key, Type type)
+            {
+                var k = (TKey) Convert.ChangeType(key, typeof(TKey));
+                return indexer[k];
+            }
+
+            public void Remove(string key)
+            {
+                var k = (TKey)Convert.ChangeType(key, typeof(TKey));
+                ((IRemover<TKey>)indexer).Remove(k);
+            }
+
+            public bool TryGet(string key, Type type, out object value)
+            {
+                throw new NotImplementedException();
+            }
         }
+
+        public static IBag ToNamedBag<TKey>(this IIndexer<TKey, object> indexer)
+        {
+            return new NamedBagWrapper<TKey>(indexer);
+        }
+#endif
     }
 }

@@ -33,7 +33,10 @@ namespace Fact.Extensions.Collection.Tests
             var memoryCache = provider.GetService<IMemoryCache>();
 
             var cacheIndexer = new MemoryCacheIndexer(null, memoryCache);
-            CacheInterceptor.Intercept<IService>(new Service(), null);
+            var cache = cacheIndexer.ToNamedBag();
+            var service = CacheInterceptor.Intercept<IService>(new Service(), cache);
+
+            var value = service.ReturnSeven();
         }
     }
 }

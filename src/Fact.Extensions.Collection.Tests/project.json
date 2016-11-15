@@ -4,8 +4,6 @@
   "testRunner": "mstest",
 
   "dependencies": {
-    "Fact.Extensions.Caching": "1.0.0-*",
-    "Fact.Extensions.Collection.Interceptor": "1.0.0-*",
     "Microsoft.Extensions.Caching.Memory": "1.0.0",
     "Microsoft.Extensions.DependencyInjection": "1.0.0"
   },
@@ -15,9 +13,14 @@
       "imports": [
         "dnxcore50"
       ],
+      "buildOptions": {
+        //"define": ["NETSTANDARD1_6"]
+      },
       "dependencies": {
         "dotnet-test-mstest": "1.1.2-preview",
         "MSTest.TestFramework": "1.0.6-preview",
+        "Fact.Extensions.Caching": "1.0.0-*",
+        "Fact.Extensions.Collection.Interceptor": "1.0.0-*",
         "Microsoft.NETCore.App": {
           "version": "1.0.1",
           "type": "platform"
