@@ -12,15 +12,15 @@ namespace Fact.Extensions.Collection.Interceptor
     {
         readonly IBag cache;
         readonly IRemover cacheRemover;
+        readonly ITryGetter cacheTryGet;
         readonly string prefix;
-
-        CacheMethodInterceptor methodInterceptor;
 
         public CacheInterceptor(IBag cache, string prefix = null)
         {
             this.prefix = prefix;
             this.cache = cache;
             this.cacheRemover = (IRemover)cache;
+            this.cacheTryGet = (ITryGetter)cache;
         }
 
 
@@ -38,7 +38,7 @@ namespace Fact.Extensions.Collection.Interceptor
             // could cause collision
             // FIX: Unexpected behavior, .NET Standard 1.1 filtering is applying to this
             // .NET Standard 1.6 assembly, so I can't reach the alternate ToString(delim) code
-            var key = prefix + method.Name + ":" + 
+            var key = prefix + method.Name + ":" +
                 invocation.Arguments.Select(x => x.ToString()).ToString(",");
             return key;
         }
@@ -55,18 +55,34 @@ namespace Fact.Extensions.Collection.Interceptor
 
         protected override void InterceptNonProperty(IInvocation invocation)
         {
-            methodInterceptor.Intercept(invocation);
+            var method = invocation.Method;
+            var attr = method.GetCustomAttribute<OperationCacheAttribute>();
+            if (attr != null)
+            {
+                var type = method.ReturnType;
+                var key = GetMethodCacheKey(invocation);
+
+                object returnValue;
+
+                if (cacheTryGet.TryGet(key, type, out returnValue))
+                {
+                    invocation.ReturnValue = returnValue;
+                }
+                else
+                {
+                    invocation.Proceed();
+                    // FAIL :(
+                    //cache[key, type] = invocation.ReturnValue;
+                }
+            }
         }
     }
 
 
-    public class CacheMethodInterceptor : IInterceptor
+    /// <summary>
+    /// Marks this operation as something the cache interceptor should pick up
+    /// </summary>
+    public class OperationCacheAttribute : Attribute
     {
-        IBag cache;
-
-        public void Intercept(IInvocation invocation)
-        {
-
-        }
     }
 }
