@@ -8,6 +8,7 @@
 
   "dependencies": {
     "Fact.Extensions.Collection": "1.0.0-*",
+    "Fact.Extensions.Serialization": "*",
     "Microsoft.Extensions.Caching.Abstractions": "1.0.0",
     "NETStandard.Library": "1.6.0"
   },

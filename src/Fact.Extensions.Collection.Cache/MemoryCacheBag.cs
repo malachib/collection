@@ -7,7 +7,7 @@ using Fact.Extensions.Serialization;
 
 namespace Fact.Extensions.Collection.Cache
 {
-    public class MemoryCacheBag : IBag
+    public class MemoryCacheBag : IBag, ITryGetter
     {
         // serializationManager is a NOOP right now and should be null
         readonly ISerializationManager serializationManager;
@@ -24,6 +24,11 @@ namespace Fact.Extensions.Collection.Cache
         public object Get(string key, Type type)
         {
             return cache.Get(key);
+        }
+
+        public bool TryGet(string key, Type type, out object value)
+        {
+            return cache.TryGetValue(key, out value);
         }
 
         public void Set(string key, object value, Type type)
