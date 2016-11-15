@@ -72,7 +72,7 @@ namespace Fact.Extensions.Collection.Interceptor
                 {
                     invocation.Proceed();
                     // FAIL :(
-                    //cache[key, type] = invocation.ReturnValue;
+                    cache[key, type] = invocation.ReturnValue;
                 }
             }
         }

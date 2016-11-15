@@ -8,12 +8,12 @@ namespace Fact.Extensions.Collection
     {
         public static TValue Get<TValue>(this IGetter<string, object> getter, string key)
         {
-            return (TValue) getter[key, typeof(TValue)];
+            return (TValue) getter.Get(key, typeof(TValue));
         }
 
         public static TValue Get<TValue>(this IGetter<object, object> getter, object key)
         {
-            return (TValue)getter[key, typeof(TValue)];
+            return (TValue)getter.Get(key, typeof(TValue));
         }
 
 

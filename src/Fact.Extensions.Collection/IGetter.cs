@@ -6,7 +6,7 @@ namespace Fact.Extensions.Collection
 {
     public interface IGetter<TKey, TValue>
     {
-        TValue this[TKey key, Type type] { get; }
+        TValue Get(TKey key, Type type);
     }
 
     public interface IGetterAsync<TKey, TValue>

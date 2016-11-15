@@ -15,9 +15,13 @@ namespace Fact.Extensions.Collection
                 this.indexer = indexer;
             }
 
+            public TValue Get(TKey key, Type type)
+            {
+                return indexer[key];
+            }
+
             public TValue this[TKey key, Type type]
             {
-                get  { return indexer[key];  }
                 set { indexer[key] = value;  }
             }
         }

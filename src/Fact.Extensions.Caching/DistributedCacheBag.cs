@@ -23,17 +23,18 @@ namespace Fact.Extensions.Caching
 
         public object this[string key, Type type]
         {
-            get
-            {
-                var value = cache.Get(key);
-                return serializationManager.Deserialize(value, type);
-            }
             set
             {
                 var options = new DistributedCacheEntryOptions();
                 Setting?.Invoke(key, options);
                 cache.Set(key, serializationManager.SerializeToByteArray(value, type), options);
             }
+        }
+
+        public object Get(string key, Type type)
+        {
+            var value = cache.Get(key);
+            return serializationManager.Deserialize(value, type);
         }
 
         public async Task<object> GetAsync(string key, Type type)
