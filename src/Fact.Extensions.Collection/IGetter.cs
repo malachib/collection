@@ -21,6 +21,8 @@ namespace Fact.Extensions.Collection
 
     public interface IGetter : IGetter<string, object> { }
     public interface IGetterAsync : IGetterAsync<string, object> { }
+
+    public interface ITryGetter<TKey> : ITryGetter<TKey, object> { }
     public interface ITryGetter : ITryGetter<string, object> { }
 
     public interface IGetterOptions

@@ -8,7 +8,7 @@ using Fact.Extensions.Serialization;
 
 namespace Fact.Extensions.Collection.Cache
 {
-    public class DistributedCacheBag : IBag, IBagAsync
+    public class DistributedCacheBag : IBag, IBagAsync, IRemover, IRemoverAsync
     {
         readonly IDistributedCache cache;
         readonly ISerializationManager serializationManager;
@@ -58,6 +58,12 @@ namespace Fact.Extensions.Collection.Cache
                 serializedValue = serializationManager.SerializeToByteArray(value, type);
 
             await cache.SetAsync(key, serializedValue, options);
+        }
+
+        public void Remove(string key) { cache.Remove(key); }
+        public async Task RemoveAsync(string key)
+        {
+            await cache.RemoveAsync(key);
         }
     }
 }

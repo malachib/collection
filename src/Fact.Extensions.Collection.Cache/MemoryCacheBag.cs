@@ -7,7 +7,11 @@ using Fact.Extensions.Serialization;
 
 namespace Fact.Extensions.Collection.Cache
 {
-    public class MemoryCacheBag : IBag, ITryGetter
+    public class MemoryCacheBag : 
+        IBag<object>, 
+        ITryGetter<object>, 
+        IIndexer<object, object>,
+        IRemover<object>
     {
         // serializationManager is a NOOP right now and should be null
         readonly ISerializationManager serializationManager;
@@ -21,7 +25,14 @@ namespace Fact.Extensions.Collection.Cache
             this.cache = cache;
         }
 
-        public object this[string key, Type type]
+
+        public object this[object key, Type type]
+        {
+            get { return this[key]; }
+            set { this[key] = value; }
+        }
+
+        public object this[object key]
         {
             get { return cache.Get(key); }
             set
@@ -35,7 +46,10 @@ namespace Fact.Extensions.Collection.Cache
             }
         }
 
-        public bool TryGet(string key, Type type, out object value)
+
+        public void Remove(object key) { cache.Remove(key); }
+
+        public bool TryGet(object key, Type type, out object value)
         {
             return cache.TryGetValue(key, out value);
         }

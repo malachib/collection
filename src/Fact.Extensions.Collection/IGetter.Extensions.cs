@@ -11,6 +11,11 @@ namespace Fact.Extensions.Collection
             return (TValue) getter[key, typeof(TValue)];
         }
 
+        public static TValue Get<TValue>(this IGetter<object, object> getter, object key)
+        {
+            return (TValue)getter[key, typeof(TValue)];
+        }
+
 
         public static async Task<TValue> GetAsync<TValue>(this IGetterAsync<string, object> getter, string key)
         {
