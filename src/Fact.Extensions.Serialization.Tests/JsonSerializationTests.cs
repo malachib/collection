@@ -41,6 +41,23 @@ namespace Fact.Extensions.Serialization.Tests
 
 
         [TestMethod]
+        public void BsonTest()
+        {
+            var sm = new BsonSerializationManager();
+            var testRecord = new TestRecord
+            {
+                Name = "Fred",
+                Color = "Blue"
+            };
+
+            var output1 = sm.SerializeToByteArray(testRecord);
+            var output2 = sm.Deserialize<TestRecord>(output1);
+
+            Assert.AreEqual(testRecord.Name, output2.Name);
+        }
+
+
+        [TestMethod]
         public void ReadonlyStringStreamTest()
         {
             var encoding = Encoding.ASCII;

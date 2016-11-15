@@ -78,6 +78,11 @@ namespace Fact.Extensions.Serialization
         }
 
 
+        public static T Deserialize<T>(this ISerializationManager serializationManager, byte[] input)
+        {
+            return (T)serializationManager.Deserialize(input, typeof(T));
+        }
+
         public static T Deserialize<T>(this ISerializationManager serializationManager, string input, Encoding encoding = null)
         {
             return (T) serializationManager.Deserialize(input, typeof(T), encoding);
