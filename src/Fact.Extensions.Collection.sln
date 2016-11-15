@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection", "Fact.Extensions.Collection\Fact.Extensions.Collection.xproj", "{8EBB3E70-9F01-46A6-AC53-285CAF1F1BE1}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection.DistributedCache", "Fact.Extensions.Collection.DistributedCache\Fact.Extensions.Collection.DistributedCache.xproj", "{8AB0D287-F597-4ACC-9DBC-29753BDEB5AC}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection.Cache", "Fact.Extensions.Collection.DistributedCache\Fact.Extensions.Collection.Cache.xproj", "{8AB0D287-F597-4ACC-9DBC-29753BDEB5AC}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection.Tests", "Fact.Extensions.Collection.Tests\Fact.Extensions.Collection.Tests.xproj", "{CBA21DBC-1140-4717-968F-7014CE53BD26}"
 EndProject

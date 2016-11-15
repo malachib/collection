@@ -5,12 +5,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Fact.Extensions.Collection.DistributedCache
+namespace Fact.Extensions.Collection.Cache
 {
     public class DistributedCacheBag : IBag, IBagAsync
     {
         readonly IDistributedCache cache;
         readonly ISerializationManager serializationManager;
+
+        public DistributedCacheBag(ISerializationManager serializationManager, IDistributedCache cache)
+        {
+            this.serializationManager = serializationManager;
+            this.cache = cache;
+        }
 
         public object Get(string key, Type type)
         {
