@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization.Tests
@@ -27,11 +28,10 @@ namespace Fact.Extensions.Serialization.Tests
             };
 
             var output1 = sm.SerializeToString(testRecord);
-            var badOutput = sm.SerializeToString(testRecord, typeof(TestRecord), System.Text.Encoding.Unicode);
+            var badOutput = sm.SerializeToString(testRecord, typeof(TestRecord), Encoding.Unicode);
             var byteArray = sm.SerializeToByteArray(testRecord, typeof(TestRecord));
 
-            var encoding = new System.Text.ASCIIEncoding();
-            var output = encoding.GetString(byteArray);
+            var output = Encoding.UTF8.GetString(byteArray);
 
             var output3 = sm.Deserialize(byteArray, typeof(TestRecord));
             var output4 = sm.Deserialize<TestRecord>(output1);
@@ -43,7 +43,7 @@ namespace Fact.Extensions.Serialization.Tests
         [TestMethod]
         public void ReadonlyStringStreamTest()
         {
-            var encoding = System.Text.Encoding.ASCII;
+            var encoding = Encoding.ASCII;
             var original = "testdata";
             var stream = new ReadonlyStringStream(original, encoding);
             

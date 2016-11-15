@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
     public interface ISerializationManager
     {
-        void Serialize(System.IO.Stream output, object inputValue, Type type = null);
-        object Deserialize(System.IO.Stream input, Type type);
+        void Serialize(Stream output, object inputValue, Type type = null);
+        object Deserialize(Stream input, Type type);
     }
 
 
     public interface ISerializationManagerAsync
     {
-        Task SerializeAsync(System.IO.Stream output, object inputValue, Type type = null);
-        Task<object> DeserializeAsync(System.IO.Stream input, Type type);
+        Task SerializeAsync(Stream output, object inputValue, Type type = null);
+        Task<object> DeserializeAsync(Stream input, Type type);
     }
 
 
