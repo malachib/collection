@@ -8,7 +8,6 @@ using Fact.Extensions.Serialization;
 namespace Fact.Extensions.Collection.Cache
 {
     public class MemoryCacheBag : 
-        IBag<object>, 
         ITryGetter<object>, 
         IIndexer<object, object>,
         IRemover<object>
@@ -25,12 +24,6 @@ namespace Fact.Extensions.Collection.Cache
             this.cache = cache;
         }
 
-
-        public object this[object key, Type type]
-        {
-            get { return this[key]; }
-            set { this[key] = value; }
-        }
 
         public object this[object key]
         {
