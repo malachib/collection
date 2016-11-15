@@ -10,15 +10,16 @@ namespace Fact.Extensions.Serialization.Newtonsoft
 {
     public class JsonSerializationManager : ISerializationManager
     {
+        //readonly JsonSerializerSettings settings;
+        readonly JsonSerializer serializer = new JsonSerializer();
+
         public object Deserialize(Stream input, Type type)
         {
-            var serializer = new JsonSerializer();
             return serializer.Deserialize(new StreamReader(input), type);
         }
 
         public void Serialize(Stream output, object inputValue, Type type = null)
         {
-            var serializer = new JsonSerializer();
             serializer.Serialize(new StreamWriter(output), inputValue, type);
         }
     }
