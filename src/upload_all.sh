@@ -6,5 +6,6 @@
 ./upload_project.sh Fact.Extensions.Collection.Cache
 ./upload_project.sh Fact.Extensions.Serialization
 ./upload_project.sh Fact.Extensions.Serialization.Newtonsoft
+./upload_project.sh Fact.Extensions.Serialization.MessagePack
 
 

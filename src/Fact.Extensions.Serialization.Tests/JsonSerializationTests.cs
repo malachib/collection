@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization.Tests
 {
+    public class TestRecord
+    {
+        public string Name { get; set; }
+        public string Color { get; set; }
+    }
+
     [TestClass]
     public class JsonSerializationTests
     {
-        public class TestRecord
-        {
-            public string Name { get; set; }
-            public string Color { get; set; }
-        }
-
         [TestMethod]
         public void JsonTest()
         {

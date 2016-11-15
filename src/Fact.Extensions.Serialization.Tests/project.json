@@ -4,6 +4,7 @@
   "testRunner": "mstest",
 
   "dependencies": {
+    "Fact.Extensions.Serialization.MessagePack": "1.0.0-*",
     "Fact.Extensions.Serialization.Newtonsoft": "1.0.0-*",
     "Microsoft.Extensions.Caching.Memory": "1.0.0",
     "Microsoft.Extensions.DependencyInjection": "1.0.0"
