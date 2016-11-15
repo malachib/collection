@@ -7,7 +7,7 @@ using Fact.Extensions.Serialization;
 
 namespace Fact.Extensions.Collection.Cache
 {
-    public class MemoryCacheBag : 
+    public class MemoryCacheIndexer : 
         ITryGetter<object>, 
         IIndexer<object, object>,
         IRemover<object>
@@ -18,7 +18,7 @@ namespace Fact.Extensions.Collection.Cache
 
         public event Action<ICacheEntry> CreatingEntry;
 
-        public MemoryCacheBag(ISerializationManager serializationManager, IMemoryCache cache)
+        public MemoryCacheIndexer(ISerializationManager serializationManager, IMemoryCache cache)
         {
             this.serializationManager = serializationManager;
             this.cache = cache;

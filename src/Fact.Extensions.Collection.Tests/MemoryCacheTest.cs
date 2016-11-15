@@ -19,7 +19,7 @@ namespace Fact.Extensions.Collection.Tests
             serviceCollection.AddMemoryCache();
             var provider = serviceCollection.BuildServiceProvider();
             var memoryCache = provider.GetService<IMemoryCache>();
-            var memoryCacheIndexer = new MemoryCacheBag(null, memoryCache);
+            var memoryCacheIndexer = new MemoryCacheIndexer(null, memoryCache);
             var memoryCacheBag = memoryCacheIndexer.ToBag();
             var key = "test";
             var value = "test value";
