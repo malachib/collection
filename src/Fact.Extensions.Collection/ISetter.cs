@@ -7,13 +7,13 @@ namespace Fact.Extensions.Collection
 {
     public interface ISetter<TKey, TValue>
     {
-        void Set(TKey key, TValue value, Type type = null);
+        void Set(TKey key, TValue value, Type type);
     }
 
 
     public interface ISetterAsync<TKey, TValue>
     {
-        Task SetAsync(TKey key, TValue value, Type type = null);
+        Task SetAsync(TKey key, TValue value, Type type);
     }
 
 

@@ -1,9 +1,10 @@
-﻿{
+{
   "version": "1.0.0-*",
 
   "testRunner": "mstest",
 
   "dependencies": {
+    "Fact.Extensions.Collection.Cache": "1.0.0-*",
     "Microsoft.Extensions.Caching.Memory": "1.0.0",
     "Microsoft.Extensions.DependencyInjection": "1.0.0"
   },

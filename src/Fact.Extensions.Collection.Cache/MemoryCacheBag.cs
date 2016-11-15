@@ -23,12 +23,13 @@ namespace Fact.Extensions.Collection.Cache
             return cache.Get(key);
         }
 
-        public void Set(string key, object value, Type type = null)
+        public void Set(string key, object value, Type type)
         {
-            var cacheEntry = cache.CreateEntry(key);
-
-            cacheEntry.SetSlidingExpiration(TimeSpan.FromSeconds(120));
-            cacheEntry.Value = value;
+            using (var cacheEntry = cache.CreateEntry(key))
+            {
+                cacheEntry.SetSlidingExpiration(TimeSpan.FromSeconds(120));
+                cacheEntry.SetValue(value);
+            }
         }
     }
 }

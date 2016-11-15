@@ -15,13 +15,17 @@ namespace Fact.Extensions.Collection.Tests
         [TestMethod]
         public void BasicTest()
         {
-            var memoryCacheOptions = new MemoryCacheOptions();
-            var memoryCache = new MemoryCache(memoryCacheOptions);
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddMemoryCache();
+            var provider = serviceCollection.BuildServiceProvider();
+            var memoryCache = provider.GetService<IMemoryCache>();
             var memoryCacheBag = new MemoryCacheBag(null, memoryCache);
+            var key = "test";
+            var value = "test value";
 
-            memoryCacheBag.Set("test", "test value", typeof(string));
-            var result = memoryCacheBag.Get("test", typeof(string));
-
+            memoryCacheBag.Set(key, value);
+            var result = memoryCacheBag.Get<string>(key);
+            Assert.AreEqual(value, result);
         }
     }
 }
