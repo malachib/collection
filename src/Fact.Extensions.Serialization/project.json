@@ -7,7 +7,8 @@
   },
 
   "dependencies": {
-    "System.Diagnostics.Contracts": "4.0.1"
+    // Seems to be causing issues with my NuGet upload
+    //"System.Diagnostics.Contracts": "4.0.1"
   },
 
   "frameworks": {

@@ -4,7 +4,9 @@ using System.IO;
 using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
+#if CODE_CONTRACTS
 using System.Diagnostics.Contracts;
+#endif
 
 namespace Fact.Extensions.Serialization
 {
@@ -23,8 +25,10 @@ namespace Fact.Extensions.Serialization
         /// <param name="encoding"></param>
         public ReadonlyStringStream(string data, Encoding encoding)
         {
+#if CODE_CONTRACTS
             Contract.Requires(data != null);
             Contract.Requires(encoding != null);
+#endif
 
             this.data = data;
             this.encoding = encoding;
