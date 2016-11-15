@@ -34,6 +34,14 @@ namespace Fact.Extensions.Serialization.Tests
             var output = encoding.GetString(byteArray);
 
             var output3 = sm.Deserialize(byteArray, typeof(TestRecord));
+            var output4 = sm.Deserialize<TestRecord>(output);
+        }
+
+
+        [TestMethod]
+        public void ReadonlyStringStreamTest()
+        {
+            var stream = new ReadonlyStringStream("testdata", System.Text.Encoding.ASCII);
         }
     }
 }

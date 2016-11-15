@@ -16,4 +16,13 @@ namespace Fact.Extensions.Serialization
         Task SerializeAsync(System.IO.Stream output, object inputValue, Type type = null);
         Task<object> DeserializeAsync(System.IO.Stream input, Type type);
     }
+
+
+    public interface ISerializationManager_TextEncoding
+    {
+        /// <summary>
+        /// Indicates which text encoding this serialization manager is using
+        /// </summary>
+        System.Text.Encoding Encoding { get; }
+    }
 }

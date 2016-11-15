@@ -51,11 +51,26 @@ namespace Fact.Extensions.Serialization
             }
         }
 
-        /*
-        public static object Deserialize(this ISerializationManager serializationManager, string input, Type type, Encoder encoder)
+
+        public static object Deserialize(this ISerializationManager serializationManager, string input, Type type, Encoding encoding = null)
         {
-            var reader = new StringReader(input);
-        }*/
+            if (encoding == null)
+            {
+                if (serializationManager is ISerializationManager_TextEncoding)
+                    encoding = ((ISerializationManager_TextEncoding)serializationManager).Encoding;
+                else
+                    encoding = Encoding.UTF8;
+            }
+            
+            var stream = new ReadonlyStringStream(input, encoding);
+            return serializationManager.Deserialize(stream, type);
+        }
+
+
+        public static T Deserialize<T>(this ISerializationManager serializationManager, string input, Encoding encoding = null)
+        {
+            return (T) serializationManager.Deserialize(input, typeof(T), encoding);
+        }
 
         public static async Task<object> DeserializeAsync(this ISerializationManagerAsync serializationManager, byte[] inputValue, Type type)
         {
