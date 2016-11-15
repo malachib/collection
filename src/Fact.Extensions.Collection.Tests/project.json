@@ -1,0 +1,25 @@
+﻿{
+  "version": "1.0.0-*",
+
+  "testRunner": "mstest",
+
+  "dependencies": {
+  },
+
+  "frameworks": {
+    "netcoreapp1.0.1": {
+      "imports": [
+        "dnxcore50"
+      ],
+      "dependencies": {
+        "dotnet-test-mstest": "1.1.2-preview",
+        "MSTest.TestFramework": "1.0.6-preview",
+        "Microsoft.NETCore.App": {
+          "version": "1.0.1",
+          "type": "platform"
+        }
+      }
+
+    }
+  }
+}
