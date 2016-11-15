@@ -26,7 +26,7 @@ namespace Fact.Extensions.Serialization.Tests
                 Color = "Blue"
             };
 
-            var output1 = sm.SerializeToString(testRecord, typeof(TestRecord), System.Text.Encoding.ASCII);
+            var output1 = sm.SerializeToString(testRecord);
             var badOutput = sm.SerializeToString(testRecord, typeof(TestRecord), System.Text.Encoding.Unicode);
             var byteArray = sm.SerializeToByteArray(testRecord, typeof(TestRecord));
 
@@ -34,14 +34,27 @@ namespace Fact.Extensions.Serialization.Tests
             var output = encoding.GetString(byteArray);
 
             var output3 = sm.Deserialize(byteArray, typeof(TestRecord));
-            var output4 = sm.Deserialize<TestRecord>(output);
+            var output4 = sm.Deserialize<TestRecord>(output1);
+
+            Assert.AreEqual(output, output1);
         }
 
 
         [TestMethod]
         public void ReadonlyStringStreamTest()
         {
-            var stream = new ReadonlyStringStream("testdata", System.Text.Encoding.ASCII);
+            var encoding = System.Text.Encoding.ASCII;
+            var original = "testdata";
+            var stream = new ReadonlyStringStream(original, encoding);
+            
+            var bytes = stream.Read().ToArray();
+
+            var converted = encoding.GetString(bytes);
+
+            Assert.AreEqual(original, converted);
+
+            // Code contracts not compiling in just yet
+            //new ReadonlyStringStream(null, null);
         }
     }
 }

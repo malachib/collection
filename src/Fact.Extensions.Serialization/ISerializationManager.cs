@@ -18,6 +18,9 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    /// <summary>
+    /// Use for ISerializationManagers which have a constant encoding
+    /// </summary>
     public interface ISerializationManager_TextEncoding
     {
         /// <summary>

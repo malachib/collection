@@ -19,8 +19,18 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static string SerializeToString(this ISerializationManager serializationManager, object input, Type type, Encoding encoding)
+        public static string SerializeToString(this ISerializationManager serializationManager, object input, Type type = null, Encoding encoding = null)
         {
+            if (encoding == null)
+            {
+                if (serializationManager is ISerializationManager_TextEncoding)
+                    encoding = ((ISerializationManager_TextEncoding)serializationManager).Encoding;
+                else
+                {
+                    // TODO: Do a policy thing here, throw exception or a default
+                    encoding = Encoding.UTF8;
+                }
+            }
             var byteArray = serializationManager.SerializeToByteArray(input, type);
             return encoding.GetString(byteArray, 0, byteArray.Length);
         }
@@ -59,6 +69,7 @@ namespace Fact.Extensions.Serialization
                 if (serializationManager is ISerializationManager_TextEncoding)
                     encoding = ((ISerializationManager_TextEncoding)serializationManager).Encoding;
                 else
+                    // TODO: Do a policy thing here, throw exception or a default
                     encoding = Encoding.UTF8;
             }
             

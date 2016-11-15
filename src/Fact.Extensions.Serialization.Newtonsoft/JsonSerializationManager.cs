@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-using global::Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Fact.Extensions.Serialization.Newtonsoft
 {
-    public class JsonSerializationManager : ISerializationManager
+    public class JsonSerializationManager : ISerializationManager, 
+        ISerializationManager_TextEncoding
     {
         //readonly JsonSerializerSettings settings;
         readonly JsonSerializer serializer = new JsonSerializer();
+
+        public Encoding Encoding => Encoding.UTF8;
 
         public object Deserialize(Stream input, Type type)
         {

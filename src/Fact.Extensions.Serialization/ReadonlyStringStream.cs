@@ -121,4 +121,26 @@ namespace Fact.Extensions.Serialization
             throw new NotImplementedException();
         }
     }
+
+
+    public static class Stream_Extensions
+    {
+        /// <summary>
+        /// Retrieve stream contents as a byte enumerable
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="bufferSize"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// TODO: optimize
+        /// bufferSize is hard wired to 1 right now
+        /// </remarks>
+        public static IEnumerable<byte> Read(this Stream stream, int bufferSize = 1)
+        {
+            int value;
+
+            while ((value = stream.ReadByte()) != -1) yield return (byte)value;
+        }
+
+    }
 }
