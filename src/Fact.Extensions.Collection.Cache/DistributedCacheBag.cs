@@ -36,14 +36,14 @@ namespace Fact.Extensions.Collection.Cache
                 return serializationManager.Deserialize(value, type);
         }
 
-        public void Set(string key, object value, Type type = null)
+        public void Set(string key, object value, Type type)
         {
             var options = new DistributedCacheEntryOptions();
             Setting?.Invoke(key, options);
-            cache.Set(key, serializationManager.Serialize(value, type), options);
+            cache.Set(key, serializationManager.SerializeToByteArray(value, type), options);
         }
 
-        public async Task SetAsync(string key, object value, Type type = null)
+        public async Task SetAsync(string key, object value, Type type)
         {
             var options = new DistributedCacheEntryOptions();
             Setting?.Invoke(key, options);
@@ -51,9 +51,9 @@ namespace Fact.Extensions.Collection.Cache
             byte[] serializedValue;
 
             if (serializationManager is ISerializationManagerAsync)
-                serializedValue = await ((ISerializationManagerAsync)serializationManager).SerializeAsync(value, type);
+                serializedValue = await ((ISerializationManagerAsync)serializationManager).SerializeToByteArrayAsync(value, type);
             else
-                serializedValue = serializationManager.Serialize(value, type);
+                serializedValue = serializationManager.SerializeToByteArray(value, type);
 
             await cache.SetAsync(key, serializedValue, options);
         }

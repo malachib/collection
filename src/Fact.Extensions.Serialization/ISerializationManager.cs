@@ -21,17 +21,17 @@ namespace Fact.Extensions.Serialization
 
     public static class ISerializationManager_Extensions
     {
-        public static byte[] Serialize(this ISerializationManager serializationManager, object input, Type type = null)
+        public static byte[] SerializeToByteArray(this ISerializationManager serializationManager, object input, Type type = null)
         {
             using (var ms = new MemoryStream())
             {
-                serializationManager.Serialize(ms, input);
+                serializationManager.Serialize(ms, input, type);
                 ms.Flush();
                 return ms.ToArray();
             }
         }
 
-        public static async Task<byte[]> SerializeAsync(this ISerializationManagerAsync serializationManager, object input, Type type = null)
+        public static async Task<byte[]> SerializeToByteArrayAsync(this ISerializationManagerAsync serializationManager, object input, Type type = null)
         {
             using (var ms = new MemoryStream())
             {
