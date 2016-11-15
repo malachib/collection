@@ -1,5 +1,10 @@
 ﻿{
   "version": "1.0.0-*",
+  "authors": [ "Malachi Burke" ],
+  "description": "ISerializationManager specific implementation for Newtonsoft JSON serialization",
+  "packOptions": {
+    "releaseNotes": ""
+  },
 
   "dependencies": {
     "Fact.Extensions.Serialization": "1.0.0-*",
