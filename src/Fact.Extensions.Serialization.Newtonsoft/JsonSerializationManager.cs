@@ -20,7 +20,10 @@ namespace Fact.Extensions.Serialization.Newtonsoft
 
         public void Serialize(Stream output, object inputValue, Type type = null)
         {
-            serializer.Serialize(new StreamWriter(output), inputValue, type);
+            using (var writer = new StreamWriter(output))
+            {
+                serializer.Serialize(writer, inputValue, type);
+            }
         }
     }
 }

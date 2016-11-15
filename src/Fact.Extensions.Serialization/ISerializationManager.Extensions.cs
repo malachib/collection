@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
@@ -16,6 +17,19 @@ namespace Fact.Extensions.Serialization
                 return ms.ToArray();
             }
         }
+
+
+        public static string SerializeToString(this ISerializationManager serializationManager, object input, Type type, Encoding encoding)
+        {
+            var byteArray = serializationManager.SerializeToByteArray(input, type);
+            return encoding.GetString(byteArray, 0, byteArray.Length);
+        }
+
+        /*
+        public static string SerializeToString(this ISerializationManager serializationManager, object input)
+        {
+            var byteArray = serializationManager.SerializeToByteArray(input, type);
+        }*/
 
         public static async Task<byte[]> SerializeToByteArrayAsync(this ISerializationManagerAsync serializationManager, object input, Type type = null)
         {
@@ -36,6 +50,12 @@ namespace Fact.Extensions.Serialization
                 return serializationManager.Deserialize(ms, type);
             }
         }
+
+        /*
+        public static object Deserialize(this ISerializationManager serializationManager, string input, Type type, Encoder encoder)
+        {
+            var reader = new StringReader(input);
+        }*/
 
         public static async Task<object> DeserializeAsync(this ISerializationManagerAsync serializationManager, byte[] inputValue, Type type)
         {
