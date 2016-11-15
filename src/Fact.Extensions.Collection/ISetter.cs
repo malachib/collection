@@ -6,7 +6,7 @@ namespace Fact.Extensions.Collection
 {
     public interface ISetter<TKey, TValue>
     {
-        void Set(TKey key, TValue value, Type type);
+        TValue this[TKey key, Type type] { set; }
     }
 
 

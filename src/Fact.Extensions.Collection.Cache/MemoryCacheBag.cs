@@ -21,24 +21,23 @@ namespace Fact.Extensions.Collection.Cache
             this.cache = cache;
         }
 
-        public object Get(string key, Type type)
+        public object this[string key, Type type]
         {
-            return cache.Get(key);
+            get { return cache.Get(key); }
+            set
+            {
+                using (var cacheEntry = cache.CreateEntry(key))
+                {
+                    CreatingEntry?.Invoke(cacheEntry);
+                    cacheEntry.SetSlidingExpiration(TimeSpan.FromSeconds(120));
+                    cacheEntry.SetValue(value);
+                }
+            }
         }
 
         public bool TryGet(string key, Type type, out object value)
         {
             return cache.TryGetValue(key, out value);
-        }
-
-        public void Set(string key, object value, Type type)
-        {
-            using (var cacheEntry = cache.CreateEntry(key))
-            {
-                CreatingEntry?.Invoke(cacheEntry);
-                cacheEntry.SetSlidingExpiration(TimeSpan.FromSeconds(120));
-                cacheEntry.SetValue(value);
-            }
         }
     }
 }

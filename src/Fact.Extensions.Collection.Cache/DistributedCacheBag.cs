@@ -21,10 +21,19 @@ namespace Fact.Extensions.Collection.Cache
             this.cache = cache;
         }
 
-        public object Get(string key, Type type)
+        public object this[string key, Type type]
         {
-            var value = cache.Get(key);
-            return serializationManager.Deserialize(value, type);
+            get
+            {
+                var value = cache.Get(key);
+                return serializationManager.Deserialize(value, type);
+            }
+            set
+            {
+                var options = new DistributedCacheEntryOptions();
+                Setting?.Invoke(key, options);
+                cache.Set(key, serializationManager.SerializeToByteArray(value, type), options);
+            }
         }
 
         public async Task<object> GetAsync(string key, Type type)
@@ -34,13 +43,6 @@ namespace Fact.Extensions.Collection.Cache
                 return await ((ISerializationManagerAsync)serializationManager).DeserializeAsync(value, type);
             else
                 return serializationManager.Deserialize(value, type);
-        }
-
-        public void Set(string key, object value, Type type)
-        {
-            var options = new DistributedCacheEntryOptions();
-            Setting?.Invoke(key, options);
-            cache.Set(key, serializationManager.SerializeToByteArray(value, type), options);
         }
 
         public async Task SetAsync(string key, object value, Type type)
