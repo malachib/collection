@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Test (Serialization)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceRoot}/Fact.Extensions.Serialization.Tests/bin/Debug/netcoreapp1.0.1/Fact.Extensions.Serialization.Tests.dll",
+            "args": ["test", "-debug"],
+            "cwd": "${workspaceRoot}/Fact.Extensions.Serialization.Tests",
+            "externalConsole": false,
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command.pickProcess}"
+        },
+        {
+            "name": "TEST",
+            "type": "composite",
+            "request": "launch",
+            "cwd": "${workspaceRoot}"
+        }
+    ]
+}
