@@ -21,7 +21,7 @@ namespace Fact.Extensions.Collection.Interceptor
         public static T Intercept<T>(T serviceToCache, IBag cache, string prefix = null)
             where T: class
         {
-            return AssemblyGlobal.Proxy.CreateClassProxyWithTarget(serviceToCache, new CacheInterceptor(cache, prefix));
+            return AssemblyGlobal.Proxy.CreateInterfaceProxyWithTarget(serviceToCache, new CacheInterceptor(cache, prefix));
         }
 
         readonly IBag cache;

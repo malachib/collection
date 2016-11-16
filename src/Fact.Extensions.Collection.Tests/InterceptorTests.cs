@@ -13,14 +13,14 @@ namespace Fact.Extensions.Collection.Tests
     [TestClass]
     public class InterceptorTests
     {
-        interface IService
+        public interface IService
         {
+            [OperationCache]
             int ReturnSeven();
         }
 
         public class Service : IService
         {
-            [OperationCache]
             public int ReturnSeven() { return 7; }
         }
 
@@ -37,6 +37,7 @@ namespace Fact.Extensions.Collection.Tests
             var service = CacheInterceptor.Intercept<IService>(new Service(), cache);
 
             var value = service.ReturnSeven();
+            value = service.ReturnSeven();
         }
     }
 }

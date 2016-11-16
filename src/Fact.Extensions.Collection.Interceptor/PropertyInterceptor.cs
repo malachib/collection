@@ -22,6 +22,10 @@ namespace Fact.Extensions.Collection.Interceptor
         protected abstract void Set(IInvocation invocation, System.Reflection.PropertyInfo prop, object value);
         protected abstract object Get(IInvocation invocation, System.Reflection.PropertyInfo prop);
 
+        /// <summary>
+        /// When an invocation is encountered that *isn't* a property, go here
+        /// </summary>
+        /// <param name="invocation"></param>
         protected virtual void InterceptNonProperty(IInvocation invocation)
         {
 #if DEBUG
@@ -67,6 +71,8 @@ namespace Fact.Extensions.Collection.Interceptor
                 else
                     InterceptNonProperty(invocation);
             }
+            else
+                InterceptNonProperty(invocation);
 
             // Frequently we are operating directly on interfaces, but
             // it's conceivable we are working on concrete objects too

@@ -48,30 +48,33 @@ namespace Fact.Extensions.Collection
                 this.indexer = indexer;
             }
 
+            TKey GetKey(string key)
+            {
+                var k = (TKey)Convert.ChangeType(key, typeof(TKey));
+                return k;
+            }
+
             public object this[string key, Type type]
             {
                 set
                 {
-                    var k = (TKey)Convert.ChangeType(key, typeof(TKey));
-                    indexer[k] = value;
+                    indexer[GetKey(key)] = value;
                 }
             }
 
             public object Get(string key, Type type)
             {
-                var k = (TKey) Convert.ChangeType(key, typeof(TKey));
-                return indexer[k];
+                return indexer[GetKey(key)];
             }
 
             public void Remove(string key)
             {
-                var k = (TKey)Convert.ChangeType(key, typeof(TKey));
-                ((IRemover<TKey>)indexer).Remove(k);
+                ((IRemover<TKey>)indexer).Remove(GetKey(key));
             }
 
             public bool TryGet(string key, Type type, out object value)
             {
-                throw new NotImplementedException();
+                return ((ITryGetter<TKey>)indexer).TryGet(GetKey(key), type, out value);
             }
         }
 
