@@ -13,15 +13,22 @@ namespace Fact.Extensions.Collection.Tests
     [TestClass]
     public class InterceptorTests
     {
-        public interface IService
+        public interface IService : ICacheableService
         {
             [OperationCache]
-            int ReturnSeven();
+            int ReturnValue();
+
+            [OperationCache(Notify = true, Cache = false)]
+            void ClearToZero();
         }
 
         public class Service : IService
         {
-            public int ReturnSeven() { return 7; }
+            int value = 7;
+
+            public int ReturnValue() { return value; }
+
+            public void ClearToZero() { value = 0; }
         }
 
         [TestMethod]
@@ -34,10 +41,36 @@ namespace Fact.Extensions.Collection.Tests
 
             var cacheIndexer = new MemoryCacheIndexer(null, memoryCache);
             var cache = cacheIndexer.ToNamedBag();
-            var service = CacheInterceptor.Intercept<IService>(new Service(), cache);
+            //var service = CacheInterceptor.Intercept<IService>(new Service(), cache);
+            // TODO: Make a fluent interface for this, ala:
+            /* *
+             * new Service().AsCached<IService>(cache).
+             *      OnMethodCall(nameof(IService.ClearToZero), 
+             *          (interceptor, invoker) => interceptor.RemoveCachedMethod(nameof(IService.ReturnValue))).
+             *          Build();
+             * 
+             */
+            CacheInterceptor interceptor;
+            var service = new Service().AsCached<IService>(cache, out interceptor);
+            interceptor.MethodCalling += Interceptor_MethodCalling;
 
-            var value = service.ReturnSeven();
-            value = service.ReturnSeven();
+            var value = service.ReturnValue();
+            var value1 = service.ReturnValue();
+
+            Assert.AreEqual(value1, value);
+
+            service.ClearToZero();
+            value = service.ReturnValue();
+
+            Assert.AreEqual(0, value);
+        }
+
+        private void Interceptor_MethodCalling(CacheInterceptor interceptor, Castle.DynamicProxy.IInvocation invocation)
+        {
+            if (invocation.Method.Name == nameof(IService.ClearToZero))
+            {
+                interceptor.RemoveCachedMethod(nameof(IService.ReturnValue));
+            }
         }
     }
 }

@@ -28,9 +28,10 @@ namespace Fact.Extensions.Collection.Interceptor
         /// <param name="invocation"></param>
         protected virtual void InterceptNonProperty(IInvocation invocation)
         {
-#if DEBUG
-            throw new InvalidOperationException();
-#endif
+            // Frequently we are operating directly on interfaces, but
+            // it's conceivable we are working on concrete objects too
+            if (invocation.InvocationTarget != null)
+                invocation.Proceed();
         }
 
         protected virtual object GetCoerce(object value, System.Reflection.PropertyInfo prop) { return value; }
@@ -42,7 +43,6 @@ namespace Fact.Extensions.Collection.Interceptor
         /// that is not present, assumes "set_";
         /// </summary>
         public bool FastMode = true;
-
 
         void IInterceptor.Intercept(IInvocation invocation)
         {
@@ -69,15 +69,14 @@ namespace Fact.Extensions.Collection.Interceptor
                     invocation.ReturnValue = value;
                 }
                 else
+                {
                     InterceptNonProperty(invocation);
+                }
             }
             else
+            {
                 InterceptNonProperty(invocation);
-
-            // Frequently we are operating directly on interfaces, but
-            // it's conceivable we are working on concrete objects too
-            if (invocation.InvocationTarget != null)
-                invocation.Proceed();
+            }
         }
     }
 

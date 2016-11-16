@@ -8,6 +8,25 @@ using Fact.Extensions.Collection;
 
 namespace Fact.Extensions.Collection.Interceptor
 {
+    public interface ICacheableService { }
+
+    /// <summary>
+    /// For services which wish to proactively participate in this caching scheme
+    /// </summary>
+    public interface ICacheAwareService
+    {
+        CacheInterceptor CacheInterceptor { get; set; }
+    }
+
+
+    /// <summary>
+    /// TODO: Use this instead of object when returning via out param
+    /// </summary>
+    public interface ICacheInterceptor
+    {
+
+    }
+
     public class CacheInterceptor : PropertyInterceptor
     {
         /// <summary>
@@ -24,17 +43,17 @@ namespace Fact.Extensions.Collection.Interceptor
             return AssemblyGlobal.Proxy.CreateInterfaceProxyWithTarget(serviceToCache, new CacheInterceptor(cache, prefix));
         }
 
-        readonly IBag cache;
-        readonly IRemover cacheRemover;
-        readonly ITryGetter cacheTryGet;
+        public readonly IBag Cache;
+        public readonly IRemover CacheRemover;
+        public readonly ITryGetter CacheTryGet;
         readonly string prefix;
 
         public CacheInterceptor(IBag cache, string prefix = null)
         {
             this.prefix = prefix;
-            this.cache = cache;
-            this.cacheRemover = (IRemover)cache;
-            this.cacheTryGet = (ITryGetter)cache;
+            this.Cache = cache;
+            this.CacheRemover = (IRemover)cache;
+            this.CacheTryGet = (ITryGetter)cache;
         }
 
 
@@ -45,16 +64,20 @@ namespace Fact.Extensions.Collection.Interceptor
         }
 
 
-        string GetMethodCacheKey(IInvocation invocation)
+        public virtual string GetMethodCacheKey(string methodName, params object[] arguments)
         {
-            var method = invocation.Method;
             // TODO: Revise argument flattener, overloaded method with different argument count
             // could cause collision
             // FIX: Unexpected behavior, .NET Standard 1.1 filtering is applying to this
             // .NET Standard 1.6 assembly, so I can't reach the alternate ToString(delim) code
-            var key = prefix + method.Name + ":" +
-                invocation.Arguments.Select(x => x.ToString()).ToString(",");
+            var key = prefix + methodName + ":" +
+                arguments.Select(x => x.ToString()).ToString(",");
             return key;
+        }
+
+        string GetMethodCacheKey(IInvocation invocation)
+        {
+            return GetMethodCacheKey(invocation.Method.Name, invocation.Arguments);
         }
 
         protected override object Get(IInvocation invocation, PropertyInfo prop)
@@ -67,30 +90,55 @@ namespace Fact.Extensions.Collection.Interceptor
             throw new NotImplementedException();
         }
 
+
+        /// <summary>
+        /// Removes entry for this method in the cache, including its arguments to qualify
+        /// </summary>
+        /// <param name="methodName"></param>
+        /// <param name="arguments"></param>
+        public void RemoveCachedMethod(string methodName, params object[] arguments)
+        {
+            var key = GetMethodCacheKey(methodName, arguments);
+            CacheRemover.Remove(key);
+        }
+
         protected override void InterceptNonProperty(IInvocation invocation)
         {
             var method = invocation.Method;
             var attr = method.GetCustomAttribute<OperationCacheAttribute>();
             if (attr != null)
             {
-                var type = method.ReturnType;
-                var key = GetMethodCacheKey(invocation);
+                if (attr.Notify)
+                    MethodCalling?.Invoke(this, invocation);
 
-                object returnValue;
-
-                if (cacheTryGet.TryGet(key, type, out returnValue))
+                if (attr.Cache)
                 {
-                    invocation.ReturnValue = returnValue;
+                    var type = method.ReturnType;
+                    var key = GetMethodCacheKey(invocation);
+
+                    object returnValue;
+
+                    if (CacheTryGet.TryGet(key, type, out returnValue))
+                    {
+                        invocation.ReturnValue = returnValue;
+                    }
+                    else
+                    {
+                        invocation.Proceed();
+
+                        //cache.Set(key, invocation.ReturnValue, type);
+                        Cache[key, type] = invocation.ReturnValue;
+                    }
                 }
                 else
-                {
                     invocation.Proceed();
-
-                    //cache.Set(key, invocation.ReturnValue, type);
-                    cache[key, type] = invocation.ReturnValue;
-                }
             }
         }
+
+        /// <summary>
+        /// Executes just before method is called
+        /// </summary>
+        public event Action<CacheInterceptor, IInvocation> MethodCalling;
     }
 
 
@@ -100,5 +148,34 @@ namespace Fact.Extensions.Collection.Interceptor
     [AttributeUsage(AttributeTargets.Method)]
     public class OperationCacheAttribute : Attribute
     {
+        /// <summary>
+        /// When set to true, fires a notification event when method is called
+        /// This is useful to clear out cache on certain operations
+        /// Default is false
+        /// </summary>
+        public bool Notify { get; set; }
+
+        /// <summary>
+        /// When set to true, caches output of method.  Default is true
+        /// </summary>
+        public bool Cache { get; set; } = true;
+    }
+
+
+    public static class ICacheableService_Extensions
+    {
+        public static T AsCached<T>(this T serviceToCache, IBag cache, string prefix = null)
+            where T : class, ICacheableService
+        {
+            //return AssemblyGlobal.Proxy.CreateInterfaceProxyWithTarget(serviceToCache, new CacheInterceptor(cache, prefix));
+            return CacheInterceptor.Intercept<T>(serviceToCache, cache, prefix);
+        }
+
+        public static T AsCached<T>(this T serviceToCache, IBag cache, out CacheInterceptor cacheInterceptor, string prefix = null)
+            where T: class, ICacheableService
+        {
+            return AssemblyGlobal.Proxy.CreateInterfaceProxyWithTarget(serviceToCache, cacheInterceptor = new CacheInterceptor(cache, prefix));
+            //return CacheInterceptor.Intercept<T>(service, cache);
+        }
     }
 }
