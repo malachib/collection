@@ -33,8 +33,7 @@ namespace Fact.Extensions.Collection
         }
 
 
-#if !NETSTANDARD1_1
-//#if NETSTANDARD1_6
+#if NETSTANDARD1_6
         /// <summary>
         /// TEMPORARY
         /// until we get pluggable/composables up, fiddle with this layer
