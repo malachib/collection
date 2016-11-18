@@ -14,10 +14,24 @@
      Commenting out due to what appears to be compilation glitch, where .NET App 1.0.1 stuff is
      not picking up code because .NET Standard 1.1 excludes it, even though .NET Standard 1.6 includes
      it (NamedBagWrapper, for example) */
+    /*
     "netstandard1.1": {
       "buildOptions": {
         "define": [
           "NETSTANDARD1_1"
+        ]
+      },
+
+      "dependencies": {
+        "System.IO": "4.1.0",
+        "System.Threading.Tasks.Parallel": "4.0.1"
+      }
+      //"imports": "dnxcore50"
+    },*/
+    "netstandard1.3": {
+      "buildOptions": {
+        "define": [
+          "NETSTANDARD1_3"
         ]
       },
 
