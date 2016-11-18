@@ -29,20 +29,24 @@ namespace Fact.Extensions.Collection.Tests
             public int ReturnValue() { return value; }
 
             public void ClearToZero() { value = 0; }
+
+            internal int CheatChangeValue { set { this.value = value; } }
         }
 
         [TestMethod]
-        public void CacheInterceptorTest()
+        private void Interceptor_MethodCalling(CacheInterceptor interceptor, Castle.DynamicProxy.IInvocation invocation)
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddMemoryCache();
-            var provider = serviceCollection.BuildServiceProvider();
-            var memoryCache = provider.GetService<IMemoryCache>();
+            if (invocation.Method.Name == nameof(IService.ClearToZero))
+            {
+                interceptor.RemoveCachedMethod(nameof(IService.ReturnValue));
+            }
+        }
 
-            var cacheIndexer = new MemoryCacheIndexer(null, memoryCache);
-            var cache = cacheIndexer.ToNamedBag();
-            //var service = CacheInterceptor.Intercept<IService>(new Service(), cache);
-            // TODO: Make a fluent interface for this, ala:
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        ///  Old comment:    // TODO: Make a fluent interface for this, ala:
             /* *
              * new Service().AsCached<IService>(cache).
              *      OnMethodCall(nameof(IService.ClearToZero), 
@@ -50,11 +54,22 @@ namespace Fact.Extensions.Collection.Tests
              *          Build();
              * 
              */
-            CacheInterceptor interceptor;
-            var service = new Service().AsCached<IService>(cache, out interceptor);
-            interceptor.MethodCalling += Interceptor_MethodCalling;
+
+        /// </remarks>
+        [TestMethod]
+        public void CacheInterceptorTest()
+        {
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddMemoryCache();
+            serviceCollection.AddCachedSingleton<IService, Service>(
+                ci => ci.MethodCalling += Interceptor_MethodCalling);
+
+            var provider = serviceCollection.BuildServiceProvider();
+            var service = provider.GetService<IService>();
+            var rawService = provider.GetService<Service>(); // since it's a singleton, we can do this
 
             var value = service.ReturnValue();
+            rawService.CheatChangeValue = 1;
             var value1 = service.ReturnValue();
 
             Assert.AreEqual(value1, value);
@@ -63,14 +78,6 @@ namespace Fact.Extensions.Collection.Tests
             value = service.ReturnValue();
 
             Assert.AreEqual(0, value);
-        }
-
-        private void Interceptor_MethodCalling(CacheInterceptor interceptor, Castle.DynamicProxy.IInvocation invocation)
-        {
-            if (invocation.Method.Name == nameof(IService.ClearToZero))
-            {
-                interceptor.RemoveCachedMethod(nameof(IService.ReturnValue));
-            }
         }
     }
 }

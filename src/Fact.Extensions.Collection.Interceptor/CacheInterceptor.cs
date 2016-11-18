@@ -46,7 +46,7 @@ namespace Fact.Extensions.Collection.Interceptor
         public readonly IBag Cache;
         public readonly IRemover CacheRemover;
         public readonly ITryGetter CacheTryGet;
-        readonly string prefix;
+        string prefix;
 
         public CacheInterceptor(IBag cache, string prefix = null)
         {
@@ -70,7 +70,7 @@ namespace Fact.Extensions.Collection.Interceptor
             // could cause collision
             // FIX: Unexpected behavior, .NET Standard 1.1 filtering is applying to this
             // .NET Standard 1.6 assembly, so I can't reach the alternate ToString(delim) code
-            var key = prefix + methodName + ":" +
+            var key = prefix + "." + methodName + ":" +
                 arguments.Select(x => x.ToString()).ToString(",");
             return key;
         }
@@ -104,6 +104,9 @@ namespace Fact.Extensions.Collection.Interceptor
 
         protected override void InterceptNonProperty(IInvocation invocation)
         {
+            // FIX: Kludgey assignment of prefix here
+            if (prefix == null) prefix = invocation.Method.DeclaringType.Name;
+
             var method = invocation.Method;
             var attr = method.GetCustomAttribute<OperationCacheAttribute>();
             if (attr != null)
@@ -159,6 +162,7 @@ namespace Fact.Extensions.Collection.Interceptor
         /// When set to true, caches output of method.  Default is true
         /// </summary>
         public bool Cache { get; set; } = true;
+
     }
 
 

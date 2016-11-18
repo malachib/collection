@@ -9,6 +9,9 @@ using Fact.Extensions.Serialization;
 
 namespace Fact.Extensions.Caching
 {
+    /// <summary>
+    /// Wraps up an IMemoryCache with an IIndexer
+    /// </summary>
     public class MemoryCacheIndexer : 
         ITryGetter<object>, 
         IIndexer<object, object>,
