@@ -1,6 +1,4 @@
-﻿#if NETCORE
-#define TYPEINFO_ENABLED
-#endif
+﻿#define TYPEINFO_ENABLED
 
 using Castle.DynamicProxy;
 using System;
