@@ -94,7 +94,11 @@ namespace Fact.Extensions.Collection.Interceptor
         {
             // TODO: Revise argument flattener, overloaded method with different argument count
             // could cause collision
-            var key = prefix + "." + methodName + ":" + arguments.ToString(",");
+            var key = prefix + "." + methodName + ":" + arguments.
+#if NETSTANDARD1_3
+                Select(x => x.ToString()).
+#endif
+                ToString(",");
             return key;
         }
 

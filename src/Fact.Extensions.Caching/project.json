@@ -6,6 +6,13 @@
     "releaseNotes": ""
   },
 
+  "buildOptions": {
+    "xmlDoc": "true",
+    /* Disable warnings about malformed XmlDoc stuff */
+    "nowarn": [ "1591", "1571", "1572", "1573", "1574", "1587" ]
+  },
+
+
   "dependencies": {
     "Fact.Extensions.Collection": "1.0.0-*",
     "Fact.Extensions.Serialization": "*",
@@ -19,6 +26,11 @@
         "define": [ "NETSTANDARD1_1" ]
       }
     },*/
+    "netstandard1.3": {
+      "buildOptions": {
+        "define": [ "NETSTANDARD1_3" ]
+      }
+    },
     "netstandard1.6": {
       "imports": "dnxcore50",
       "buildOptions": {

@@ -7,7 +7,9 @@
   },
 
   "buildOptions": {
-    "xmlDoc":  "true"
+    "xmlDoc": "true",
+    /* Disable warnings about malformed XmlDoc stuff */
+    "nowarn": [ "1591", "1571", "1572", "1573", "1574", "1587" ]
   },
 
   "dependencies": {
@@ -17,12 +19,11 @@
   },
 
   "frameworks": {
-    /*
     "netstandard1.3": {
       "buildOptions": {
         "define": [ "NETSTANDARD1_3" ]
       }
-    },*/
+    },
     "netstandard1.6": {
       "buildOptions": {
         "define": [ "NETSTANDARD1_6" ]

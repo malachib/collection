@@ -50,7 +50,14 @@ namespace Fact.Extensions.Collection
         }
 
 
-        public static void AddMemoryCachedSingleton(this IServiceCollection serviceCollection, Type serviceType, Type implementationType, Action<CacheInterceptor> configure = null)
+        /// <summary>
+        /// Caches this singleton with the built-in .NET Core IMemoryCache
+        /// </summary>
+        /// <param name="serviceCollection"></param>
+        /// <param name="serviceType"></param>
+        /// <param name="implementationType"></param>
+        /// <param name="configure"></param>
+        public static void AddCachedSingleton(this IServiceCollection serviceCollection, Type serviceType, Type implementationType, Action<CacheInterceptor> configure = null)
         {
             serviceCollection.AddCachedSingleton<IMemoryCache>(
                 serviceType,
@@ -78,7 +85,7 @@ namespace Fact.Extensions.Collection
         /// </remarks>
         public static void AddCachedSingleton<TService, TImplementation>(this IServiceCollection serviceCollection, Action<CacheInterceptor> configure = null)
         {
-            serviceCollection.AddMemoryCachedSingleton(typeof(TService), typeof(TImplementation), configure);
+            serviceCollection.AddCachedSingleton(typeof(TService), typeof(TImplementation), configure);
         }
     }
 }

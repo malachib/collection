@@ -6,6 +6,13 @@
     "releaseNotes": ""
   },
 
+  "buildOptions": {
+    "xmlDoc": "true",
+    /* Disable warnings about malformed XmlDoc stuff */
+    "nowarn": [ "1591", "1571", "1572", "1573", "1574", "1587" ]
+  },
+
+
   "dependencies": {
   },
 
@@ -37,6 +44,8 @@
 
       "dependencies": {
         "System.IO": "4.1.0",
+        "System.Linq": "4.1.0", // For ToString(delim)
+        "System.Runtime.Extensions": "4.1.0", // for Convert in NamedBagWrapper class
         "System.Threading.Tasks.Parallel": "4.0.1"
       }
       //"imports": "dnxcore50"
