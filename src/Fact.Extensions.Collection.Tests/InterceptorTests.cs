@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Fact.Extensions.Collection.Tests
@@ -18,7 +19,7 @@ namespace Fact.Extensions.Collection.Tests
             [OperationCache]
             int ReturnValue();
 
-            [OperationCache(Notify = true, Cache = false)]
+            //[OperationCache(Notify = true, Cache = false)]
             void ClearToZero();
         }
 
@@ -62,7 +63,12 @@ namespace Fact.Extensions.Collection.Tests
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddMemoryCache();
             serviceCollection.AddCachedSingleton<IService, Service>(
-                ci => ci.MethodCalling += Interceptor_MethodCalling);
+                ci =>
+                {
+                    var methodInfo = typeof(IService).GetTypeInfo().GetMethod(nameof(IService.ClearToZero));
+                    ci.AddOperativeMethod(methodInfo, false, true);
+                    ci.MethodCalling += Interceptor_MethodCalling;
+                });
 
             var provider = serviceCollection.BuildServiceProvider();
             var service = provider.GetService<IService>();

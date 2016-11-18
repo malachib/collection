@@ -43,6 +43,32 @@ namespace Fact.Extensions.Collection.Interceptor
             return AssemblyGlobal.Proxy.CreateInterfaceProxyWithTarget(serviceToCache, new CacheInterceptor(cache, prefix));
         }
 
+        // Use this if you don't want to use declarative markup on methods
+        Dictionary<MethodInfo, OperationCacheAttribute> operativeMethods;
+
+        Dictionary<MethodInfo, OperationCacheAttribute> OperativeMethods
+        {
+            get { return operativeMethods ?? (operativeMethods = new Dictionary<MethodInfo, OperationCacheAttribute>()); }
+        }
+
+
+        /// <summary>
+        /// Use this as an alternative to marking up methods with the OperationCache attribute
+        /// Be sure to use the MethodInfo from the service facade (typically the interface) and not
+        /// the implementation instance itself
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="cache"></param>
+        /// <param name="notify"></param>
+        public void AddOperativeMethod(MethodInfo method, bool cache, bool notify = false)
+        {
+            OperativeMethods.Add(method, new OperationCacheAttribute
+            {
+                Cache = cache,
+                Notify = notify
+            });
+        }
+
         public readonly IBag Cache;
         public readonly IRemover CacheRemover;
         public readonly ITryGetter CacheTryGet;
@@ -59,7 +85,7 @@ namespace Fact.Extensions.Collection.Interceptor
 
         string GetPropCacheKey(PropertyInfo prop)
         {
-            var key = prefix + "." + prop.DeclaringType.Name + "." + prop.Name;
+            var key = prefix + ".prop." + prop.Name;
             return key;
         }
 
@@ -68,10 +94,7 @@ namespace Fact.Extensions.Collection.Interceptor
         {
             // TODO: Revise argument flattener, overloaded method with different argument count
             // could cause collision
-            // FIX: Unexpected behavior, .NET Standard 1.1 filtering is applying to this
-            // .NET Standard 1.6 assembly, so I can't reach the alternate ToString(delim) code
-            var key = prefix + "." + methodName + ":" +
-                arguments.Select(x => x.ToString()).ToString(",");
+            var key = prefix + "." + methodName + ":" + arguments.ToString(",");
             return key;
         }
 
@@ -82,12 +105,28 @@ namespace Fact.Extensions.Collection.Interceptor
 
         protected override object Get(IInvocation invocation, PropertyInfo prop)
         {
-            throw new NotImplementedException();
+            var key = GetPropCacheKey(prop);
+            object value;
+
+            if (!CacheTryGet.TryGet(key, prop.PropertyType, out value))
+            {
+                invocation.Proceed();
+                Cache.Set(key, invocation.ReturnValue, prop.PropertyType);
+
+                // TODO: optimize PropertyInterceptorBase to not double-assign invocation.ReturnValue
+                // for now, should not hurt anything
+                value = invocation.ReturnValue;
+            }
+
+            return value;
         }
 
         protected override void Set(IInvocation invocation, PropertyInfo prop, object value)
         {
-            throw new NotImplementedException();
+            // A set operation merely removes item from cache.  Reason being, the get operation
+            // might be a different result than the set (although usually they are the same, so
+            // consider a flag/option for that)
+            CacheRemover.Remove(GetPropCacheKey(prop));
         }
 
 
@@ -109,6 +148,9 @@ namespace Fact.Extensions.Collection.Interceptor
 
             var method = invocation.Method;
             var attr = method.GetCustomAttribute<OperationCacheAttribute>();
+            if (attr == null && operativeMethods != null)
+                operativeMethods.TryGetValue(method, out attr);
+
             if (attr != null)
             {
                 if (attr.Notify)
