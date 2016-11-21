@@ -38,7 +38,7 @@ namespace Fact.Extensions.Collection
                 var cache = serviceProvider.GetRequiredService<TCacheService>();
                 // convert native cache & configure it special for this scenario
                 var cacheBag = configureBag(cache);
-                var cacheInterceptor = new CacheInterceptor(cacheBag);
+                var cacheInterceptor = new CacheInterceptor(cacheBag, serviceType);
                 configureInterceptor?.Invoke(cacheInterceptor);
                 var proxy = AssemblyGlobal.Proxy.CreateInterfaceProxyWithTarget(
                     serviceType,

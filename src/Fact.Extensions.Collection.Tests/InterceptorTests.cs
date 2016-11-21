@@ -19,11 +19,18 @@ namespace Fact.Extensions.Collection.Tests
             [OperationCache]
             int ReturnValue();
 
-            //[OperationCache(Notify = true, Cache = false)]
+            [OperationCache(Notify = true, Cache = false)]
             void ClearToZero();
         }
 
-        public class Service : IService
+        public interface IService2
+        {
+            int ReturnValue();
+
+            void ClearToZero();
+        }
+
+        public class Service : IService, IService2
         {
             int value = 7;
 
@@ -58,20 +65,51 @@ namespace Fact.Extensions.Collection.Tests
 
         /// </remarks>
         [TestMethod]
-        public void CacheInterceptorTest()
+        public void CacheInterceptorDeclarativeTest()
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddMemoryCache();
-            serviceCollection.AddCachedSingleton<IService, Service>(
-                ci =>
-                {
-                    var methodInfo = typeof(IService).GetTypeInfo().GetMethod(nameof(IService.ClearToZero));
-                    ci.AddOperativeMethod(methodInfo, false, true);
-                    ci.MethodCalling += Interceptor_MethodCalling;
-                });
+            serviceCollection.AddCachedSingleton<IService, Service>(ci =>
+            {
+                ci.MethodCalling += Interceptor_MethodCalling;
+            });
 
             var provider = serviceCollection.BuildServiceProvider();
             var service = provider.GetService<IService>();
+            var rawService = provider.GetService<Service>(); // since it's a singleton, we can do this
+
+            var value = service.ReturnValue();
+            rawService.CheatChangeValue = 1;
+            var value1 = service.ReturnValue();
+
+            Assert.AreEqual(value1, value);
+
+            service.ClearToZero();
+            value = service.ReturnValue();
+
+            Assert.AreEqual(0, value);
+        }
+
+        [TestMethod]
+        public void CacheInterceptorImperativeTest()
+        {
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddMemoryCache();
+            serviceCollection.AddCachedSingleton<IService2, Service>(
+                ci =>
+                {
+                    var builder = ci.GetBuilder();
+                    builder.For(nameof(IService.ReturnValue)).
+                        Cache().
+                        OnCall(nameof(IService.ClearToZero)).
+                            Notify(oc =>
+                            {
+                                oc.ClearKey();
+                            });
+                });
+
+            var provider = serviceCollection.BuildServiceProvider();
+            var service = provider.GetService<IService2>();
             var rawService = provider.GetService<Service>(); // since it's a singleton, we can do this
 
             var value = service.ReturnValue();
