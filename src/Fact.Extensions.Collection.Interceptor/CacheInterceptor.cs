@@ -46,7 +46,7 @@ namespace Fact.Extensions.Collection.Interceptor
         // Use this if you don't want to use declarative markup on methods
         Dictionary<MethodInfo, OperationCacheAttribute> operativeMethods;
 
-        Dictionary<MethodInfo, OperationCacheAttribute> OperativeMethods
+        internal Dictionary<MethodInfo, OperationCacheAttribute> OperativeMethods
         {
             get { return operativeMethods ?? (operativeMethods = new Dictionary<MethodInfo, OperationCacheAttribute>()); }
         }
@@ -60,13 +60,18 @@ namespace Fact.Extensions.Collection.Interceptor
         /// <param name="method"></param>
         /// <param name="cache"></param>
         /// <param name="notify"></param>
-        public void AddOperativeMethod(MethodInfo method, bool cache, bool notify = false)
+        public OperationCacheAttribute AddOperativeMethod(MethodInfo method, bool cache, bool notify = false)
         {
-            OperativeMethods.Add(method, new OperationCacheAttribute
+            // FIX: kludgey to "combine" reflected (declarative) and imperative like this, but will work for now
+            // ^^^^ above comment not yet applicable, vvvv below line not enabled
+            //var reflectedAttribute = method.GetCustomAttribute<OperationCacheAttribute>();
+            var operationCacheAttribute = new OperationCacheAttribute
             {
                 Cache = cache,
                 Notify = notify
-            });
+            };
+            OperativeMethods.Add(method, operationCacheAttribute);
+            return operationCacheAttribute;
         }
 
         public readonly Type Type;
@@ -104,6 +109,26 @@ namespace Fact.Extensions.Collection.Interceptor
 #endif
                 ToString(",");
             return key;
+        }
+
+
+        /// <summary>
+        /// To fuel imperative-config code
+        /// </summary>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        internal OperationCacheAttribute GetOperationCache(MethodInfo method)
+        {
+            OperationCacheAttribute oca;
+
+            if (!OperativeMethods.TryGetValue(method, out oca))
+                OperativeMethods.Add(method, oca = new OperationCacheAttribute
+                {
+                    // when using for imperative / builder, start with everything disabled
+                    Cache = false
+                });
+
+            return oca;
         }
 
         string GetMethodCacheKey(IInvocation invocation)
@@ -156,13 +181,20 @@ namespace Fact.Extensions.Collection.Interceptor
 
             var method = invocation.Method;
             var attr = method.GetCustomAttribute<OperationCacheAttribute>();
-            if (attr == null && operativeMethods != null)
-                operativeMethods.TryGetValue(method, out attr);
+            if (operativeMethods != null)
+            {
+                // A bit clunky, but for now any imperative code fully overrides declarative code
+                OperationCacheAttribute attrOverride;
+                if (operativeMethods.TryGetValue(method, out attrOverride))
+                    attr = attrOverride;
+            }
 
             if (attr != null)
             {
                 if (attr.Notify)
                     MethodCalling?.Invoke(this, invocation);
+
+                attr.DoNotifyEvent(invocation.Arguments);
 
                 if (attr.Cache)
                 {
@@ -213,6 +245,14 @@ namespace Fact.Extensions.Collection.Interceptor
         /// </summary>
         public bool Cache { get; set; } = true;
 
+        // just for testing right now, I don't think this is mutable 
+        internal event Action<object[]> NotifyEvent;
+
+        internal void DoNotifyEvent(object[] arguments)
+        {
+            NotifyEvent?.Invoke(arguments);
+        }
+
     }
 
 
@@ -243,13 +283,16 @@ namespace Fact.Extensions.Collection.Interceptor
         public class MethodBuilder
         {
             public readonly Builder parent;
-            readonly MethodInfo method;
+            readonly MethodInfo methodInfo;
 
             internal MethodBuilder(Builder parent, MethodInfo method)
             {
                 this.parent = parent;
-                this.method = method;
+                this.methodInfo = method;
             }
+
+
+            internal OperationCacheAttribute OperationCache => parent.ci.GetOperationCache(methodInfo);
 
             /// <summary>
             /// Cache the method identified in a previous "For" invocation
@@ -257,17 +300,23 @@ namespace Fact.Extensions.Collection.Interceptor
             /// <returns></returns>
             public MethodBuilder Cache()
             {
-                // FIX: Retrieve the OperationCache attribute
-                // So we can update notify properly
-                parent.ci.AddOperativeMethod(method, true, true);
+                OperationCache.Cache = true;
+
                 return this;
             }
 
             public MethodBuilder Notify(Action<CacheInterceptor, object[]> notify)
             {
+                OperationCache.Notify = true;
+
+                OperationCache.NotifyEvent += args =>
+                {
+
+                };
+
                 parent.ci.MethodCalling += (ci, i) =>
                 {
-                    if (i.Method == method)
+                    if (i.Method == methodInfo)
                     {
                         notify(ci, i.Arguments);
                     }
@@ -300,17 +349,54 @@ namespace Fact.Extensions.Collection.Interceptor
                     this.methodInfo = methodInfo;
                 }
 
-                /// <summary>Input from OnCall'd method</summary>
-                public object[] Input;
+                internal OperationCacheAttribute OperationCache => parent.parent.ci.GetOperationCache(methodInfo);
+
+                // Using this will probably relieve some memory pressure
+                public class OnCallHelper : IAccessor<int, object>
+                {
+                    readonly MethodInfo parentMethodInfo;
+                    readonly MethodInfo methodInfo;
+                    readonly CacheInterceptor cacheInterceptor;
+                    readonly object[] input;
+
+                    internal OnCallHelper(MethodInfo parentMethodInfo, MethodInfo methodInfo, CacheInterceptor cacheInterceptor, object[] input)
+                    {
+                        this.parentMethodInfo = parentMethodInfo;
+                        this.methodInfo = methodInfo;
+                        this.cacheInterceptor = cacheInterceptor;
+                    }
+
+                    public object this[int index] { get { return input[index]; } }
+
+                    /// <summary>
+                    /// Remove key for method identified by a previous "For" invocation
+                    /// </summary>
+                    public void Clear(params object[] input)
+                    {
+                        cacheInterceptor.RemoveCachedMethod(
+                            parentMethodInfo.Name,
+                            input);
+                    }
+                }
 
                 /// <summary>
-                /// Remove key for method identified by a previous "For" invocation
+                /// Experimental, to see if we can reduce a bit of memory pressure (otherwise builders seem to "sticK" in memory)
                 /// </summary>
-                public void ClearKey(params object[] input)
+                /// <param name="operationCache"></param>
+                /// <param name="methodInfo"></param>
+                /// <param name="ci"></param>
+                static void SetupNotifyEvent(OperationCacheAttribute operationCache, 
+                    MethodInfo parentMethodInfo,
+                    MethodInfo methodInfo, 
+                    CacheInterceptor ci, 
+                    Action<OnCallHelper> notify)
                 {
-                    parent.parent.ci.RemoveCachedMethod(
-                        parent.method.Name,
-                        input);
+                    operationCache.Notify = true;
+                    operationCache.NotifyEvent += args =>
+                    {
+                        var och = new OnCallHelper(parentMethodInfo, methodInfo, ci, args);
+                        notify(och);
+                    };
                 }
 
 
@@ -319,18 +405,9 @@ namespace Fact.Extensions.Collection.Interceptor
                 /// </summary>
                 /// <param name="notify"></param>
                 /// <returns></returns>
-                public OnCallBuilder Notify(Action<OnCallBuilder> notify)
+                public OnCallBuilder Notify(Action<OnCallHelper> notify)
                 {
-                    // FIX: Retrieve OperationCache attribute and operate on it
-                    parent.parent.ci.AddOperativeMethod(methodInfo, false, true);
-                    parent.parent.ci.MethodCalling += (ci, i) =>
-                    {
-                        if (i.Method == methodInfo)
-                        {
-                            Input = i.Arguments;
-                            notify(this);
-                        }
-                    };
+                    SetupNotifyEvent(OperationCache, parent.methodInfo, methodInfo, parent.parent.ci, notify);
                     return this;
                 }
 

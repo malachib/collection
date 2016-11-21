@@ -102,10 +102,7 @@ namespace Fact.Extensions.Collection.Tests
                     builder.For(nameof(IService.ReturnValue)).
                         Cache().
                         OnCall(nameof(IService.ClearToZero)).
-                            Notify(oc =>
-                            {
-                                oc.ClearKey();
-                            });
+                            Notify(oc => oc.Clear());
                 });
 
             var provider = serviceCollection.BuildServiceProvider();
