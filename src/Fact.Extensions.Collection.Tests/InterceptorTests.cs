@@ -69,9 +69,9 @@ namespace Fact.Extensions.Collection.Tests
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddMemoryCache();
-            serviceCollection.AddCachedSingleton<IService, Service>(ci =>
+            serviceCollection.AddCachedSingleton<IService, Service>(builder =>
             {
-                ci.MethodCalling += Interceptor_MethodCalling;
+                builder.CacheInterceptor.MethodCalling += Interceptor_MethodCalling;
             });
 
             var provider = serviceCollection.BuildServiceProvider();
@@ -96,9 +96,8 @@ namespace Fact.Extensions.Collection.Tests
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddMemoryCache();
             serviceCollection.AddCachedSingleton<IService2, Service>(
-                ci =>
+                builder =>
                 {
-                    var builder = ci.GetBuilder();
                     builder.For(nameof(IService.ReturnValue)).
                         Cache().
                         OnCall(nameof(IService.ClearToZero)).

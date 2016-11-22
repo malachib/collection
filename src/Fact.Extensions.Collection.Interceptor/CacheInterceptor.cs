@@ -224,6 +224,165 @@ namespace Fact.Extensions.Collection.Interceptor
         /// Executes just before method is called
         /// </summary>
         public event Action<CacheInterceptor, IInvocation> MethodCalling;
+
+
+        public class Builder
+        {
+            internal readonly CacheInterceptor ci;
+
+            public CacheInterceptor CacheInterceptor => ci;
+
+            internal Builder(CacheInterceptor ci)
+            {
+                this.ci = ci;
+            }
+
+            public MethodBuilder For(string methodName)
+            {
+                var methodInfo = ci.Type.GetMethod(methodName);
+                return new MethodBuilder(this, methodInfo);
+            }
+
+
+
+            public class MethodBuilder
+            {
+                public readonly Builder parent;
+                readonly MethodInfo methodInfo;
+
+                internal MethodBuilder(Builder parent, MethodInfo method)
+                {
+                    this.parent = parent;
+                    this.methodInfo = method;
+                }
+
+
+                internal OperationCacheAttribute OperationCache => parent.ci.GetOperationCache(methodInfo);
+
+                /// <summary>
+                /// Cache the method identified in a previous "For" invocation
+                /// </summary>
+                /// <returns></returns>
+                public MethodBuilder Cache()
+                {
+                    OperationCache.Cache = true;
+
+                    return this;
+                }
+
+                public MethodBuilder Notify(Action<CacheInterceptor, object[]> notify)
+                {
+                    OperationCache.Notify = true;
+
+                    OperationCache.NotifyEvent += args =>
+                    {
+
+                    };
+
+                    parent.ci.MethodCalling += (ci, i) =>
+                    {
+                        if (i.Method == methodInfo)
+                        {
+                            notify(ci, i.Arguments);
+                        }
+                    };
+                    return this;
+                }
+
+
+                /// <summary>
+                /// When a call occurs on the methodName specified here, operations are performed on the
+                /// method identified in the previous "For" invocation
+                /// </summary>
+                /// <param name="methodName"></param>
+                /// <returns></returns>
+                public OnCallBuilder OnCall(string methodName)
+                {
+                    var methodInfo = parent.ci.Type.GetMethod(methodName);
+                    return new OnCallBuilder(this, methodInfo);
+                }
+
+
+                public class OnCallBuilder
+                {
+                    readonly MethodBuilder parent;
+                    readonly MethodInfo methodInfo;
+
+                    internal OnCallBuilder(MethodBuilder parent, MethodInfo methodInfo)
+                    {
+                        this.parent = parent;
+                        this.methodInfo = methodInfo;
+                    }
+
+                    internal OperationCacheAttribute OperationCache => parent.parent.ci.GetOperationCache(methodInfo);
+
+                    // Using this will probably relieve some memory pressure
+                    public class OnCallHelper : IAccessor<int, object>
+                    {
+                        readonly MethodInfo parentMethodInfo;
+                        readonly MethodInfo methodInfo;
+                        readonly CacheInterceptor cacheInterceptor;
+                        readonly object[] input;
+
+                        internal OnCallHelper(MethodInfo parentMethodInfo, MethodInfo methodInfo, CacheInterceptor cacheInterceptor, object[] input)
+                        {
+                            this.parentMethodInfo = parentMethodInfo;
+                            this.methodInfo = methodInfo;
+                            this.cacheInterceptor = cacheInterceptor;
+                        }
+
+                        public object this[int index] { get { return input[index]; } }
+
+                        /// <summary>
+                        /// Remove key for method identified by a previous "For" invocation
+                        /// </summary>
+                        public void Clear(params object[] input)
+                        {
+                            cacheInterceptor.RemoveCachedMethod(
+                                parentMethodInfo.Name,
+                                input);
+                        }
+                    }
+
+                    /// <summary>
+                    /// Experimental, to see if we can reduce a bit of memory pressure (otherwise builders seem to "sticK" in memory)
+                    /// </summary>
+                    /// <param name="operationCache"></param>
+                    /// <param name="methodInfo"></param>
+                    /// <param name="ci"></param>
+                    static void SetupNotifyEvent(OperationCacheAttribute operationCache,
+                        MethodInfo parentMethodInfo,
+                        MethodInfo methodInfo,
+                        CacheInterceptor ci,
+                        Action<OnCallHelper> notify)
+                    {
+                        operationCache.Notify = true;
+                        operationCache.NotifyEvent += args =>
+                        {
+                            var och = new OnCallHelper(parentMethodInfo, methodInfo, ci, args);
+                            notify(och);
+                        };
+                    }
+
+
+                    /// <summary>
+                    /// Perform a notification when the method identified by a previous "OnCall" is invoked
+                    /// </summary>
+                    /// <param name="notify"></param>
+                    /// <returns></returns>
+                    public OnCallBuilder Notify(Action<OnCallHelper> notify)
+                    {
+                        SetupNotifyEvent(OperationCache, parent.methodInfo, methodInfo, parent.parent.ci, notify);
+                        return this;
+                    }
+
+                    public MethodBuilder For(string methodName)
+                    {
+                        return parent.parent.For(methodName);
+                    }
+                }
+            }
+        }
     }
 
 
@@ -258,164 +417,9 @@ namespace Fact.Extensions.Collection.Interceptor
 
     public static class CacheInterceptor_Extensions
     {
-        public class Builder
+        public static CacheInterceptor.Builder GetBuilder(this CacheInterceptor ci)
         {
-            internal readonly CacheInterceptor ci;
-
-            internal Builder(CacheInterceptor ci)
-            {
-                this.ci = ci;
-            }
-
-            public MethodBuilder For(string methodName)
-            {
-                var methodInfo = ci.Type.GetMethod(methodName);
-                return new MethodBuilder(this, methodInfo);
-            }
-        }
-
-        public static Builder GetBuilder(this CacheInterceptor ci)
-        {
-            return new Builder(ci);
-        }
-
-
-        public class MethodBuilder
-        {
-            public readonly Builder parent;
-            readonly MethodInfo methodInfo;
-
-            internal MethodBuilder(Builder parent, MethodInfo method)
-            {
-                this.parent = parent;
-                this.methodInfo = method;
-            }
-
-
-            internal OperationCacheAttribute OperationCache => parent.ci.GetOperationCache(methodInfo);
-
-            /// <summary>
-            /// Cache the method identified in a previous "For" invocation
-            /// </summary>
-            /// <returns></returns>
-            public MethodBuilder Cache()
-            {
-                OperationCache.Cache = true;
-
-                return this;
-            }
-
-            public MethodBuilder Notify(Action<CacheInterceptor, object[]> notify)
-            {
-                OperationCache.Notify = true;
-
-                OperationCache.NotifyEvent += args =>
-                {
-
-                };
-
-                parent.ci.MethodCalling += (ci, i) =>
-                {
-                    if (i.Method == methodInfo)
-                    {
-                        notify(ci, i.Arguments);
-                    }
-                };
-                return this;
-            }
-
-
-            /// <summary>
-            /// When a call occurs on the methodName specified here, operations are performed on the
-            /// method identified in the previous "For" invocation
-            /// </summary>
-            /// <param name="methodName"></param>
-            /// <returns></returns>
-            public OnCallBuilder OnCall(string methodName)
-            {
-                var methodInfo = parent.ci.Type.GetMethod(methodName);
-                return new OnCallBuilder(this, methodInfo);
-            }
-
-
-            public class OnCallBuilder
-            {
-                readonly MethodBuilder parent;
-                readonly MethodInfo methodInfo;
-
-                internal OnCallBuilder(MethodBuilder parent, MethodInfo methodInfo)
-                {
-                    this.parent = parent;
-                    this.methodInfo = methodInfo;
-                }
-
-                internal OperationCacheAttribute OperationCache => parent.parent.ci.GetOperationCache(methodInfo);
-
-                // Using this will probably relieve some memory pressure
-                public class OnCallHelper : IAccessor<int, object>
-                {
-                    readonly MethodInfo parentMethodInfo;
-                    readonly MethodInfo methodInfo;
-                    readonly CacheInterceptor cacheInterceptor;
-                    readonly object[] input;
-
-                    internal OnCallHelper(MethodInfo parentMethodInfo, MethodInfo methodInfo, CacheInterceptor cacheInterceptor, object[] input)
-                    {
-                        this.parentMethodInfo = parentMethodInfo;
-                        this.methodInfo = methodInfo;
-                        this.cacheInterceptor = cacheInterceptor;
-                    }
-
-                    public object this[int index] { get { return input[index]; } }
-
-                    /// <summary>
-                    /// Remove key for method identified by a previous "For" invocation
-                    /// </summary>
-                    public void Clear(params object[] input)
-                    {
-                        cacheInterceptor.RemoveCachedMethod(
-                            parentMethodInfo.Name,
-                            input);
-                    }
-                }
-
-                /// <summary>
-                /// Experimental, to see if we can reduce a bit of memory pressure (otherwise builders seem to "sticK" in memory)
-                /// </summary>
-                /// <param name="operationCache"></param>
-                /// <param name="methodInfo"></param>
-                /// <param name="ci"></param>
-                static void SetupNotifyEvent(OperationCacheAttribute operationCache, 
-                    MethodInfo parentMethodInfo,
-                    MethodInfo methodInfo, 
-                    CacheInterceptor ci, 
-                    Action<OnCallHelper> notify)
-                {
-                    operationCache.Notify = true;
-                    operationCache.NotifyEvent += args =>
-                    {
-                        var och = new OnCallHelper(parentMethodInfo, methodInfo, ci, args);
-                        notify(och);
-                    };
-                }
-
-
-                /// <summary>
-                /// Perform a notification when the method identified by a previous "OnCall" is invoked
-                /// </summary>
-                /// <param name="notify"></param>
-                /// <returns></returns>
-                public OnCallBuilder Notify(Action<OnCallHelper> notify)
-                {
-                    SetupNotifyEvent(OperationCache, parent.methodInfo, methodInfo, parent.parent.ci, notify);
-                    return this;
-                }
-
-                public MethodBuilder For(string methodName)
-                {
-                    return parent.parent.For(methodName);
-                }
-            }
+            return new CacheInterceptor.Builder(ci);
         }
     }
 

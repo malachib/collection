@@ -21,12 +21,12 @@ namespace Fact.Extensions.Collection
         /// <param name="serviceType"></param>
         /// <param name="implementationType"></param>
         /// <param name="configureBag">Create and configure IBag from the provided <typeparamref name="TCacheService"/> </param>
-        /// <param name="configureInterceptor"></param>
+        /// <param name="configureBuilder">Configure CacheInterceptor</param>
         public static void AddCachedSingleton<TCacheService>(this IServiceCollection serviceCollection, 
             Type serviceType, 
             Type implementationType, 
             Func<TCacheService, IBag> configureBag, 
-            Action<CacheInterceptor> configureInterceptor = null)
+            Action<CacheInterceptor.Builder> configureBuilder = null)
         {
             // Use DI provider to hold on to raw implementation singleton, so that
             // its constructor is called properly
@@ -39,7 +39,7 @@ namespace Fact.Extensions.Collection
                 // convert native cache & configure it special for this scenario
                 var cacheBag = configureBag(cache);
                 var cacheInterceptor = new CacheInterceptor(cacheBag, serviceType);
-                configureInterceptor?.Invoke(cacheInterceptor);
+                configureBuilder?.Invoke(cacheInterceptor.GetBuilder());
                 var proxy = AssemblyGlobal.Proxy.CreateInterfaceProxyWithTarget(
                     serviceType,
                     serviceInstance,
@@ -56,8 +56,8 @@ namespace Fact.Extensions.Collection
         /// <param name="serviceCollection"></param>
         /// <param name="serviceType"></param>
         /// <param name="implementationType"></param>
-        /// <param name="configure"></param>
-        public static void AddCachedSingleton(this IServiceCollection serviceCollection, Type serviceType, Type implementationType, Action<CacheInterceptor> configure = null)
+        /// <param name="configureBuilder"></param>
+        public static void AddCachedSingleton(this IServiceCollection serviceCollection, Type serviceType, Type implementationType, Action<CacheInterceptor.Builder> configureBuilder = null)
         {
             serviceCollection.AddCachedSingleton<IMemoryCache>(
                 serviceType,
@@ -67,8 +67,8 @@ namespace Fact.Extensions.Collection
                     var memoryCacheIndexer = new MemoryCacheIndexer(null, memoryCache);
                     var memoryCacheBag = memoryCacheIndexer.ToNamedBag();
                     return memoryCacheBag;
-                }, 
-                configure);
+                },
+                configureBuilder);
         }
 
 
@@ -78,14 +78,14 @@ namespace Fact.Extensions.Collection
         /// <typeparam name="TService"></typeparam>
         /// <typeparam name="TImplementation"></typeparam>
         /// <param name="serviceCollection"></param>
-        /// <param name="configure"></param>
+        /// <param name="configureBuilder"></param>
         /// <remarks>
         /// If interested in using something other than IMemoryCache, then:
         /// <seealso cref="AddCachedSingleton{TCacheService}(IServiceCollection, Type, Type, Func{TCacheService, IBag}, Action{CacheInterceptor})"/>
         /// </remarks>
-        public static void AddCachedSingleton<TService, TImplementation>(this IServiceCollection serviceCollection, Action<CacheInterceptor> configure = null)
+        public static void AddCachedSingleton<TService, TImplementation>(this IServiceCollection serviceCollection, Action<CacheInterceptor.Builder> configureBuilder = null)
         {
-            serviceCollection.AddCachedSingleton(typeof(TService), typeof(TImplementation), configure);
+            serviceCollection.AddCachedSingleton(typeof(TService), typeof(TImplementation), configureBuilder);
         }
     }
 }
