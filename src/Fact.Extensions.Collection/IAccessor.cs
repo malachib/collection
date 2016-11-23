@@ -14,6 +14,12 @@ namespace Fact.Extensions.Collection
         TValue this[TKey key] { get; }
     }
 
+
+    public interface IAccessor_Keys<TKey>
+    {
+        IEnumerable<TKey> Keys { get; }
+    }
+
     /// <summary>
     /// Reusable template for standard read-only indexer operations whose lookup key is a string.
     /// </summary>

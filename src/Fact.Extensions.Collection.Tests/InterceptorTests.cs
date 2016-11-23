@@ -119,5 +119,26 @@ namespace Fact.Extensions.Collection.Tests
 
             Assert.AreEqual(0, value);
         }
+
+
+        public interface IConfig
+        {
+            string Test { get; set; }
+        }
+
+        [TestMethod]
+        public void IndexToInterceptorTest()
+        {
+            var testValue = "value";
+
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddMemoryCache();
+            var provider = serviceCollection.BuildServiceProvider();
+            var dictionary = new Dictionary<string, object>();
+            dictionary.Add("Test", testValue);
+            var config = dictionary.ToIndexer().ToInterceptor<IConfig>();
+
+            Assert.AreEqual(testValue, config.Test);
+        }
     }
 }
