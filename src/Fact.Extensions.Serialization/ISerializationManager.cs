@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
+#if NETSTANDARD1_6_2
+using System.IO.Pipelines;
+#endif
+
 namespace Fact.Extensions.Serialization
 {
     public interface ISerializationManager
@@ -11,12 +15,21 @@ namespace Fact.Extensions.Serialization
         object Deserialize(Stream input, Type type);
     }
 
+#if NETSTANDARD1_6_2
+    public interface ISerializationManagerAsync
+    {
+        Task SerializeAsync(IPipelineWriter output, object inputValue, Type type = null);
+        Task<object> DeserializeAsync(IPipelineReader input, Type type);
+    }
+#else
 
     public interface ISerializationManagerAsync
     {
         Task SerializeAsync(Stream output, object inputValue, Type type = null);
         Task<object> DeserializeAsync(Stream input, Type type);
     }
+
+#endif
 
 
     /// <summary>

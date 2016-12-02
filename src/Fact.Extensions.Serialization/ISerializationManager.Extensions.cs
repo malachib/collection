@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+#if NETSTANDARD1_6_2
+using System.IO.Pipelines;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,7 +48,14 @@ namespace Fact.Extensions.Serialization
         {
             using (var ms = new MemoryStream())
             {
+#if NETSTANDARD1_6_2
+                // See below comment in DeserializeAsync regarding kludginess of this
+                var writer = ms.AsPipelineWriter();
+                await serializationManager.SerializeAsync(writer, input);
+                writer.Complete();
+#else
                 await serializationManager.SerializeAsync(ms, input);
+#endif
                 ms.Flush();
                 return ms.ToArray();
             }
@@ -92,7 +102,14 @@ namespace Fact.Extensions.Serialization
         {
             using (var ms = new System.IO.MemoryStream(inputValue))
             {
+#if NETSTANDARD1_6_2
+                // 100% certain this is not the right way, but PipeLine stuff is pretty new
+                // so after 15 minutes of digging and finding no clues, I am rolling with this - for now
+                var reader = ms.AsPipelineReader();
+                return await serializationManager.DeserializeAsync(reader, type);
+#else
                 return await serializationManager.DeserializeAsync(ms, type);
+#endif
             }
         }
 
