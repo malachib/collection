@@ -13,6 +13,7 @@
   },
 
   "frameworks": {
+    /*
     "netcoreapp1.0.1": {
       "imports": [
         "dnxcore50"
@@ -24,12 +25,14 @@
         }
       }
 
-    },
+    }, */
     "netcoreapp1.2": {
       "buildOptions": {
         "define": [ "NETCOREAPP1_2" ]
       },
-      "imports": [ "dotnet" ],
+      // Not sure if we need ALL these imports, I think just "dotnet" is needed
+      // but erring on the side of caution for now
+      "imports": [ "dotnet", "dnxcore50", "netcoreapp1.0", "net50" ],
       "dependencies": {
         //"NETStandard.Library": "1.6.2-beta-24721-02", // This doesn't help
         "Microsoft.NETCore.App": {
