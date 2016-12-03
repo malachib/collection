@@ -40,7 +40,7 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
-#if NETCOREAPP1_1
+#if NETCOREAPP1_2
         [TestMethod]
         public void JsonAsyncTest()
         {

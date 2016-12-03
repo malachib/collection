@@ -59,6 +59,16 @@
       "dependencies": {
         "NETStandard.Library": "1.6.0"
       }
+    },
+    "netstandard1.6.2": {
+      "buildOptions": {
+        "define": [
+          "NETSTANDARD1_6_2"
+        ]
+      },
+      "dependencies": {
+        "NETStandard.Library": "1.6.2-beta-24721-02"
+      }
     }
   }
 }
