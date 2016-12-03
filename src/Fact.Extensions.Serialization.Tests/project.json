@@ -31,6 +31,7 @@
       },
       "imports": [ "dotnet" ],
       "dependencies": {
+        //"NETStandard.Library": "1.6.2-beta-24721-02", // This doesn't help
         "Microsoft.NETCore.App": {
           "version": "1.2.0-beta-001137-00",
           "type": "platform"
