@@ -40,6 +40,14 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
+#if NETCOREAPP1_1
+        [TestMethod]
+        public void JsonAsyncTest()
+        {
+            var sm = new JsonSerializationManagerAsync();
+        }
+#endif
+
         [TestMethod]
         public void BsonTest()
         {

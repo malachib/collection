@@ -27,6 +27,11 @@
       //"imports": "dnxcore50"
     },
     "netstandard1.6": {
+      "buildOptions": {
+        "define": [
+          "NETSTANDARD1_6"
+        ]
+      },
       "dependencies": {
         "NETStandard.Library": "1.6"
       }

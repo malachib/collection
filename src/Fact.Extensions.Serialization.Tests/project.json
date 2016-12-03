@@ -4,6 +4,8 @@
   "testRunner": "mstest",
 
   "dependencies": {
+    "dotnet-test-mstest": "1.1.2-preview",
+    "MSTest.TestFramework": "1.0.7-preview",
     "Fact.Extensions.Serialization.MessagePack": "1.0.0-*",
     "Fact.Extensions.Serialization.Newtonsoft": "1.0.0-*",
     "Microsoft.Extensions.Caching.Memory": "1.0.0",
@@ -16,14 +18,24 @@
         "dnxcore50"
       ],
       "dependencies": {
-        "dotnet-test-mstest": "1.1.2-preview",
-        "MSTest.TestFramework": "1.0.6-preview",
         "Microsoft.NETCore.App": {
           "version": "1.0.1",
           "type": "platform"
         }
       }
 
+    },
+    "netcoreapp1.1": {
+      "buildOptions": {
+        "define": [ "NETCOREAPP1_1" ]
+      },
+      "imports": [ "dotnet" ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.1.0",
+          "type": "platform"
+        }
+      }
     }
   }
 }

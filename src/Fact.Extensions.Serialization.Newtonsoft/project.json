@@ -7,14 +7,33 @@
   },
 
   "dependencies": {
-    "Fact.Extensions.Serialization": "1.0.0-*",
-    "NETStandard.Library": "1.6.0",
     "Newtonsoft.Json": "9.0.1"
   },
 
   "frameworks": {
     "netstandard1.6": {
-      "imports": "dnxcore50"
+      "buildOptions": {
+        "define": [
+          "NETSTANDARD1_6"
+        ]
+      },
+      "imports": "dnxcore50",
+      "dependencies": {
+        "Fact.Extensions.Serialization": "1.0.0-*",
+        "NETStandard.Library": "1.6.0"
+      }
+    },
+    "netstandard1.6.2": {
+      "buildOptions": {
+        "define": [
+          "NETSTANDARD1_6_2"
+        ]
+      },
+      "dependencies": {
+        "Fact.Extensions.Serialization": "1.0.0-*",
+        "NETStandard.Library": "1.6.2-beta-24721-02",
+        "System.IO.Pipelines": "0.1.0-e161202-1"
+      }
     }
   }
 }

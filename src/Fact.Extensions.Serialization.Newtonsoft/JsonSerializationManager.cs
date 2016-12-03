@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+#if NETSTANDARD1_6_2
+using System.IO.Pipelines;
+#endif
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 using Newtonsoft.Json;
 
@@ -30,4 +34,37 @@ namespace Fact.Extensions.Serialization.Newtonsoft
             }
         }
     }
+
+
+#if NETSTANDARD1_6_2
+    public class JsonSerializationManagerAsync : ISerializationManagerAsync,
+        ISerializationManager_TextEncoding
+    {
+        //readonly JsonSerializerSettings settings;
+        readonly JsonSerializer serializer = new JsonSerializer();
+
+        public Encoding Encoding => Encoding.UTF8;
+
+        public async Task<object> DeserializeAsync(IPipelineReader input, Type type)
+        {
+            // FIX: Super kludgey and massive overhead, right now I'm just learning how to use this thing
+            var buffer = await input.ReadToEndAsync();
+            var jsonText = this.Encoding.GetString(buffer.ToArray());
+            return serializer.Deserialize(new StringReader(jsonText), type);
+        }
+
+        public async Task SerializeAsync(IPipelineWriter output, object inputValue, Type type = null)
+        {
+            // FIX: Super kludgey and massive overhead, right now I'm just learning how to use this thing
+            using (var writer = new StringWriter())
+            {
+                serializer.Serialize(writer, inputValue, type);
+                var writeBuffer = output.Alloc();
+                var bytes = this.Encoding.GetBytes(writer.ToString());
+                writeBuffer.Write(bytes);
+                await output.Writing;
+            }
+        }
+    }
+#endif
 }
