@@ -25,14 +25,14 @@
       }
 
     },
-    "netcoreapp1.1": {
+    "netcoreapp1.2": {
       "buildOptions": {
-        "define": [ "NETCOREAPP1_1" ]
+        "define": [ "NETCOREAPP1_2" ]
       },
       "imports": [ "dotnet" ],
       "dependencies": {
         "Microsoft.NETCore.App": {
-          "version": "1.1.0",
+          "version": "1.2.0-beta-001137-00",
           "type": "platform"
         }
       }
