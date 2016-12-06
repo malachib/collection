@@ -1,7 +1,7 @@
 ﻿{
   "version": "1.0.0-*",
   "authors": [ "Malachi Burke" ],
-  "description": "Castle interceptors for Caching",
+  "description": "Castle interceptors for IBag and Caching",
   "packOptions": {
     "releaseNotes": ""
   },
