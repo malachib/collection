@@ -15,10 +15,14 @@ namespace Fact.Extensions.Collection.Tests
     public class GetterTest
     {
         [TestMethod]
-        public void BasicTest()
+        public void TryGetExpTest()
         {
             var dict = new Dictionary<string, object>();
             var bag = dict.ToBag();
+            dict["test"] = "value";
+            object output;
+            bag.TryGetExp("test", typeof(string), out output);
+            Assert.AreEqual("value", (string)output);
         }
     }
 }

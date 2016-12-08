@@ -6,9 +6,9 @@ namespace Fact.Extensions.Collection
 {
     public static class IBag_Extensions
     {
-        public static IBag<string, object> ToBag(this IDictionary<string, object> dictionary)
+        public static IBag ToBag(this IDictionary<string, object> dictionary)
         {
-            return dictionary.ToIndexer().ToBag();
+            return dictionary.ToIndexer().ToNamedBag();
         }
     }
 }

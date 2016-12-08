@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Fact.Extensions.Collection
@@ -49,6 +51,47 @@ namespace Fact.Extensions.Collection
                 value = null;
                 return false;
             }
+        }
+
+        // EXPERIMENTAL, does not have the type safety I'd like AND
+        // potentially weakens the type safety of other TryGet calls since they
+        // potentially can overload automatically to this call
+        public static bool TryGetExp<TKey>(this IGetter<TKey, object> getter, TKey key, Type type, out object value)
+        {
+            // What would be interesting is a factory to resolve interfaces to query
+            // and act , but it might ONLY be interesting, maybe not actually useful
+            // or practical
+            var getterContainsKey = getter as IContainsKey<TKey>;
+            var getterKeys = getter as IKeys<TKey>;
+
+            if(getterContainsKey != null)
+            {
+                if(getterContainsKey.ContainsKey(key))
+                {
+                    value = getter.Get(key, type);
+                    return true;
+                }
+                else
+                {
+                    value = null;
+                    return false;
+                }
+            }
+            else if(getterKeys != null)
+            {
+                if(getterKeys.Keys.Contains(key))
+                {
+                    value = getter.Get(key, type);
+                    return true;
+                }
+                else
+                {
+                    value = null;
+                    return false;
+                }
+            }
+            else
+                throw new InvalidCastException();
         }
 
 #if NETSTANDARD1_6

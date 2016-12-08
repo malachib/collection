@@ -8,7 +8,7 @@ namespace Fact.Extensions.Collection
     /// Abstracted getters and setters for a property-bag pattern
     /// This flavor expects keys to be strings
     /// </summary>
-    public interface IBag : IGetter, ISetter { }
+    public interface IBag : IBag<string, object>, IGetter, ISetter { }
 
     public interface IBagAsync : IGetterAsync, ISetterAsync { }
 
