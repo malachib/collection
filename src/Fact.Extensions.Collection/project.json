@@ -67,7 +67,7 @@
         ]
       },
       "dependencies": {
-        "NETStandard.Library": "1.6.2-beta-24721-02"
+        "NETStandard.Library": "1.6.2-beta-24806-05"
       }
     }
   }
