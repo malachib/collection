@@ -56,7 +56,10 @@ namespace Fact.Extensions.Serialization.Tests
         {
             var sm = new JsonSerializationManagerAsync();
             var testRecord = new TestRecord(true);
-            //var byteArray = Task.Run(() => sm.SerializeToByteArrayAsync(testRecord)).Result;
+            var resultBytesTask = sm.SerializeToByteArrayAsync(testRecord);
+            var resultBytes = resultBytesTask.Result;
+            var testRecord2Task = sm.DeserializeAsync(resultBytes, typeof(TestRecord));
+            var testRecord2 = testRecord2Task.Result;
         }
 #endif
 

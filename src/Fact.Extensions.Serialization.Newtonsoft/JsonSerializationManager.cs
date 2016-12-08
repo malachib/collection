@@ -63,10 +63,13 @@ namespace Fact.Extensions.Serialization.Newtonsoft
             using (var writer = new StringWriter())
             {
                 serializer.Serialize(writer, inputValue, type);
-                var writeBuffer = output.Alloc();
                 var bytes = this.Encoding.GetBytes(writer.ToString());
+                //await output.WriteAsync(bytes);
+                var writeBuffer = output.Alloc(bytes.Length);
                 writeBuffer.Write(bytes);
-                await output.Writing;
+                await writeBuffer.FlushAsync();
+                //output.Complete();
+                //await output.Writing;
             }
         }
     }

@@ -56,7 +56,7 @@ namespace Fact.Extensions.Serialization
                 // See below comment in DeserializeAsync regarding kludginess of this
                 var writer = ms.AsPipelineWriter();
                 await serializationManager.SerializeAsync(writer, input);
-                writer.Complete();
+                writer.Complete(); // Probably optional given the tight scope of writer here
 #else
                 await serializationManager.SerializeAsync(ms, input);
 #endif
