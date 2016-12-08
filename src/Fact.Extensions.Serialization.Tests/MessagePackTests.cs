@@ -14,11 +14,7 @@ namespace Fact.Extensions.Serialization.Tests
         {
             var sm = new MessagePack.MessagePackSerializationManager();
 
-            var testRecord = new TestRecord
-            {
-                Name = "Fred",
-                Color = "Blue"
-            };
+            var testRecord = new TestRecord(true);
 
             var output = sm.SerializeToByteArray(testRecord);
             var output1 = sm.SerializeToString(testRecord);

@@ -6,12 +6,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#if FEATURE_ENABLED_PIPELINES
+using System.IO.Pipelines;
+#endif
+
 namespace Fact.Extensions.Serialization.Tests
 {
     public class TestRecord
     {
         public string Name { get; set; }
         public string Color { get; set; }
+
+        public TestRecord() {}
+        public TestRecord(bool autoPopulate = false)
+        {
+            if(autoPopulate)
+            {
+                Name = "Fred";
+                Color = "Blue";
+            }
+        }
     }
 
     [TestClass]
@@ -21,11 +35,7 @@ namespace Fact.Extensions.Serialization.Tests
         public void JsonTest()
         {
             var sm = new JsonSerializationManager();
-            var testRecord = new TestRecord
-            {
-                Name = "Fred",
-                Color = "Blue"
-            };
+            var testRecord = new TestRecord(true);
 
             var output1 = sm.SerializeToString(testRecord);
             var badOutput = sm.SerializeToString(testRecord, typeof(TestRecord), Encoding.Unicode);
@@ -40,11 +50,13 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
-#if NETCOREAPP1_2
+#if FEATURE_ENABLED_PIPELINES
         [TestMethod]
         public void JsonAsyncTest()
         {
             var sm = new JsonSerializationManagerAsync();
+            var testRecord = new TestRecord(true);
+            var byteArray = Task.Run(() => sm.SerializeToByteArrayAsync(testRecord)).Result;
         }
 #endif
 

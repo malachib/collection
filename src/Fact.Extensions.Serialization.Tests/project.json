@@ -28,7 +28,7 @@
     }, */
     "netcoreapp1.0": {
       "buildOptions": {
-        "define": [ "NETCOREAPP1_2" ]
+        "define": [ "FEATURE_ENABLED_PIPELINES" ]
       },
       // Not sure if we need ALL these imports, I think just "dotnet" is needed
       // but erring on the side of caution for now
