@@ -21,14 +21,5 @@ namespace Fact.Extensions.Collection.Interceptor
             return AssemblyGlobal.Proxy.CreateInterfaceProxyWithoutTarget<T>(interceptor);
             
         }
-
-
-        public static INamedIndexer<TValue> ToIndexer<TValue>(this IDictionary<string, TValue> dictionary)
-        {
-            return new NamedIndexerWrapperWithKeys<TValue>(
-                key => dictionary[key],
-                (key, value) => dictionary[key] = value,
-                () => dictionary.Keys);
-        }
     }
 }

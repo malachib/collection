@@ -82,5 +82,13 @@ namespace Fact.Extensions.Collection
             return new NamedBagWrapper<TKey>(indexer);
         }
 #endif
+
+        public static INamedIndexer<TValue> ToIndexer<TValue>(this IDictionary<string, TValue> dictionary)
+        {
+            return new NamedIndexerWrapperWithKeys<TValue>(
+                key => dictionary[key],
+                (key, value) => dictionary[key] = value,
+                () => dictionary.Keys);
+        }
     }
 }

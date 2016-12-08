@@ -28,6 +28,29 @@ namespace Fact.Extensions.Collection
             return (TValue)await getter.GetAsync(key, typeof(TValue));
         }
 
+
+        /*
+        public static async Task<TValue> GetOrCreateAsync<TValue>(this IGetterAsync<string, object> getter, string key)
+        {
+
+        } */
+
+
+        public static bool TryGet<TGetter>(this TGetter getter, string key, Type type, out object value)
+            where TGetter: IContainsKey<string>, IGetter
+        {
+            if(getter.ContainsKey(key))
+            {
+                value = getter.Get(key, type);
+                return true;
+            }
+            else
+            {
+                value = null;
+                return false;
+            }
+        }
+
 #if NETSTANDARD1_6
         /// <summary>
         /// Listen for changes from a particular property, and when they appear, call a notifier
