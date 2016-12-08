@@ -1,7 +1,11 @@
-﻿using System;
+﻿#if NETSTANDARD1_6
+#define FEATURE_ENABLE_PIPELINES
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.IO;
-#if NETSTANDARD1_6_2
+#if FEATURE_ENABLE_PIPELINES
 using System.IO.Pipelines;
 #endif
 using System.Linq;
@@ -36,7 +40,7 @@ namespace Fact.Extensions.Serialization.Newtonsoft
     }
 
 
-#if NETSTANDARD1_6_2
+#if FEATURE_ENABLE_PIPELINES
     public class JsonSerializationManagerAsync : ISerializationManagerAsync,
         ISerializationManager_TextEncoding
     {

@@ -1,9 +1,13 @@
-﻿using System;
+﻿#if NETSTANDARD1_6
+#define FEATURE_ENABLE_PIPELINES
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-#if NETSTANDARD1_6_2
+#if FEATURE_ENABLE_PIPELINES
 using System.IO.Pipelines;
 #endif
 
@@ -15,7 +19,7 @@ namespace Fact.Extensions.Serialization
         object Deserialize(Stream input, Type type);
     }
 
-#if NETSTANDARD1_6_2
+#if FEATURE_ENABLE_PIPELINES
     public interface ISerializationManagerAsync
     {
         Task SerializeAsync(IPipelineWriter output, object inputValue, Type type = null);

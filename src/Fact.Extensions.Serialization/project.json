@@ -33,20 +33,8 @@
         ]
       },
       "dependencies": {
-        "NETStandard.Library": "1.6.2-beta-24806-05",
-        //"NETStandard.Library": "1.6.2-beta-24721-02",
-        "System.IO.Pipelines": "0.1.0-e161207-1"
-      }
-    },
-    "netstandard1.6.2": {
-      "buildOptions": {
-        "define": [
-          "NETSTANDARD1_6_2"
-        ]
-      },
-      "dependencies": {
-        //"NETStandard.Library": "1.6.2-beta-24721-02",
-        "System.IO.Pipelines": "0.1.0-e161207-1"
+        "NETStandard.Library": "1.6.0",
+        "System.IO.Pipelines": "0.1.0-e161208-2"
       }
     }
   }

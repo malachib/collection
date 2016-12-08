@@ -1,7 +1,11 @@
-﻿using System;
+﻿#if NETSTANDARD1_6
+#define FEATURE_ENABLE_PIPELINES
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.IO;
-#if NETSTANDARD1_6_2
+#if FEATURE_ENABLE_PIPELINES
 using System.IO.Pipelines;
 #endif
 using System.Text;
@@ -48,7 +52,7 @@ namespace Fact.Extensions.Serialization
         {
             using (var ms = new MemoryStream())
             {
-#if NETSTANDARD1_6_2
+#if FEATURE_ENABLE_PIPELINES
                 // See below comment in DeserializeAsync regarding kludginess of this
                 var writer = ms.AsPipelineWriter();
                 await serializationManager.SerializeAsync(writer, input);
@@ -102,7 +106,7 @@ namespace Fact.Extensions.Serialization
         {
             using (var ms = new System.IO.MemoryStream(inputValue))
             {
-#if NETSTANDARD1_6_2
+#if FEATURE_ENABLE_PIPELINES
                 // 100% certain this is not the right way, but PipeLine stuff is pretty new
                 // so after 15 minutes of digging and finding no clues, I am rolling with this - for now
                 var reader = ms.AsPipelineReader();
