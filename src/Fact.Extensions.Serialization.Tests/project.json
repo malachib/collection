@@ -26,6 +26,31 @@
       }
 
     }, */
+    "netcoreapp1.0": {
+      "buildOptions": {
+        "define": [ "NETCOREAPP1_2" ]
+      },
+      // Not sure if we need ALL these imports, I think just "dotnet" is needed
+      // but erring on the side of caution for now
+      "imports": "dnxcore50",
+      "dependencies": {
+        "System.IO.Pipelines": "0.1.0-e161207-1",
+        "NETStandard.Library": 
+        {
+          "version": "1.6.2-beta-24806-05", // This doesn't help
+          "type": "platform"
+        },
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0-*",
+          "type": "build"
+        },
+        "Microsoft.CodeCoverage": {
+          "type": "build",
+          "version": "1.0.1"
+        }
+      }
+    }
+    /*
     "netcoreapp1.2": {
       "buildOptions": {
         "define": [ "NETCOREAPP1_2" ]
@@ -34,12 +59,13 @@
       // but erring on the side of caution for now
       "imports": [ "dotnet", "dnxcore50", "netcoreapp1.0", "net50" ],
       "dependencies": {
-        //"NETStandard.Library": "1.6.2-beta-24721-02", // This doesn't help
+        "NETStandard.Library": "1.6.2-beta-24806-05", // This doesn't help
         "Microsoft.NETCore.App": {
           "version": "1.2.0-beta-001137-00",
           "type": "platform"
         }
       }
     }
+      */
   }
 }

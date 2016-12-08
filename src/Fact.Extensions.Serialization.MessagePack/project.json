@@ -20,8 +20,8 @@
         ]
       },
       "dependencies": {
-        "NETStandard.Library": "1.6.2-beta-24721-02",
-        "System.IO.Pipelines": "0.1.0-e161202-1"
+        //"NETStandard.Library": "1.6.2-beta-24721-02",
+        "System.IO.Pipelines": "0.1.0-e161207-1"
       }
     }
   }
