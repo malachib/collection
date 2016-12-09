@@ -38,6 +38,22 @@ namespace Fact.Extensions.Collection
         } */
 
 
+        public static bool TryGet<TValue>(this ITryGetter getter, string key, out TValue value)
+        {
+            object output;
+            if(getter.TryGet(key, typeof(TValue), out output))
+            {
+                value = (TValue)output;
+                return true;
+            }
+            else
+            {
+                value = default(TValue);
+                return false;
+            }
+        }
+
+
         public static bool TryGet<TGetter>(this TGetter getter, string key, Type type, out object value)
             where TGetter: IContainsKey<string>, IGetter
         {
@@ -53,9 +69,17 @@ namespace Fact.Extensions.Collection
             }
         }
 
-        // EXPERIMENTAL, does not have the type safety I'd like AND
-        // potentially weakens the type safety of other TryGet calls since they
-        // potentially can overload automatically to this call
+        /// <summary>
+        /// EXPERIMENTAL, does not have the type safety I'd like AND
+        /// potentially weakens the type safety of other TryGet calls since they
+        /// potentially can overload automatically to this call
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="getter"></param>
+        /// <param name="key"></param>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static bool TryGetExp<TKey>(this IGetter<TKey, object> getter, TKey key, Type type, out object value)
         {
             // What would be interesting is a factory to resolve interfaces to query

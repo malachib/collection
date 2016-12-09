@@ -17,13 +17,14 @@ namespace Fact.Extensions.Caching
         {
             get
             {
-                return Enumerable.Empty<Type>();
+                yield return typeof(AbsoluteTimeExpiration);
+                yield return typeof(SlidingTimeExpiration);
             }
         }
 
         public event Action<string, DistributedCacheEntryOptions> Setting;
 
-        public DistributedCacheBag(ISerializationManager serializationManager, IDistributedCache cache)
+        public DistributedCacheBag(IDistributedCache cache, ISerializationManager serializationManager)
         {
             this.serializationManager = serializationManager;
             this.cache = cache;
@@ -80,9 +81,27 @@ namespace Fact.Extensions.Caching
             }
         }
 
+
+        static void OptionConverter(DistributedCacheEntryOptions msOptions, params ICacheItemOption[] options)
+        {
+            foreach(var option in options)
+            {
+                if(option is SlidingTimeExpiration)
+                {
+                    msOptions.SetSlidingExpiration(((SlidingTimeExpiration)option).Duration);
+                }
+                else if(option is AbsoluteTimeExpiration)
+                {
+                    msOptions.SetAbsoluteExpiration(((AbsoluteTimeExpiration)option).Expiry);
+                }
+            }
+        }
+
         public async Task SetAsync(string key, object value, Type type, params ICacheItemOption[] options)
         {
             var _options = new DistributedCacheEntryOptions();
+
+            OptionConverter(_options, options);
             Setting?.Invoke(key, _options);
 
             byte[] serializedValue;
@@ -98,6 +117,7 @@ namespace Fact.Extensions.Caching
         public void Set(string key, object value, Type type, params ICacheItemOption[] options)
         {
             var _options = new DistributedCacheEntryOptions();
+            OptionConverter(_options, options);
             Setting?.Invoke(key, _options);
             cache.Set(key, serializationManager.SerializeToByteArray(value, type), _options);
         }
