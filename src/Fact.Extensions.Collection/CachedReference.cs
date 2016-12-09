@@ -7,12 +7,23 @@ using Fact.Extensions.Collection;
 
 namespace Fact.Extensions.Caching
 {
+    public interface ICachedReference
+    {
+        ICacheItemOption[] Options { get; }
+    }
+
+
+    public interface ICachedReference<TValue> : ICachedReference
+    {
+        TValue Value { get; set; }
+    }
+
     /// <summary>
     /// EXPERIMENTAL
     /// Use this to further attempt to hide the fact that one is caching a value
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public struct CachedReference<T>
+    public struct CachedReference<T> : ICachedReference<T>
     {
         readonly Func<T> factory;
         readonly ICache cache;
@@ -27,6 +38,8 @@ namespace Fact.Extensions.Caching
             this.getOptions = () => options;
         }
 
+        public ICacheItemOption[] Options => getOptions().AsArray();
+
         public T Value
         {
             get
@@ -37,9 +50,16 @@ namespace Fact.Extensions.Caching
                 {
                     cachedValue = factory();
                     // TODO: Make an AsArray and use it
-                    cache.Set(key, cachedValue, typeof(T), getOptions().ToArray());
+                    cache.Set(key, cachedValue, typeof(T), Options);
                 }
                 return cachedValue;
+            }
+            set
+            {
+                // One can explicitly set the cache value if one desires, bypassing the factory method.
+                // this can be useful for seed values
+                // TODO: Make an AsArray and use it
+                cache.Set(key, value, typeof(T), getOptions().AsArray());
             }
         }
 
@@ -49,8 +69,7 @@ namespace Fact.Extensions.Caching
         }
     }
 
-
-    public struct CachedReferenceAsync<T>
+    public struct CachedReferenceAsync<T> : ICachedReference<T>
     {
         readonly ICacheAsync cache;
         readonly Func<Task<T>> factory;
@@ -66,6 +85,8 @@ namespace Fact.Extensions.Caching
         }
 
 
+        public ICacheItemOption[] Options => options;
+
         /// <summary>
         /// Retrieve item from the cache, and if it's not present there, allocate + add it
         /// </summary>
@@ -78,9 +99,28 @@ namespace Fact.Extensions.Caching
             else
             {
                 var value = await factory();
-                await cache.SetAsync(key, value, typeof(T), options);
+                await SetValue(value);
                 return value;
             }
+        }
+
+
+        public async Task SetValue(T value)
+        {
+            await cache.SetAsync(key, value, typeof(T), options);
+        }
+
+
+        public T Value
+        {
+            get { return GetValue().Result; }
+            set { SetValue(value).Wait(); }
+        }
+
+
+        public static implicit operator T(CachedReferenceAsync<T> cachedReference)
+        {
+            return cachedReference.Value;
         }
     }
 

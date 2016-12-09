@@ -51,6 +51,17 @@ namespace Fact.Extensions.Caching
         }
 
 
+        public static async Task SetAsync<TValue>(this ICacheAsync cache, string key, TValue value, DateTimeOffset absoluteTimeExpiration)
+        {
+            await cache.SetAsync(key, value, typeof(TValue), new AbsoluteTimeExpiration(absoluteTimeExpiration));
+        }
+
+
+        public static async Task SetAsync<TValue>(this ICacheAsync cache, string key, TValue value, TimeSpan slidingTimeExpiration)
+        {
+            await cache.SetAsync(key, value, typeof(TValue), new SlidingTimeExpiration(slidingTimeExpiration));
+        }
+
         /// <summary>
         /// Acquire a CachedReference class using the specified key
         /// </summary>
