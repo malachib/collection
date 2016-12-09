@@ -19,11 +19,18 @@ namespace Fact.Extensions.Collection
         bool TryGet(TKey key, Type type, out TValue value);
     }
 
+    public interface ITryGetterAsync<TKey, TValue>
+    {
+        Task<Tuple<bool, TValue>> TryGetAsync(TKey key, Type type);
+    }
+
     public interface IGetter : IGetter<string, object> { }
     public interface IGetterAsync : IGetterAsync<string, object> { }
 
     public interface ITryGetter<TKey> : ITryGetter<TKey, object> { }
     public interface ITryGetter : ITryGetter<string, object> { }
+
+    public interface ITryGetterAsync : ITryGetterAsync<string, object> { }
 
     public interface IGetterOptions
     {

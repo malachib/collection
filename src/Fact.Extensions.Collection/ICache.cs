@@ -19,7 +19,7 @@ namespace Fact.Extensions.Caching
     }
 
 
-    public interface ICacheAsync : ICacheBase, IBagAsync, IRemoverAsync
+    public interface ICacheAsync : ICacheBase, IBagAsync, IRemoverAsync, ITryGetterAsync
     {
         Task SetAsync(string key, object value, Type type, params ICacheItemOption[] options);
     }
