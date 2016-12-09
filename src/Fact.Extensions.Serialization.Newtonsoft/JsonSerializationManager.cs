@@ -41,6 +41,72 @@ namespace Fact.Extensions.Serialization.Newtonsoft
 
 
 #if FEATURE_ENABLE_PIPELINES
+    public class ReadableBufferStream : Stream
+    {
+        readonly ReadableBuffer readableBuffer;
+
+        public ReadableBufferStream(ReadableBuffer readableBuffer)
+        {
+            this.readableBuffer = readableBuffer;
+        }
+
+        public override bool CanRead => true;
+
+        public override bool CanSeek => false;
+
+        public override bool CanWrite => false;
+
+        public override long Length
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override long Position
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public override void Flush()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            readableBuffer.CopyTo(new Span<byte>(buffer, offset, count));
+            if (count > readableBuffer.Length)
+                return readableBuffer.Length;
+            else
+                return count;
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class JsonSerializationManagerAsync : ISerializationManagerAsync,
         ISerializationManager_TextEncoding
     {
@@ -51,27 +117,33 @@ namespace Fact.Extensions.Serialization.Newtonsoft
 
         public async Task<object> DeserializeAsync(IPipelineReader input, Type type)
         {
+            // TODO: Works, but seems ReadAsync may be creating more of an intermediate buffer than we actually need
+            var readResult = await input.ReadAsync();
+            var stream = new ReadableBufferStream(readResult.Buffer);
+            var reader = new StreamReader(stream, Encoding);
+            return serializer.Deserialize(reader, type);
+
+#if UNUSED
+            //new ReadableBufferReader(readableBufferAwaitable.)
             // FIX: Super kludgey and massive overhead, right now I'm just learning how to use this thing
             var buffer = await input.ReadToEndAsync();
             var jsonText = this.Encoding.GetString(buffer.ToArray());
             return serializer.Deserialize(new StringReader(jsonText), type);
+#endif
         }
+
 
         public async Task SerializeAsync(IPipelineWriter output, object inputValue, Type type = null)
         {
-            // FIX: Super kludgey and massive overhead, right now I'm just learning how to use this thing
-            using (var writer = new StringWriter())
-            {
-                serializer.Serialize(writer, inputValue, type);
-                var bytes = this.Encoding.GetBytes(writer.ToString());
-                //await output.WriteAsync(bytes);
-                var writeBuffer = output.Alloc(bytes.Length);
-                writeBuffer.Write(bytes);
-                await writeBuffer.FlushAsync();
-                //output.Complete();
-                //await output.Writing;
-            }
+            var writeBuffer = output.Alloc();
+            var stream = new WriteableBufferStream(writeBuffer);
+            var writer = new StreamWriter(stream, Encoding);
+            serializer.Serialize(writer, inputValue, type);
+            await writer.FlushAsync();
+            //await writer.FlushAsync();
+            //await writeBuffer.FlushAsync();
+            output.Complete();
         }
     }
 #endif
-}
+        }

@@ -50,19 +50,24 @@ namespace Fact.Extensions.Serialization
 
         public static async Task<byte[]> SerializeToByteArrayAsync(this ISerializationManagerAsync serializationManager, object input, Type type = null)
         {
+#if FEATURE_ENABLE_PIPELINES
+            // See below comment in DeserializeAsync regarding kludginess of this
+            var pipeline = new PipelineFactory().Create();
+            var writerTask = serializationManager.SerializeAsync(pipeline, input);
+            // Happens inside SerializeAsync, but do we always really want to totally end pipeline communication
+            // from INSIDE a utility function?
+            //pipeline.CompleteWriter(); 
+            var readableBuffer = await pipeline.ReadToEndAsync();
+            var returnValue = readableBuffer.ToArray();
+            return returnValue;
+#else
             using (var ms = new MemoryStream())
             {
-#if FEATURE_ENABLE_PIPELINES
-                // See below comment in DeserializeAsync regarding kludginess of this
-                var writer = ms.AsPipelineWriter();
-                await serializationManager.SerializeAsync(writer, input);
-                writer.Complete(); // Probably optional given the tight scope of writer here
-#else
                 await serializationManager.SerializeAsync(ms, input);
-#endif
                 ms.Flush();
                 return ms.ToArray();
             }
+#endif
         }
 
 

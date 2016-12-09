@@ -59,7 +59,9 @@ namespace Fact.Extensions.Serialization.Tests
             var resultBytesTask = sm.SerializeToByteArrayAsync(testRecord);
             var resultBytes = resultBytesTask.Result;
             var testRecord2Task = sm.DeserializeAsync(resultBytes, typeof(TestRecord));
-            var testRecord2 = testRecord2Task.Result;
+            var testRecord2 = (TestRecord)testRecord2Task.Result;
+
+            Assert.AreEqual(testRecord.Name, testRecord2.Name);
         }
 #endif
 
