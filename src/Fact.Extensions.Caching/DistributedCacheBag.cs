@@ -121,5 +121,19 @@ namespace Fact.Extensions.Caching
             Setting?.Invoke(key, _options);
             cache.Set(key, serializationManager.SerializeToByteArray(value, type), _options);
         }
+
+        public async Task<Tuple<bool, object>> TryGetAsync(string key, Type type)
+        {
+            // according to this https://github.com/aspnet/Caching/blob/dev/samples/RedisCacheSample/Program.cs
+            // it's implied that regular getters can merely return null if key not present.  So we'll try that
+            var byteArray = await cache.GetAsync(key);
+            if (byteArray == null)
+                return Tuple.Create(false, (object)null);
+            else
+            {
+                object value = await serializationManager.DeserializeAsyncHelper(byteArray, type);
+                return Tuple.Create(true, value);
+            }
+        }
     }
 }

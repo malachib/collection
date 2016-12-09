@@ -101,5 +101,14 @@ namespace Fact.Extensions.Serialization
         {
             return (T) serializationManager.Deserialize(input, typeof(T));
         }
+
+
+        public static async Task<object> DeserializeAsyncHelper(this ISerializationManager serializationManager, byte[] input, Type type)
+        {
+            if (serializationManager is ISerializationManagerAsync)
+                return await ((ISerializationManagerAsync)serializationManager).DeserializeAsync(input, type);
+            else
+                return serializationManager.Deserialize(input, type);
+        }
     }
 }
