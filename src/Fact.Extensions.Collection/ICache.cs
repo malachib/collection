@@ -46,9 +46,9 @@ namespace Fact.Extensions.Caching
 
     public class AbsoluteTimeExpiration : ICacheItemExpiration
     {
-        public DateTime Expiry { get; private set; }
+        public DateTimeOffset Expiry { get; private set; }
 
-        public AbsoluteTimeExpiration(DateTime expiryTime)
+        public AbsoluteTimeExpiration(DateTimeOffset expiryTime)
         {
             Expiry = expiryTime;
         }

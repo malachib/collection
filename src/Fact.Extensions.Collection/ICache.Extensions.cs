@@ -11,7 +11,7 @@ namespace Fact.Extensions.Caching
 {
     public static class ICache_Extensions
     {
-        public static void Set(this ICache cache, string key, object value, Type type, DateTime absoluteTimeExpiration)
+        public static void Set(this ICache cache, string key, object value, Type type, DateTimeOffset absoluteTimeExpiration)
         {
 #if STRICT
             var validOperation = cache.SupportedOptions.Contains(typeof(AbsoluteTimeExpiration));
@@ -39,7 +39,7 @@ namespace Fact.Extensions.Caching
         }
 
 
-        public static void Set<TValue>(this ICache cache, string key, TValue value, DateTime absoluteTimeExpiration)
+        public static void Set<TValue>(this ICache cache, string key, TValue value, DateTimeOffset absoluteTimeExpiration)
         {
             cache.Set(key, value, typeof(TValue), absoluteTimeExpiration);
         }
