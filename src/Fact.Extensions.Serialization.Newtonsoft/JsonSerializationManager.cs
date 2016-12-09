@@ -107,6 +107,36 @@ namespace Fact.Extensions.Serialization.Newtonsoft
         }
     }
 
+
+    /// <summary>
+    /// UNTESTED
+    /// </summary>
+    public class TextSerializationManagerWrapperAsync : 
+        ISerializationManagerAsync, 
+        ISerializationManager_TextEncoding
+    {
+        readonly ISerializationManager serializationManager;
+
+        public Encoding Encoding => ((ISerializationManager_TextEncoding)serializationManager).Encoding;
+
+        public async Task<object> DeserializeAsync(IPipelineReader input, Type type)
+        {
+            var readResult = await input.ReadAsync();
+            var stream = new ReadableBufferStream(readResult.Buffer);
+            return serializationManager.Deserialize(stream, type);
+        }
+
+        public async Task SerializeAsync(IPipelineWriter output, object inputValue, Type type = null)
+        {
+            var writeBuffer = output.Alloc();
+            var stream = new WriteableBufferStream(writeBuffer);
+            serializationManager.Serialize(stream, inputValue, type);
+            // FIX: following line needs to somehow work for this code to be viable
+            //await writer.FlushAsync();
+            output.Complete();
+        }
+    }
+
     public class JsonSerializationManagerAsync : ISerializationManagerAsync,
         ISerializationManager_TextEncoding
     {
