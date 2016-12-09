@@ -15,6 +15,7 @@ namespace Fact.Extensions.Caching
 
     public interface ICachedReference<TValue> : ICachedReference
     {
+        string Key { get; }
         TValue Value { get; set; }
     }
 
@@ -37,6 +38,9 @@ namespace Fact.Extensions.Caching
             this.factory = factory;
             this.getOptions = () => options;
         }
+
+        public string Key => key;
+        public void Clear() { cache.Remove(key); }
 
         public ICacheItemOption[] Options => getOptions().AsArray();
 
@@ -83,6 +87,10 @@ namespace Fact.Extensions.Caching
             this.key = key;
             this.options = options;
         }
+
+
+        public string Key => key;
+        public async Task Clear() { await cache.RemoveAsync(key); }
 
 
         public ICacheItemOption[] Options => options;

@@ -46,5 +46,27 @@ namespace Fact.Extensions.Caching.Tests
             Assert.AreNotEqual(option.TimeStamp, cr3.GetValue().Result.TimeStamp);
             Assert.AreEqual("desc 3", cr3.GetValue().Result.Desc);
         }
+
+
+        [TestMethod]
+        public void CachedReferenceAsyncAssignerTest()
+        {
+            int descConter = 1;
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddDistributedMemoryCache();
+            var provider = serviceCollection.BuildServiceProvider();
+            var dcache = provider.GetService<IDistributedCache>();
+            var cache = new DistributedCacheBag(dcache, new JsonSerializationManager());
+            TestCachedItem option;
+            Func<Task<TestCachedItem>> factory = async delegate
+            {
+                return await Task.FromResult(new TestCachedItem { Desc = "desc " + descConter++ });
+            };
+            var cr = cache.ReferenceAsync(factory);
+            option = cr;
+            cr.Clear().Wait();
+            option = cr;
+            cr.Value = option;
+        }
     }
 }
