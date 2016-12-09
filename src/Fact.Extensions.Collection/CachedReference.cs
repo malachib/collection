@@ -48,4 +48,40 @@ namespace Fact.Extensions.Caching
             return cachedReference.Value;
         }
     }
+
+
+    public struct CachedReferenceAsync<T>
+    {
+        readonly ICacheAsync cache;
+        readonly Func<Task<T>> factory;
+        readonly string key;
+        readonly ICacheItemOption[] options;
+
+        public CachedReferenceAsync(ICacheAsync cache, string key, Func<Task<T>> factory, params ICacheItemOption[] options)
+        {
+            this.cache = cache;
+            this.factory = factory;
+            this.key = key;
+            this.options = options;
+        }
+
+
+        /// <summary>
+        /// Retrieve item from the cache, and if it's not present there, allocate + add it
+        /// </summary>
+        /// <returns></returns>
+        public async Task<T> GetValue()
+        {
+            var response = await cache.TryGetAsync(key, typeof(T));
+            if (response.Item1)
+                return (T)response.Item2;
+            else
+            {
+                var value = await factory();
+                await cache.SetAsync(key, value, typeof(T), options);
+                return value;
+            }
+        }
+    }
+
 }

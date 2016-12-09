@@ -7,6 +7,9 @@ using Microsoft.Extensions.Caching.Memory;
 using Fact.Extensions.Caching;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading;
+using Microsoft.Extensions.Caching.Distributed;
+using Fact.Extensions.Serialization;
+using System.IO;
 
 namespace Fact.Extensions.Collection.Tests
 {

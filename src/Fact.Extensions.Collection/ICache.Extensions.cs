@@ -78,5 +78,32 @@ namespace Fact.Extensions.Caching
             var key = guid.ToString();
             return new CachedReference<TValue>(cache, "CachedReference:" + key, factory, options);
         }
+
+
+        /// <summary>
+        /// Acquire a CachedReference class using the specified key
+        /// </summary>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="cache"></param>
+        /// <param name="factory"></param>
+        /// <param name="options"></param>
+        public static CachedReferenceAsync<TValue> ReferenceAsync<TValue>(this ICacheAsync cache, string key, Func<Task<TValue>> factory, params ICacheItemOption[] options)
+        {
+            return new CachedReferenceAsync<TValue>(cache, key, factory, options);
+        }
+
+        /// <summary>
+        /// Acquire a CachedReference class using the specified key
+        /// </summary>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="cache"></param>
+        /// <param name="factory"></param>
+        /// <param name="options"></param>
+        public static CachedReferenceAsync<TValue> ReferenceAsync<TValue>(this ICacheAsync cache, Func<Task<TValue>> factory, params ICacheItemOption[] options)
+        {
+            var guid = Guid.NewGuid();
+            var key = guid.ToString();
+            return new CachedReferenceAsync<TValue>(cache, key, factory, options);
+        }
     }
 }
