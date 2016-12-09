@@ -49,5 +49,34 @@ namespace Fact.Extensions.Caching
         {
             cache.Set(key, value, typeof(TValue), slidingTimeExpiration);
         }
+
+
+        /// <summary>
+        /// Acquire a CachedReference class using the specified key
+        /// </summary>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="cache"></param>
+        /// <param name="factory"></param>
+        /// <param name="options"></param>
+        public static CachedReference<TValue> Reference<TValue>(this ICache cache, string key, Func<TValue> factory, params ICacheItemOption[] options)
+        {
+            return new CachedReference<TValue>(cache, key, factory, options);
+        }
+
+
+        /// <summary>
+        /// Acquire a CachedReference class using an auto-generated unique key
+        /// </summary>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="cache"></param>
+        /// <param name="factory"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static CachedReference<TValue> Reference<TValue>(this ICache cache, Func<TValue> factory, params ICacheItemOption[] options)
+        {
+            var guid = Guid.NewGuid();
+            var key = guid.ToString();
+            return new CachedReference<TValue>(cache, "CachedReference:" + key, factory, options);
+        }
     }
 }

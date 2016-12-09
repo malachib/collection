@@ -17,6 +17,13 @@ namespace Fact.Extensions.Caching
 
         public event Action<ICacheEntry> CreatingEntry;
 
+        /// <summary>
+        /// EXPERIMENTAL
+        /// For this entire bag behavior, allow options and possibly cached-object value itself
+        /// to be modified before placement in the cache
+        /// </summary>
+        public event Action<string, object, List<ICacheItemOption>> Modify;
+
         public MemoryCacheBag(IMemoryCache cache, ISerializationManager serializationManager = null)
         {
             this.serializationManager = serializationManager;
@@ -56,8 +63,19 @@ namespace Fact.Extensions.Caching
             cache.Remove(key);
         }
 
-        public void Set(string key, object value, Type type, params ICacheItemOption[] options)
+        public void Set(string key, object value, Type type, params ICacheItemOption[] _options)
         {
+            IEnumerable<ICacheItemOption> options;
+
+            if (Modify != null)
+            {
+                var modifiableOptions = new List<ICacheItemOption>(_options);
+                Modify(key, value, modifiableOptions);
+                options = modifiableOptions;
+            }
+            else
+                options = _options;
+
             using (var cacheEntry = cache.CreateEntry(key))
             {
                 foreach(var option in options)
