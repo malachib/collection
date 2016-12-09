@@ -16,15 +16,12 @@ namespace Fact.Extensions.Caching
         IIndexer<object, object>,
         IRemover<object>
     {
-        // serializationManager is a NOOP right now and should be null
-        readonly ISerializationManager serializationManager;
         readonly IMemoryCache cache;
 
         public event Action<ICacheEntry> CreatingEntry;
 
         public MemoryCacheIndexer(ISerializationManager serializationManager, IMemoryCache cache)
         {
-            this.serializationManager = serializationManager;
             this.cache = cache;
         }
 

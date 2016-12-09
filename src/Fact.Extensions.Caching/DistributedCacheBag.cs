@@ -4,13 +4,22 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Fact.Extensions.Serialization;
+using System.Linq;
 
 namespace Fact.Extensions.Caching
 {
-    public class DistributedCacheBag : IBag, IBagAsync, ITryGetter, IRemover, IRemoverAsync
+    public class DistributedCacheBag : ICache, ICacheAsync
     {
         readonly IDistributedCache cache;
         readonly ISerializationManager serializationManager;
+
+        public IEnumerable<Type> SupportedOptions
+        {
+            get
+            {
+                return Enumerable.Empty<Type>();
+            }
+        }
 
         public event Action<string, DistributedCacheEntryOptions> Setting;
 
@@ -47,17 +56,7 @@ namespace Fact.Extensions.Caching
 
         public async Task SetAsync(string key, object value, Type type)
         {
-            var options = new DistributedCacheEntryOptions();
-            Setting?.Invoke(key, options);
-
-            byte[] serializedValue;
-
-            if (serializationManager is ISerializationManagerAsync)
-                serializedValue = await ((ISerializationManagerAsync)serializationManager).SerializeToByteArrayAsync(value, type);
-            else
-                serializedValue = serializationManager.SerializeToByteArray(value, type);
-
-            await cache.SetAsync(key, serializedValue, options);
+            await SetAsync(key, value, type, new ICacheItemOption[0]);
         }
 
         public void Remove(string key) { cache.Remove(key); }
@@ -79,6 +78,28 @@ namespace Fact.Extensions.Caching
                 value = null;
                 return false;
             }
+        }
+
+        public async Task SetAsync(string key, object value, Type type, params ICacheItemOption[] options)
+        {
+            var _options = new DistributedCacheEntryOptions();
+            Setting?.Invoke(key, _options);
+
+            byte[] serializedValue;
+
+            if (serializationManager is ISerializationManagerAsync)
+                serializedValue = await ((ISerializationManagerAsync)serializationManager).SerializeToByteArrayAsync(value, type);
+            else
+                serializedValue = serializationManager.SerializeToByteArray(value, type);
+
+            await cache.SetAsync(key, serializedValue, _options);
+        }
+
+        public void Set(string key, object value, Type type, params ICacheItemOption[] options)
+        {
+            var _options = new DistributedCacheEntryOptions();
+            Setting?.Invoke(key, _options);
+            cache.Set(key, serializationManager.SerializeToByteArray(value, type), _options);
         }
     }
 }
