@@ -1,0 +1,3 @@
+[submodule "ext/myget"]
+	path = ext/myget
+	url = git@gitlab.com:malachi-configuration/myget.git
