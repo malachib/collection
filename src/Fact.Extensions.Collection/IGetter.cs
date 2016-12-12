@@ -40,4 +40,35 @@ namespace Fact.Extensions.Collection
         /// </summary>
         bool UnavailableThrowsException { get; set; }
     }
+
+
+    /// <summary>
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <remarks>
+    /// Some providers combine these operations for convenience and maybe to avoid race conditions
+    /// </remarks>
+    public interface IGetOrFetch<TKey, TValue>
+    {
+        TValue GetOrFetch(TKey key, Func<TValue> factory);
+    }
+
+
+    public interface IGetOrFetch : IGetOrFetch<string, object> { }
+
+
+    /// <summary>
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <remarks>
+    /// Some providers combine these operations for convenience and maybe to avoid race conditions
+    /// </remarks>
+    public interface IGetOrFetchAsync<TKey, TValue>
+    {
+        Task<TValue> GetOrFetchAsync(TKey key, Func<Task<TValue>> factory);
+    }
+
+    public interface IGetOrFetchAsync : IGetOrFetchAsync<string, object> { }
 }
