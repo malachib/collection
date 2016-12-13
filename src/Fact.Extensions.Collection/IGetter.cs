@@ -51,7 +51,7 @@ namespace Fact.Extensions.Collection
     /// </remarks>
     public interface IGetOrFetch<TKey, TValue>
     {
-        TValue GetOrFetch(TKey key, Func<TValue> factory);
+        TValue GetOrFetch(TKey key, Type type, Func<TValue> factory);
     }
 
 
@@ -67,7 +67,7 @@ namespace Fact.Extensions.Collection
     /// </remarks>
     public interface IGetOrFetchAsync<TKey, TValue>
     {
-        Task<TValue> GetOrFetchAsync(TKey key, Func<Task<TValue>> factory);
+        Task<TValue> GetOrFetchAsync(TKey key, Type type, Func<Task<TValue>> factory);
     }
 
     public interface IGetOrFetchAsync : IGetOrFetchAsync<string, object> { }
