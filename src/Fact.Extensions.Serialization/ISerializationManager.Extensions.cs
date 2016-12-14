@@ -50,26 +50,14 @@ namespace Fact.Extensions.Serialization
             var byteArray = serializationManager.SerializeToByteArray(input, type);
         }*/
 
-        public static async Task<byte[]> SerializeToByteArrayAsync(this ISerializationManagerAsync serializationManager, object input, Type type = null)
+        public static async Task<byte[]> SerializeToByteArrayAsync(this ISerializerAsync<Stream> serializationManager, object input, Type type = null)
         {
-#if FEATURE_ENABLE_PIPELINES
-            // See below comment in DeserializeAsync regarding kludginess of this
-            var pipeline = new PipelineFactory().Create();
-            var writerTask = serializationManager.SerializeAsync(pipeline, input);
-            // Happens inside SerializeAsync, but do we always really want to totally end pipeline communication
-            // from INSIDE a utility function?
-            //pipeline.CompleteWriter(); 
-            var readableBuffer = await pipeline.ReadToEndAsync();
-            var returnValue = readableBuffer.ToArray();
-            return returnValue;
-#else
             using (var ms = new MemoryStream())
             {
                 await serializationManager.SerializeAsync(ms, input);
                 ms.Flush();
                 return ms.ToArray();
             }
-#endif
         }
 
 
@@ -109,20 +97,12 @@ namespace Fact.Extensions.Serialization
             return (T) serializationManager.Deserialize(input, typeof(T), encoding);
         }
 
-        public static async Task<object> DeserializeAsync(this ISerializationManagerAsync serializationManager, byte[] inputValue, Type type)
+        public static async Task<object> DeserializeAsync(this IDeserializerAsync<Stream> serializationManager, byte[] inputValue, Type type)
         {
-#if FEATURE_ENABLE_PIPELINES
-            var reader = inputValue.AsPipelineReader();
-
-            // Not waiting on awaiter from AsReader because it should be 100% consumed by the read embedded in 
-            // DeserializeAsync
-            return await serializationManager.DeserializeAsync(reader, type);
-#else
             using (var ms = new System.IO.MemoryStream(inputValue))
             {
                 return await serializationManager.DeserializeAsync(ms, type);
             }
-#endif
         }
 
 
@@ -131,25 +111,4 @@ namespace Fact.Extensions.Serialization
             return (T) serializationManager.Deserialize(input, typeof(T));
         }
     }
-
-
-#if FEATURE_ENABLE_PIPELINES
-    public static class ByteArray_Extensions
-    {
-        public static UnownedBufferReader AsPipelineReader(this byte[] value, out Task awaiter)
-        {
-            var reader = new UnownedBufferReader();
-            awaiter = reader.WriteAsync(value, CancellationToken.None);
-            return reader;
-        }
-
-
-        public static UnownedBufferReader AsPipelineReader(this byte[] value)
-        {
-            var reader = new UnownedBufferReader();
-            reader.WriteAsync(value, CancellationToken.None);
-            return reader;
-        }
-    }
-#endif
 }

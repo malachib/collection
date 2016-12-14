@@ -1,0 +1,28 @@
+﻿{
+  "version": "1.0.0-*",
+  "authors": [ "Malachi Burke" ],
+  "description": "Experimental Pipeline implementations of ISerializationManager",
+  "packOptions": {
+    "releaseNotes": ""
+  },
+
+  "dependencies": {
+    "Fact.Extensions.Serialization": "*"
+    // Seems to be causing issues with my NuGet upload
+    //"System.Diagnostics.Contracts": "4.0.1"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [
+          "NETSTANDARD1_6"
+        ]
+      },
+      "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "System.IO.Pipelines": "0.1.0-e161214-2"
+      }
+    }
+  }
+}

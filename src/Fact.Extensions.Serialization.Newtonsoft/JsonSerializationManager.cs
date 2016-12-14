@@ -112,7 +112,7 @@ namespace Fact.Extensions.Serialization.Newtonsoft
     /// UNTESTED
     /// </summary>
     public class TextSerializationManagerWrapperAsync : 
-        ISerializationManagerAsync, 
+        ISerializationManagerAsync<IPipelineReader, IPipelineWriter>, 
         ISerializationManager_TextEncoding
     {
         readonly ISerializationManager serializationManager;
@@ -137,7 +137,8 @@ namespace Fact.Extensions.Serialization.Newtonsoft
         }
     }
 
-    public class JsonSerializationManagerAsync : ISerializationManagerAsync,
+    public class JsonSerializationManagerAsync : 
+        ISerializationManagerAsync<IPipelineReader, IPipelineWriter>,
         ISerializationManager_TextEncoding
     {
         //readonly JsonSerializerSettings settings;

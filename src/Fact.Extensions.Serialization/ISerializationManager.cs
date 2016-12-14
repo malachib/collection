@@ -13,38 +13,51 @@ using System.IO.Pipelines;
 
 namespace Fact.Extensions.Serialization
 {
-    public interface ISerializationManager<TTransportIn, TTransportOut>
+    public interface ISerializer<TOut>
     {
-        void Serialize(TTransportOut output, object inputValue, Type type = null);
-        object Deserialize(TTransportIn input, Type type);
+        void Serialize(TOut output, object inputValue, Type type = null);
     }
 
 
-    public interface ISerializationManagerAsync<TTransportIn, TTransportOut>
+    public interface IDeserializer<TIn>
     {
-        Task SerializeAsync(TTransportOut output, object inputValue, Type type = null);
-        Task<object> DeserializeAsync(TTransportIn input, Type type);
+        object Deserialize(TIn input, Type type);
+    }
+
+    public interface ISerializerAsync<TOut>
+    {
+        Task SerializeAsync(TOut output, object inputValue, Type type = null);
     }
 
 
-    public interface ISerializationManager : ISerializationManager<Stream, Stream>
+    public interface IDeserializerAsync<TIn>
+    {
+        Task<object> DeserializeAsync(TIn input, Type type);
+    }
+
+    public interface ISerializationManager<TTransportIn, TTransportOut> : 
+        ISerializer<TTransportOut>,
+        IDeserializer<TTransportIn>
     {
     }
 
-#if FEATURE_ENABLE_PIPELINES
-    public interface ISerializationManagerAsync : 
-        ISerializationManagerAsync<IPipelineReader, IPipelineWriter>
-    {
-    }
-#else
 
-    public interface ISerializationManagerAsync : 
-        ISerializationManagerAsync<Stream, Stream>
+    public interface ISerializationManagerAsync<TTransportIn, TTransportOut> :
+        ISerializerAsync<TTransportOut>,
+        IDeserializerAsync<TTransportIn>
     {
     }
 
-#endif
 
+    public interface ISerializationManagerAsync<TTransport> :
+        ISerializationManagerAsync<TTransport, TTransport>
+    { }
+
+
+    public interface ISerializationManager<TTransport> : 
+        ISerializationManager<TTransport, TTransport>
+    {
+    }
 
     /// <summary>
     /// Use for ISerializationManagers which have a constant encoding
