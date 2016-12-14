@@ -11,6 +11,30 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    /// <summary>
+    /// Generally, a serializer pushes something over an out channel.  Sometimes though,
+    /// the serializer generates the output channel itself.  This is the case with byte array
+    /// output channels
+    /// </summary>
+    /// <typeparam name="TOut"></typeparam>
+    public interface IAllocatingSerializer<TOut>
+    {
+        TOut Serialize(object input, Type type = null);
+    }
+
+
+    /// <summary>
+    /// Generally, a serializer pushes something over an out channel.  Sometimes though,
+    /// the serializer generates the output channel itself.  This is the case with byte array
+    /// output channels
+    /// </summary>
+    /// <typeparam name="TOut"></typeparam>
+    public interface IAllocatingSerializerAsync<TOut>
+    {
+        Task<TOut> SerializeAsync(object input, Type type = null);
+    }
+
+
     public interface IDeserializer<TIn>
     {
         object Deserialize(TIn input, Type type);
@@ -34,10 +58,26 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    public interface IByteArraySerializationManager : 
+        IAllocatingSerializer<byte[]>,
+        IDeserializer<byte[]>
+    {
+
+    }
+
+
     public interface ISerializationManagerAsync<TTransportIn, TTransportOut> :
         ISerializerAsync<TTransportOut>,
         IDeserializerAsync<TTransportIn>
     {
+    }
+
+
+    public interface IByteArraySerializationManagerAsync : 
+        IAllocatingSerializerAsync<byte[]>,
+        IDeserializerAsync<byte[]>
+    {
+
     }
 
 

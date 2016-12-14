@@ -53,27 +53,9 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static byte[] SerializeToByteArray(this ISerializer<ByteArray> serializer, object input, Type type)
-        {
-            var output = new ByteArray();
-            serializer.Serialize(output, input, type);
-            return output.Value;
-        }
-
-
-
-        public static async Task<byte[]> SerializeToByteArrayAsync(this ISerializerAsync<ByteArray> serializer, object input, Type type)
-        {
-            var output = new ByteArray();
-            await serializer.SerializeAsync(output, input, type);
-            return output.Value;
-        }
-
-
-
         public static object Deserialize(this IDeserializer<Stream> serializationManager, byte[] inputValue, Type type)
         {
-            using (var ms = new System.IO.MemoryStream(inputValue))
+            using (var ms = new MemoryStream(inputValue))
             {
                 return serializationManager.Deserialize(ms, type);
             }

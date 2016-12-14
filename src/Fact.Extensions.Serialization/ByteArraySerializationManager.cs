@@ -9,47 +9,36 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
-    public class ByteArray
-    {
-        public byte[] Value { get; set; }
-
-        public static implicit operator byte[] (ByteArray byteArray)
-        {
-            return byteArray.Value;
-        }
-    }
-
-    public class ByteArrayToStreamSerializationManager : 
-        ISerializationManager<ByteArray>
+    public class ByteArrayToStreamSerializationManager : IByteArraySerializationManager
     {
         readonly ISerializationManager<Stream> serializationManager;
 
-        public object Deserialize(ByteArray input, Type type)
+        public object Deserialize(byte[] input, Type type)
         {
             return serializationManager.Deserialize(input, type);
         }
 
-        public void Serialize(ByteArray output, object inputValue, Type type = null)
+        public byte[] Serialize(object inputValue, Type type = null)
         {
-            output.Value = serializationManager.SerializeToByteArray(inputValue, type);
+            return serializationManager.SerializeToByteArray(inputValue, type);
         }
     }
 
-
-    public class ByteArrayToReaderWriteSerializationManager : ISerializationManager<ByteArray>
+    /*
+    public class ByteArrayToReaderWriteSerializationManager : IByteArraySerializationManager
     {
         readonly ISerializationManager<TextReader, TextWriter> serializationManager;
 
-        public object Deserialize(ByteArray input, Type type)
+        public object Deserialize(byte[] input, Type type)
         {
             throw new NotImplementedException();
         }
 
-        public void Serialize(ByteArray output, object inputValue, Type type = null)
+        public byte[] Serialize(object inputValue, Type type = null)
         {
             throw new NotImplementedException();
         }
-    }
+    }*/
 
 
 #if NETSTANDARD1_6
