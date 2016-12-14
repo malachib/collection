@@ -3,6 +3,6 @@ dist: trusty
 sudo: required
 mono: none
 dotnet: 1.0.0-preview2-1-003177
-before-script: cd src
+before-install: cd src
 script:
   - ./travis_build.sh --quiet verify
