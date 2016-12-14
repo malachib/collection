@@ -7,10 +7,10 @@
   },
 
   "dependencies": {
-    "Fact.Extensions.Serialization": "*",
+    "Fact.Extensions.Serialization": "1.0.0-*",
     // NOTE: Only during proof of concept phase.  After which Newtonsoft will be split out elsewhere, if it
     // still even exists (JsonSerializationManagerAsync might phase out in lieu of wrappers)
-    "Fact.Extensions.Serialization.Newtonsoft": "*"
+    "Fact.Extensions.Serialization.Newtonsoft": "1.0.0-*"
     // Seems to be causing issues with my NuGet upload
     //"System.Diagnostics.Contracts": "4.0.1"
   },
