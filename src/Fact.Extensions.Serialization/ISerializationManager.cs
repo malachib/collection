@@ -13,24 +13,34 @@ using System.IO.Pipelines;
 
 namespace Fact.Extensions.Serialization
 {
-    public interface ISerializationManager
+    public interface ISerializationManager<TTransportIn, TTransportOut>
     {
-        void Serialize(Stream output, object inputValue, Type type = null);
-        object Deserialize(Stream input, Type type);
+        void Serialize(TTransportOut output, object inputValue, Type type = null);
+        object Deserialize(TTransportIn input, Type type);
+    }
+
+
+    public interface ISerializationManagerAsync<TTransportIn, TTransportOut>
+    {
+        Task SerializeAsync(TTransportOut output, object inputValue, Type type = null);
+        Task<object> DeserializeAsync(TTransportIn input, Type type);
+    }
+
+
+    public interface ISerializationManager : ISerializationManager<Stream, Stream>
+    {
     }
 
 #if FEATURE_ENABLE_PIPELINES
-    public interface ISerializationManagerAsync
+    public interface ISerializationManagerAsync : 
+        ISerializationManagerAsync<IPipelineReader, IPipelineWriter>
     {
-        Task SerializeAsync(IPipelineWriter output, object inputValue, Type type = null);
-        Task<object> DeserializeAsync(IPipelineReader input, Type type);
     }
 #else
 
-    public interface ISerializationManagerAsync
+    public interface ISerializationManagerAsync : 
+        ISerializationManagerAsync<Stream, Stream>
     {
-        Task SerializeAsync(Stream output, object inputValue, Type type = null);
-        Task<object> DeserializeAsync(Stream input, Type type);
     }
 
 #endif
