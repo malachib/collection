@@ -1,6 +1,6 @@
 language: csharp
 dist: trusty
-sudo: required
+#sudo: required
 mono: none
 dotnet: 1.0.0-preview2-1-003177
 before_script:
@@ -8,6 +8,8 @@ before_script:
   - cd src
 script:
   - ./travis_build.sh --quiet verify
-#deploy:
-#  provider: script
-#  script: bumped release patch
+deploy:
+  provider: script
+  script: 
+    - nuget
+    - echo Will deploy to: $NUGET_SOURCE
