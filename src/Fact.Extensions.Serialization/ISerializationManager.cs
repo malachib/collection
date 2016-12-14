@@ -1,15 +1,7 @@
-﻿#if NETSTANDARD1_6
-#define FEATURE_ENABLE_PIPELINES
-#endif
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
-#if FEATURE_ENABLE_PIPELINES
-using System.IO.Pipelines;
-#endif
 
 namespace Fact.Extensions.Serialization
 {

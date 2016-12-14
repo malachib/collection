@@ -1,14 +1,6 @@
-﻿#if NETSTANDARD1_6
-#define FEATURE_ENABLE_PIPELINES
-#endif
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-#if FEATURE_ENABLE_PIPELINES
-using System.Buffers;
-using System.IO.Pipelines;
-#endif
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,10 +46,27 @@ namespace Fact.Extensions.Serialization
         {
             using (var ms = new MemoryStream())
             {
-                await serializationManager.SerializeAsync(ms, input);
+                await serializationManager.SerializeAsync(ms, input, type);
                 ms.Flush();
                 return ms.ToArray();
             }
+        }
+
+
+        public static byte[] SerializeToByteArray(this ISerializer<ByteArray> serializer, object input, Type type)
+        {
+            var output = new ByteArray();
+            serializer.Serialize(output, input, type);
+            return output.Value;
+        }
+
+
+
+        public static async Task<byte[]> SerializeToByteArrayAsync(this ISerializerAsync<ByteArray> serializer, object input, Type type)
+        {
+            var output = new ByteArray();
+            await serializer.SerializeAsync(output, input, type);
+            return output.Value;
         }
 
 
