@@ -8,10 +8,10 @@ before_script:
   - cd src
 script:
   - ./travis_build.sh --quiet verify
-after_success:
-  script:
-    - dotnet test Fact.Extensions.Collection.Tests
-    - dotnet test Fact.Extensions.Serialization.Tests
+  - dotnet test Fact.Extensions.Collection.Tests
+  - dotnet test Fact.Extensions.Serialization.Tests
+#after_success:
+#  script:
 deploy:
   provider: script
   script: 
