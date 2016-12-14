@@ -13,3 +13,5 @@ deploy:
   script: 
     - nuget
     - echo Will deploy to: $NUGET_SOURCE
+  on:
+    branch: travis
