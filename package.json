@@ -1,5 +1,10 @@
 {
   "name": "Fact.Extensions.Collection",
   "description": "Set of libraries for property-bag like operations",
-  "version": "0.0.1"
+  "version": "0.0.2",
+  "license": "MIT",
+  "devDependencies": {
+    "bumped": "0.10.3",
+    "git-dirty": "1.0.2"
+  }
 }
