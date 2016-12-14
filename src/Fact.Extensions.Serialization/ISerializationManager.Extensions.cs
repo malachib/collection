@@ -9,6 +9,25 @@ namespace Fact.Extensions.Serialization
 {
     public static class ISerializationManager_Extensions
     {
+        public static Encoding GetEncodingOrDefault<T>(this ISerializer<T> serializer)
+        {
+            Encoding encoding;
+            if (serializer is ISerializationManager_TextEncoding)
+                return ((ISerializationManager_TextEncoding)serializer).Encoding;
+            else
+            {
+                // TODO: Do a policy thing here, throw exception or a default
+                return Encoding.UTF8;
+            }
+        }
+
+        public static byte[] SerializeToByteArray(this ISerializer<TextWriter> serializer, object input, Type type = null)
+        {
+            var stringOutput = serializer.SerializeToString(input, type);
+            var encoding = serializer.GetEncodingOrDefault();
+            return encoding.GetBytes(stringOutput);
+        }
+
         public static byte[] SerializeToByteArray(this ISerializer<Stream> serializationManager, object input, Type type = null)
         {
             using (var ms = new MemoryStream())
@@ -17,6 +36,14 @@ namespace Fact.Extensions.Serialization
                 ms.Flush();
                 return ms.ToArray();
             }
+        }
+
+
+        public static string SerializeToString(this ISerializer<TextWriter> serializer, object input, Type type = null)
+        {
+            var writer = new StringWriter();
+            serializer.Serialize(writer, input, type);
+            return writer.ToString();
         }
 
 
@@ -50,6 +77,27 @@ namespace Fact.Extensions.Serialization
                 ms.Flush();
                 return ms.ToArray();
             }
+        }
+
+
+        public static object Deserialize(this IDeserializer<TextReader> deserializer, byte[] inputValue, Type type)
+        {
+            var encoding = ((ISerializer<TextWriter>)deserializer).GetEncodingOrDefault();
+            return deserializer.Deserialize(encoding.GetString(inputValue, 0, inputValue.Length), type);
+        }
+
+
+        public static object Deserialize(this IDeserializer<TextReader> deserializer, string input, Type type)
+        {
+            using (var reader = new StringReader(input))
+            {
+                return deserializer.Deserialize(reader, type);
+            }
+        }
+
+        public static T Deserialize<T>(this IDeserializer<TextReader> deserializer, string input)
+        {
+            return (T)deserializer.Deserialize(input, typeof(T));
         }
 
 

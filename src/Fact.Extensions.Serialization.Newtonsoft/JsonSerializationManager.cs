@@ -17,6 +17,32 @@ using Newtonsoft.Json;
 
 namespace Fact.Extensions.Serialization.Newtonsoft
 {
+    public class JsonSerializationManagerNative : 
+        ISerializationManager<TextReader, TextWriter>,
+        ISerializationManager_TextEncoding
+    {
+        //readonly JsonSerializerSettings settings;
+        readonly JsonSerializer serializer;
+
+        public Encoding Encoding => Encoding.UTF8;
+
+        public JsonSerializationManagerNative(JsonSerializer serializer = null)
+        {
+            this.serializer = serializer ?? JsonSerializer.CreateDefault();
+        }
+
+        public object Deserialize(TextReader input, Type type)
+        {
+            return serializer.Deserialize(input, type);
+        }
+
+        public void Serialize(TextWriter output, object inputValue, Type type = null)
+        {
+            serializer.Serialize(output, inputValue, type);
+        }
+    }
+
+
     public class JsonSerializationManager : ISerializationManager<Stream>, 
         ISerializationManager_TextEncoding
     {

@@ -50,6 +50,25 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
+        [TestMethod]
+        public void JsonNativeTest()
+        {
+            var sm = new JsonSerializationManagerNative();
+            var testRecord = new TestRecord(true);
+
+            var output1 = sm.SerializeToString(testRecord);
+            //var badOutput = sm.SerializeToString(testRecord, typeof(TestRecord), Encoding.Unicode);
+            var byteArray = sm.SerializeToByteArray(testRecord, typeof(TestRecord));
+
+            var output = Encoding.UTF8.GetString(byteArray);
+
+            var output3 = sm.Deserialize(byteArray, typeof(TestRecord));
+            var output4 = sm.Deserialize<TestRecord>(output1);
+
+            Assert.AreEqual(output, output1);
+        }
+
+
 #if FEATURE_ENABLED_PIPELINES
         [TestMethod]
         public void JsonAsyncTest()
