@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "authors": [ "Malachi Burke" ],
   "description": "Utility interface abstractions for serialization",
@@ -34,7 +34,7 @@
       },
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "System.IO.Pipelines": "0.1.0-e161208-2"
+        "System.IO.Pipelines": "0.1.0-e161214-2"
       }
     }
   }

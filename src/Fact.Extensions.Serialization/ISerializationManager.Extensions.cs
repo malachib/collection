@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 #if FEATURE_ENABLE_PIPELINES
+using System.Buffers;
 using System.IO.Pipelines;
 #endif
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
@@ -109,17 +111,18 @@ namespace Fact.Extensions.Serialization
 
         public static async Task<object> DeserializeAsync(this ISerializationManagerAsync serializationManager, byte[] inputValue, Type type)
         {
+#if FEATURE_ENABLE_PIPELINES
+            var reader = inputValue.AsPipelineReader();
+
+            // Not waiting on awaiter from AsReader because it should be 100% consumed by the read embedded in 
+            // DeserializeAsync
+            return await serializationManager.DeserializeAsync(reader, type);
+#else
             using (var ms = new System.IO.MemoryStream(inputValue))
             {
-#if FEATURE_ENABLE_PIPELINES
-                // 100% certain this is not the right way, but PipeLine stuff is pretty new
-                // so after 15 minutes of digging and finding no clues, I am rolling with this - for now
-                var reader = ms.AsPipelineReader();
-                return await serializationManager.DeserializeAsync(reader, type);
-#else
                 return await serializationManager.DeserializeAsync(ms, type);
-#endif
             }
+#endif
         }
 
 
@@ -128,4 +131,25 @@ namespace Fact.Extensions.Serialization
             return (T) serializationManager.Deserialize(input, typeof(T));
         }
     }
+
+
+#if FEATURE_ENABLE_PIPELINES
+    public static class ByteArray_Extensions
+    {
+        public static UnownedBufferReader AsPipelineReader(this byte[] value, out Task awaiter)
+        {
+            var reader = new UnownedBufferReader();
+            awaiter = reader.WriteAsync(value, CancellationToken.None);
+            return reader;
+        }
+
+
+        public static UnownedBufferReader AsPipelineReader(this byte[] value)
+        {
+            var reader = new UnownedBufferReader();
+            reader.WriteAsync(value, CancellationToken.None);
+            return reader;
+        }
+    }
+#endif
 }
