@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Fact.Extensions.Serialization;
 using System.Linq;
+using System.IO;
 
 namespace Fact.Extensions.Caching
 {
     public class DistributedCacheBag : ICache, ICacheAsync
     {
         readonly IDistributedCache cache;
-        readonly ISerializationManager serializationManager;
+        readonly ISerializationManager<Stream> serializationManager;
 
         public IEnumerable<Type> SupportedOptions
         {
@@ -24,7 +25,7 @@ namespace Fact.Extensions.Caching
 
         public event Action<string, DistributedCacheEntryOptions> Setting;
 
-        public DistributedCacheBag(IDistributedCache cache, ISerializationManager serializationManager)
+        public DistributedCacheBag(IDistributedCache cache, ISerializationManager<Stream> serializationManager)
         {
             this.serializationManager = serializationManager;
             this.cache = cache;
@@ -49,10 +50,12 @@ namespace Fact.Extensions.Caching
         public async Task<object> GetAsync(string key, Type type)
         {
             var value = await cache.GetAsync(key);
+            return await serializationManager.DeserializeAsyncHelper(value, type);
+            /*
             if (serializationManager is ISerializationManagerAsync)
                 return await ((ISerializationManagerAsync)serializationManager).DeserializeAsync(value, type);
             else
-                return serializationManager.Deserialize(value, type);
+                return serializationManager.Deserialize(value, type);*/
         }
 
         public async Task SetAsync(string key, object value, Type type)
@@ -106,8 +109,8 @@ namespace Fact.Extensions.Caching
 
             byte[] serializedValue;
 
-            if (serializationManager is ISerializationManagerAsync)
-                serializedValue = await ((ISerializationManagerAsync)serializationManager).SerializeToByteArrayAsync(value, type);
+            if (serializationManager is ISerializerAsync<Stream>)
+                serializedValue = await ((ISerializerAsync<Stream>)serializationManager).SerializeToByteArrayAsync(value, type);
             else
                 serializedValue = serializationManager.SerializeToByteArray(value, type);
 

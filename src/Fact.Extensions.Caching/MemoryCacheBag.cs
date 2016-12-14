@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using Fact.Extensions.Collection;
 using Fact.Extensions.Serialization;
 using Microsoft.Extensions.Caching.Memory;
+using System.IO;
 
 namespace Fact.Extensions.Caching
 {
     public class MemoryCacheBag : ICache
     {
         // TODO: serializationManager is 100% dormant here, but at some point we may want to fill it out
-        readonly ISerializationManager serializationManager;
+        readonly ISerializationManager<Stream> serializationManager;
         readonly IMemoryCache cache;
 
         public event Action<ICacheEntry> CreatingEntry;
@@ -24,7 +25,7 @@ namespace Fact.Extensions.Caching
         /// </summary>
         public event Action<string, object, List<ICacheItemOption>> Modify;
 
-        public MemoryCacheBag(IMemoryCache cache, ISerializationManager serializationManager = null)
+        public MemoryCacheBag(IMemoryCache cache, ISerializationManager<Stream> serializationManager = null)
         {
             this.serializationManager = serializationManager;
             this.cache = cache;

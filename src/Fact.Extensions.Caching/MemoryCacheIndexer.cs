@@ -20,7 +20,7 @@ namespace Fact.Extensions.Caching
 
         public event Action<ICacheEntry> CreatingEntry;
 
-        public MemoryCacheIndexer(ISerializationManager serializationManager, IMemoryCache cache)
+        public MemoryCacheIndexer(IMemoryCache cache)
         {
             this.cache = cache;
         }

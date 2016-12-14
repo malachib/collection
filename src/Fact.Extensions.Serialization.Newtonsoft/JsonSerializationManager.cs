@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace Fact.Extensions.Serialization.Newtonsoft
 {
-    public class JsonSerializationManager : ISerializationManager, 
+    public class JsonSerializationManager : ISerializationManager<Stream>, 
         ISerializationManager_TextEncoding
     {
         //readonly JsonSerializerSettings settings;
@@ -115,7 +115,7 @@ namespace Fact.Extensions.Serialization.Newtonsoft
         ISerializationManagerAsync<IPipelineReader, IPipelineWriter>, 
         ISerializationManager_TextEncoding
     {
-        readonly ISerializationManager serializationManager;
+        readonly ISerializationManager<Stream, Stream> serializationManager;
 
         public Encoding Encoding => ((ISerializationManager_TextEncoding)serializationManager).Encoding;
 

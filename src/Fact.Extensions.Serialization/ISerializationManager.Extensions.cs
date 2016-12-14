@@ -17,7 +17,7 @@ namespace Fact.Extensions.Serialization
 {
     public static class ISerializationManager_Extensions
     {
-        public static byte[] SerializeToByteArray(this ISerializationManager serializationManager, object input, Type type = null)
+        public static byte[] SerializeToByteArray(this ISerializer<Stream> serializationManager, object input, Type type = null)
         {
             using (var ms = new MemoryStream())
             {
@@ -28,7 +28,7 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static string SerializeToString(this ISerializationManager serializationManager, object input, Type type = null, Encoding encoding = null)
+        public static string SerializeToString(this ISerializer<Stream> serializationManager, object input, Type type = null, Encoding encoding = null)
         {
             if (encoding == null)
             {
@@ -62,7 +62,7 @@ namespace Fact.Extensions.Serialization
 
 
 
-        public static object Deserialize(this ISerializationManager serializationManager, byte[] inputValue, Type type)
+        public static object Deserialize(this IDeserializer<Stream> serializationManager, byte[] inputValue, Type type)
         {
             using (var ms = new System.IO.MemoryStream(inputValue))
             {
@@ -71,7 +71,7 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static object Deserialize(this ISerializationManager serializationManager, string input, Type type, Encoding encoding = null)
+        public static object Deserialize(this IDeserializer<Stream> serializationManager, string input, Type type, Encoding encoding = null)
         {
             if (encoding == null)
             {
@@ -87,12 +87,12 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static T Deserialize<T>(this ISerializationManager serializationManager, byte[] input)
+        public static T Deserialize<T>(this IDeserializer<Stream> serializationManager, byte[] input)
         {
             return (T)serializationManager.Deserialize(input, typeof(T));
         }
 
-        public static T Deserialize<T>(this ISerializationManager serializationManager, string input, Encoding encoding = null)
+        public static T Deserialize<T>(this IDeserializer<Stream> serializationManager, string input, Encoding encoding = null)
         {
             return (T) serializationManager.Deserialize(input, typeof(T), encoding);
         }
@@ -106,7 +106,7 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static T Deserialize<T>(this ISerializationManager serializationManager, Stream input)
+        public static T Deserialize<T>(this IDeserializer<Stream> serializationManager, Stream input)
         {
             return (T) serializationManager.Deserialize(input, typeof(T));
         }
@@ -120,10 +120,10 @@ namespace Fact.Extensions.Serialization
         /// <param name="input"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static async Task<object> DeserializeAsyncHelper(this ISerializationManager serializationManager, byte[] input, Type type)
+        public static async Task<object> DeserializeAsyncHelper(this IDeserializer<Stream> serializationManager, byte[] input, Type type)
         {
-            if (serializationManager is ISerializationManagerAsync)
-                return await ((ISerializationManagerAsync)serializationManager).DeserializeAsync(input, type);
+            if (serializationManager is IDeserializerAsync<Stream>)
+                return await ((IDeserializerAsync<Stream>)serializationManager).DeserializeAsync(input, type);
             else
                 return serializationManager.Deserialize(input, type);
         }

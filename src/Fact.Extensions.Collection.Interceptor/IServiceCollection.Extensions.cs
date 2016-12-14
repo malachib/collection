@@ -64,7 +64,7 @@ namespace Fact.Extensions.Collection
                 implementationType, 
                 memoryCache =>
                 {
-                    var memoryCacheIndexer = new MemoryCacheIndexer(null, memoryCache);
+                    var memoryCacheIndexer = new MemoryCacheIndexer(memoryCache);
                     var memoryCacheBag = memoryCacheIndexer.ToNamedBag();
                     return memoryCacheBag;
                 },

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Bson;
 
 namespace Fact.Extensions.Serialization.Newtonsoft
 {
-    public class BsonSerializationManager : ISerializationManager
+    public class BsonSerializationManager : ISerializationManager<Stream>
     {
         readonly JsonSerializer serializer = new JsonSerializer();
 

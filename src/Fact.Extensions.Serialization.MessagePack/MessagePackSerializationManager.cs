@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization.MessagePack
 {
-    public class MessagePackSerializationManager : ISerializationManager
+    public class MessagePackSerializationManager : ISerializationManager<Stream>
     {
         public object Deserialize(Stream input, Type type)
         {
