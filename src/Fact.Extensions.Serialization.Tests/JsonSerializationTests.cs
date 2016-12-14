@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 #if FEATURE_ENABLED_PIPELINES
 using System.IO.Pipelines;
+using Fact.Extensions.Serialization.Pipelines;
 #endif
 
 namespace Fact.Extensions.Serialization.Tests

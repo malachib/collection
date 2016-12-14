@@ -83,7 +83,13 @@ namespace Fact.Extensions.Serialization
         public static object Deserialize(this IDeserializer<TextReader> deserializer, byte[] inputValue, Type type)
         {
             var encoding = ((ISerializer<TextWriter>)deserializer).GetEncodingOrDefault();
-            return deserializer.Deserialize(encoding.GetString(inputValue, 0, inputValue.Length), type);
+            using (var stream = new MemoryStream(inputValue))
+            {
+                using (var reader = new StreamReader(stream, encoding))
+                {
+                    return deserializer.Deserialize(reader, type);
+                }
+            }
         }
 
 
