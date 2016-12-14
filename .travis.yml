@@ -10,6 +10,6 @@ script:
   - ./travis_build.sh --quiet verify
 deploy:
   provider: script
-  script: chmod +x testecho.sh && ./testecho.sh 'Will deploy to: ${NUGET_SOURCE}'
+  script: chmod +x testecho.sh && ./testecho.sh 'Will deploy to: NUGET_SOURCE'
   on:
     branch: travis
