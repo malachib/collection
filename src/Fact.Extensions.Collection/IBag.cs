@@ -4,7 +4,11 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Collection
 {
-    public interface IBag : IGetter, ISetter { }
+    /// <summary>
+    /// Abstracted getters and setters for a property-bag pattern
+    /// This flavor expects keys to be strings
+    /// </summary>
+    public interface IBag : IBag<string, object>, IGetter, ISetter { }
 
     public interface IBagAsync : IGetterAsync, ISetterAsync { }
 

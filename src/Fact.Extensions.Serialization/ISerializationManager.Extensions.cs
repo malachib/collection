@@ -110,5 +110,22 @@ namespace Fact.Extensions.Serialization
         {
             return (T) serializationManager.Deserialize(input, typeof(T));
         }
+
+
+        /// <summary>
+        /// Assists in deserializing from a byte array, and automatically forward casts to ISerializationManagerAsync
+        /// if available - otherwise uses regular ISerializationManager
+        /// </summary>
+        /// <param name="serializationManager"></param>
+        /// <param name="input"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static async Task<object> DeserializeAsyncHelper(this ISerializationManager serializationManager, byte[] input, Type type)
+        {
+            if (serializationManager is ISerializationManagerAsync)
+                return await ((ISerializationManagerAsync)serializationManager).DeserializeAsync(input, type);
+            else
+                return serializationManager.Deserialize(input, type);
+        }
     }
 }

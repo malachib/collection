@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>8ab0d287-f597-4acc-9dbc-29753bdeb5ac</ProjectGuid>
-    <RootNamespace>Fact.Extensions.Caching</RootNamespace>
+    <ProjectGuid>f4e828e3-f7db-475c-8632-b624cac2a10b</ProjectGuid>
+    <RootNamespace>Fact.Extensions.Configuration</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>

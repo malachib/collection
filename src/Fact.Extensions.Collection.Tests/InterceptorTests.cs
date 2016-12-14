@@ -140,5 +140,22 @@ namespace Fact.Extensions.Collection.Tests
 
             Assert.AreEqual(testValue, config.Test);
         }
+
+
+        [TestMethod]
+        public void BagToInterceptorTest()
+        {
+            var dictionary = new Dictionary<string, object>();
+            var indexer = dictionary.ToIndexer();
+            var bag = indexer.ToNamedBag();
+            var i = bag.ToInterface<IConfig>();
+
+            i.Test = "10";
+
+            Assert.IsTrue(dictionary.ContainsKey("Test"));
+            var result = dictionary["Test"];
+            Assert.IsTrue(result is string);
+            Assert.AreEqual((string)result, "10");
+        }
     }
 }

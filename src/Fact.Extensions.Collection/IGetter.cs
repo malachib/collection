@@ -19,11 +19,18 @@ namespace Fact.Extensions.Collection
         bool TryGet(TKey key, Type type, out TValue value);
     }
 
+    public interface ITryGetterAsync<TKey, TValue>
+    {
+        Task<Tuple<bool, TValue>> TryGetAsync(TKey key, Type type);
+    }
+
     public interface IGetter : IGetter<string, object> { }
     public interface IGetterAsync : IGetterAsync<string, object> { }
 
     public interface ITryGetter<TKey> : ITryGetter<TKey, object> { }
     public interface ITryGetter : ITryGetter<string, object> { }
+
+    public interface ITryGetterAsync : ITryGetterAsync<string, object> { }
 
     public interface IGetterOptions
     {
@@ -33,4 +40,35 @@ namespace Fact.Extensions.Collection
         /// </summary>
         bool UnavailableThrowsException { get; set; }
     }
+
+
+    /// <summary>
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <remarks>
+    /// Some providers combine these operations for convenience and maybe to avoid race conditions
+    /// </remarks>
+    public interface IGetOrFetch<TKey, TValue>
+    {
+        TValue GetOrFetch(TKey key, Type type, Func<TValue> factory);
+    }
+
+
+    public interface IGetOrFetch : IGetOrFetch<string, object> { }
+
+
+    /// <summary>
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <remarks>
+    /// Some providers combine these operations for convenience and maybe to avoid race conditions
+    /// </remarks>
+    public interface IGetOrFetchAsync<TKey, TValue>
+    {
+        Task<TValue> GetOrFetchAsync(TKey key, Type type, Func<Task<TValue>> factory);
+    }
+
+    public interface IGetOrFetchAsync : IGetOrFetchAsync<string, object> { }
 }

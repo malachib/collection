@@ -30,7 +30,7 @@ namespace Fact.Extensions.Collection
     }
 
 
-    public class NamedIndexerWrapperWithKeys<TValue> : NamedIndexerWrapper<TValue>, IAccessor_Keys<string>
+    public class NamedIndexerWrapperWithKeys<TValue> : NamedIndexerWrapper<TValue>, IKeys<string>
     {
         readonly Func<IEnumerable<string>> getKeys;
 

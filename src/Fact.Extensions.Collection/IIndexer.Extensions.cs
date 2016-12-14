@@ -40,7 +40,7 @@ namespace Fact.Extensions.Collection
         /// </summary>
         internal class NamedBagWrapper<TKey> : IBag, IRemover, ITryGetter
         {
-            readonly IIndexer<TKey, object> indexer;
+            protected readonly IIndexer<TKey, object> indexer;
 
             internal NamedBagWrapper(IIndexer<TKey, object> indexer)
             {
@@ -77,10 +77,35 @@ namespace Fact.Extensions.Collection
             }
         }
 
+
+        internal class NamedBagWrapperWithKeys<TKey> : NamedBagWrapper<TKey>, IKeys<TKey>
+        {
+            internal NamedBagWrapperWithKeys(IIndexer<TKey, object> indexer)
+            : base(indexer)
+            {
+            }
+
+            IEnumerable<TKey> IKeys<TKey>.Keys => ((IKeys<TKey>) indexer).Keys;
+        }
+
         public static IBag ToNamedBag<TKey>(this IIndexer<TKey, object> indexer)
         {
             return new NamedBagWrapper<TKey>(indexer);
         }
+
+
+        public static IBag ToNamedBag(this NamedIndexerWrapperWithKeys<object> indexer)
+        {
+            return new NamedBagWrapperWithKeys<string>(indexer);
+        }
 #endif
+
+        public static NamedIndexerWrapperWithKeys<TValue> ToIndexer<TValue>(this IDictionary<string, TValue> dictionary)
+        {
+            return new NamedIndexerWrapperWithKeys<TValue>(
+                key => dictionary[key],
+                (key, value) => dictionary[key] = value,
+                () => dictionary.Keys);
+        }
     }
 }
