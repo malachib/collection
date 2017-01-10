@@ -29,14 +29,14 @@ namespace Fact.Extensions.Collection
         {
             get
             {
-                var pinfo = paramProvider.GetParameterByName(name);
+                var pinfo = paramProvider[name];
                 if (pinfo == null)
                     throw new KeyNotFoundException("Unknown parameter: " + name);
                 return this[pinfo];
             }
             set
             {
-                var pinfo = paramProvider.GetParameterByName(name);
+                var pinfo = paramProvider[name];
                 if (pinfo == null)
                     throw new KeyNotFoundException("Unknown parameter: " + name);
                 if (value != null && !pinfo.ParameterType.IsAssignableFrom(value.GetType()))

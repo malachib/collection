@@ -33,22 +33,23 @@ namespace Fact.Extensions.Collection
     /// Provider for IStateAccessors providing details of the parameters they must interact
     /// with
     /// </summary>
-    public interface IParameterProvider : IParameterProviderCore
+    /// <remarks>
+    /// It is recommende that IParameterInfo reference be repeatable.  That is, if it is
+    /// requested twice, the same instance should be returned
+    /// </remarks>
+    public interface IParameterProvider : IParameterProviderCore,
+        // Retrieve native parameter info given the parameter name.  Case insensitve by default
+        IAccessor<string, IParameterInfo>
     {
         int Count { get; }
 
-        /// <summary>
-        /// Retrieve native parameter info given the parameter name.  Case insensitve.
-        /// Returns NULL if parameter not available
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// It is recommende that IParameterInfo reference be repeatable.  That is, if this
-        /// is called twice with the same name, the same reference is returned
-        /// </remarks>
-        IParameterInfo GetParameterByName(string name);
+        bool Contains(string name);
 
+        /// <summary>
+        /// At which index position does the requested parameter live
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
         int IndexOf(IParameterInfo p);
     }
 }
