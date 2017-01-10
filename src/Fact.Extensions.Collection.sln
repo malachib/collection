@@ -41,8 +41,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Caching.Tes
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Configuration.Policy", "Fact.Extensions.Configuration.Policy\Fact.Extensions.Configuration.Policy.xproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Validation", "Fact.Extensions.Validation\Fact.Extensions.Validation.xproj", "{FD29BDBF-DF98-4F29-9AED-10A848D940E3}"
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.StateAccessor", "Fact.Extensions.StateAccessor\Fact.Extensions.StateAccessor.xproj", "{3188DAE0-373A-4F93-8094-042A2104BFFA}"
 EndProject
 Global
