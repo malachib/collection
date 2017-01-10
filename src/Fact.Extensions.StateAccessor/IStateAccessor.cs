@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Fact.Extensions.State;
+using Fact.Extensions.States;
 
 namespace Fact.Extensions.Collection
 {

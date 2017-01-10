@@ -4,7 +4,7 @@ using System.Reflection;
 //using System.Xml.Serialization;
 //using System.Runtime.Serialization;
 
-using Fact.Extensions.State;
+using Fact.Extensions.States;
 
 namespace Fact.Extensions.Collection
 {

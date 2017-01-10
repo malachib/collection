@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Fact.Extensions.State
+namespace Fact.Extensions.States
 {
     public enum SyncMode
     {

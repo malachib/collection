@@ -11,3 +11,4 @@
 ./upload_project.sh Fact.Extensions.Serialization.Newtonsoft
 ./upload_project.sh Fact.Extensions.Serialization.MessagePack
 ./upload_project.sh Fact.Extensions.Serialization.Pipelines
+./upload_project.sh Fact.Extensions.StateAccessor
