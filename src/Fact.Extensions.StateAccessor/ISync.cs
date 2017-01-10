@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Fact.Extensions.Collection
+namespace Fact.Extensions.State
 {
     public enum SyncMode
     {
@@ -23,6 +23,16 @@ namespace Fact.Extensions.Collection
         /// expected to be much simpler as it is a value vs reference type
         /// </summary>
         Value
+    }
+
+    /// <summary>
+    /// Like dirty state but never reverts back to false once it is set true
+    /// </summary>
+    public interface ITouchedMarker
+    {
+        bool IsTouched { get; }
+
+        event Action<ITouchedMarker> TouchedStateChanged;
     }
 
     /// <summary>
@@ -86,5 +96,19 @@ namespace Fact.Extensions.Collection
     public interface ICommitable
     {
         void Commit();
+    }
+
+
+    public interface IResettable
+    {
+        /// <summary>
+        /// Event fired when Reset() operation begins
+        /// </summary>
+        event Action<IResettable> Resetting;
+
+        /// <summary>
+        /// Bring object back to its default/freshly initialized state
+        /// </summary>
+        void Reset();
     }
 }

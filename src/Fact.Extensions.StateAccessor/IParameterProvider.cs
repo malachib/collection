@@ -48,5 +48,7 @@ namespace Fact.Extensions.Collection
         /// is called twice with the same name, the same reference is returned
         /// </remarks>
         IParameterInfo GetParameterByName(string name);
+
+        int IndexOf(IParameterInfo p);
     }
 }

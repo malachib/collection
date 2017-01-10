@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fact.Extensions.State;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,11 +11,17 @@ namespace Fact.Extensions.Collection
 #if FEATURE_DYNAMIC
          DynamicObject,
 #endif
-        IStateAccessorBase
+        IStateAccessorBase,
+        IDirtyMarker
     {
         readonly protected IParameterProvider paramProvider;
 
         public IParameterProvider ParameterProvider => paramProvider;
+
+        protected StateAccessorBase(IParameterProvider paramProvider) : this()
+        {
+            this.paramProvider = paramProvider;
+        }
 
         public abstract object this[IParameterInfo p] { get; set; }
 
@@ -54,7 +61,13 @@ namespace Fact.Extensions.Collection
 
         protected StateAccessorBase()
         {
-            ParameterUpdated += (p, o) => dirtyParameters.Add(p);
+            ParameterUpdated += (p, o) =>
+            {
+                dirtyParameters.Add(p);
+
+                // TODO: incomplete feature, need to track reverting back to 0 as well
+                if (dirtyParameters.Count == 1) DirtyStateChanged?.Invoke(this);
+            };
 #if ENABLE_COMPOSITES
 			ParameterUpdated += CompositeHelperUpdated;
             ParameterUpdating += CompositeHelperUpdating;
@@ -173,6 +186,8 @@ namespace Fact.Extensions.Collection
 
 #endif
 
+        public event Action<IDirtyMarker> DirtyStateChanged;
+
         protected HashSet<IParameterInfo> dirtyParameters = new HashSet<IParameterInfo>();
 
         /// <summary>
@@ -180,6 +195,8 @@ namespace Fact.Extensions.Collection
         /// </summary>
         /// <remarks>
         /// TODO: Use DirtyHashset here, and beef up DirtyHashset to fire dirty state change notifications
+        /// TODO: Make this able to revert back to non-dirty, looks like this code doesn't offer that provision except
+        /// on a downline reset
         /// </remarks>
         public bool IsDirty
         {
