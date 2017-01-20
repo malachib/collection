@@ -87,7 +87,8 @@ namespace Fact.Extensions.Serialization.Tests
         public void JsonPersistor2Test()
         {
             var testRecord = new TestRecord2();
-            var p = new JsonPersistor(null, null, new TestRecord2Persistor());
+            var _p = new TestRecord2Persistor();
+            var p = new Method3Persistor(_p);
 
             p.Serialize(testRecord);
 
@@ -118,19 +119,6 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
-        public class Persistor<T> : Method3Persistor
-        {
-            public Persistor(Persistor method3) : base(method3)
-            {
-
-            }
-
-            public void DoPersist(T instance)
-            {
-                this.Persist(instance);
-            }
-        }
-
 
         [TestMethod]
         public void JsonPersistorContainerTest()
@@ -146,6 +134,7 @@ namespace Fact.Extensions.Serialization.Tests
             {
                 return null;
             }, ServiceLifetime.Singleton);
+            serviceCollection.AddMethod3Persistor<TestRecord2>(new TestRecord2Persistor());
             //serviceCollection.AddSingleton(new Persistor<TestRecord2>())
             //serviceCollection.Append(new Srev)
         }

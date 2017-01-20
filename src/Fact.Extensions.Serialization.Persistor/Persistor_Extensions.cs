@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,6 +30,44 @@ namespace Fact.Extensions.Serialization
             // the object's constructor
             //Activator.CreateInstance()
             persistor.Deserialize(instance);
+        }
+    }
+
+
+
+    /// <summary>
+    /// Shim for existing persistor instances to register in a DI container
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class Persistor<T> : Persistor, IPersistor
+    {
+        readonly IPersistor persistor;
+
+        public Persistor(IPersistor persistor)
+        {
+            this.persistor = persistor;
+        }
+
+        public void Persist(object instance)
+        {
+            persistor.Mode = Mode;
+            persistor.Persist(instance);
+        }
+    }
+
+    public static class IServiceCollection_Extensions
+    {
+        public static void AddPersistor<T>(this IServiceCollection serviceCollection, IPersistor persistor)
+        {
+            var pShim = new Persistor<T>(persistor);
+            serviceCollection.AddSingleton(pShim);
+        }
+
+
+        public static void AddMethod3Persistor<T>(this IServiceCollection serviceCollection, Persistor persistor)
+        {
+            var p = new Method3Persistor(persistor);
+            serviceCollection.AddPersistor<T>(p);
         }
     }
 }
