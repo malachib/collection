@@ -7,6 +7,143 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
+    public class Method3DelegatePersistor : Persistor, IPersistor
+    {
+        readonly Delegate method3;
+
+        public Method3DelegatePersistor(Delegate method3)
+        {
+            this.method3 = method3;
+        }
+
+        public void Persist(object instance)
+        {
+            var fields = instance.GetType().GetTypeInfo().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            var persistMethod = method3.GetMethodInfo();
+            var parameters = persistMethod.GetParameters();
+            if (parameters[0].ParameterType != typeof(ModeEnum))
+                throw new InvalidCastException("First parameter must be mode enum specifier");
+
+            if (Mode == ModeEnum.Serialize)
+            {
+                var parameterValues = new object[parameters.Length];
+                var index = 0;
+
+                foreach (var p in parameters)
+                {
+                    // match each parameter to a field
+                    var field = fields.FirstOrDefault(x => x.Name == p.Name);
+
+                    // if no such field exists, then we abort method 3 processing
+                    if (field == null) throw new InvalidOperationException("Persist method specifies invalid parameters: " + p.Name);
+
+                    var value = field.GetValue(instance);
+
+                    parameterValues[index++] = value;
+                }
+
+                parameterValues[0] = Mode;
+                persistMethod.Invoke(method3, parameterValues);
+            }
+            else
+            {
+                // effectively map fields to method parameters
+                var parameterValues = new object[parameters.Length];
+
+                parameterValues[0] = Mode;
+                persistMethod.Invoke(method3, parameterValues);
+
+                var index = 0;
+
+                foreach (var p in parameters)
+                {
+                    // match each parameter to a field
+                    var field = fields.FirstOrDefault(x => x.Name == p.Name);
+
+                    // if no such field exists, then we abort method 3 processing
+                    if (field == null) throw new InvalidOperationException("Persist method specifies invalid parameters: " + p.Name);
+
+                    var value = parameterValues[index++];
+
+                    field.SetValue(instance, value);
+                }
+            }
+        }
+    }
+
+    public class Method3Persistor : Persistor, IPersistor
+    {
+        /// <summary>
+        /// FIX: bad name, refers to method#3 described on IPersistor interface
+        /// </summary>
+        readonly Persistor method3;
+
+        public Method3Persistor(Persistor method3)
+        {
+            this.method3 = method3;
+        }
+
+        public void Persist(object instance)
+        {
+            var fields = instance.GetType().GetTypeInfo().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            Persist(instance, fields);
+        }
+
+        internal void Persist(object instance, IEnumerable<FieldInfo> fields)
+        {
+            if(Mode == ModeEnum.Serialize)
+            {
+                // effectively map fields to method parameters
+                var persistMethod = method3.GetType().GetTypeInfo().GetMethod("Persist");
+                var parameters = persistMethod.GetParameters();
+                var parameterValues = new object[parameters.Length];
+                var index = 0;
+
+                foreach (var p in parameters)
+                {
+                    // match each parameter to a field
+                    var field = fields.FirstOrDefault(x => x.Name == p.Name);
+
+                    // if no such field exists, then we abort method 3 processing
+                    if (field == null) throw new InvalidOperationException("Persist method specifies invalid parameters: " + p.Name);
+
+                    var value = field.GetValue(instance);
+
+                    parameterValues[index++] = value;
+                }
+
+                method3.Mode = ModeEnum.Serialize;
+                persistMethod.Invoke(method3, parameterValues);
+            }
+            else
+            {
+                // effectively map fields to method parameters
+                var persistMethod = method3.GetType().GetTypeInfo().GetMethod("Persist");
+                var parameters = persistMethod.GetParameters();
+                var parameterValues = new object[parameters.Length];
+
+                method3.Mode = ModeEnum.Deserialize;
+                persistMethod.Invoke(method3, parameterValues);
+
+
+                var index = 0;
+
+                foreach (var p in parameters)
+                {
+                    // match each parameter to a field
+                    var field = fields.FirstOrDefault(x => x.Name == p.Name);
+
+                    // if no such field exists, then we abort method 3 processing
+                    if (field == null) throw new InvalidOperationException("Persist method specifies invalid parameters: " + p.Name);
+
+                    var value = parameterValues[index++];
+
+                    field.SetValue(instance, value);
+                }
+            }
+        }
+    }
+
     public class JsonPersistor : Persistor, IPersistor
     {
         readonly Func<JsonReader> readerFactory;
@@ -14,18 +151,24 @@ namespace Fact.Extensions.Serialization
         /// <summary>
         /// FIX: bad name, refers to method#3 described on IPersistor interface
         /// </summary>
-        readonly Persistor method3;
+        readonly Method3Persistor method3persistor;
 
         public JsonPersistor(Func<JsonReader> readerFactory, Func<JsonWriter> writerFactory, Persistor method3 = null)
         {
             this.readerFactory = readerFactory;
             this.writerFactory = writerFactory;
-            this.method3 = method3;
+            if(method3 != null) method3persistor = new Method3Persistor(method3);
         }
 
 
         public void Persist(object instance)
         {
+            if(method3persistor != null)
+            {
+                method3persistor.Mode = Mode;
+                method3persistor.Persist(instance);
+                return;
+            }
             //var typeInfo = instance.GetType().GetTypeInfo();
             //System.Runtime.Serialization.SerializationInfo;
             //System.Runtime.Versioning.TargetFrameworkAttribute
@@ -38,31 +181,6 @@ namespace Fact.Extensions.Serialization
 
             if (Mode == ModeEnum.Serialize)
             {
-                if (method3 != null)
-                {
-                    // effectively map fields to method parameters
-                    var persistMethod = method3.GetType().GetTypeInfo().GetMethod("Persist");
-                    var parameters = persistMethod.GetParameters();
-                    var parameterValues = new object[parameters.Length];
-                    var index = 0;
-
-                    foreach (var p in parameters)
-                    {
-                        // match each parameter to a field
-                        var field = fields.FirstOrDefault(x => x.Name == p.Name);
-
-                        // if no such field exists, then we abort method 3 processing
-                        if (field == null) throw new InvalidOperationException("Persist method specifies invalid parameters: " + p.Name);
-
-                        var value = field.GetValue(instance);
-
-                        parameterValues[index++] = value;
-                    }
-
-                    method3.Mode = ModeEnum.Serialize;
-                    persistMethod.Invoke(method3, parameterValues);
-                }
-                else
                 {
                     var writer = writerFactory();
                     using (var ps = new JsonPropertySerializer(writer))
@@ -77,33 +195,6 @@ namespace Fact.Extensions.Serialization
             }
             else
             {
-                if (method3 != null)
-                {
-                    // effectively map fields to method parameters
-                    var persistMethod = method3.GetType().GetTypeInfo().GetMethod("Persist");
-                    var parameters = persistMethod.GetParameters();
-                    var parameterValues = new object[parameters.Length];
-
-                    method3.Mode = ModeEnum.Deserialize;
-                    persistMethod.Invoke(method3, parameterValues);
-
-
-                    var index = 0;
-
-                    foreach (var p in parameters)
-                    {
-                        // match each parameter to a field
-                        var field = fields.FirstOrDefault(x => x.Name == p.Name);
-
-                        // if no such field exists, then we abort method 3 processing
-                        if (field == null) throw new InvalidOperationException("Persist method specifies invalid parameters: " + p.Name);
-
-                        var value = parameterValues[index++];
-
-                        field.SetValue(instance, value);
-                    }
-                }
-                else
                 {
                     var reader = readerFactory();
                     var pds = new JsonPropertyDeserializer(reader);

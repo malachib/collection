@@ -22,5 +22,7 @@ namespace Fact.Extensions.Serialization
     public interface IPersistor
     {
         void Persist(object instance);
+
+        Persistor.ModeEnum Mode { get; set; }
     }
 }

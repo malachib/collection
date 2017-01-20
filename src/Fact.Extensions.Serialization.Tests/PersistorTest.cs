@@ -1,4 +1,5 @@
 ﻿using Fact.Extensions.Collection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
@@ -88,14 +89,65 @@ namespace Fact.Extensions.Serialization.Tests
             var testRecord = new TestRecord2();
             var p = new JsonPersistor(null, null, new TestRecord2Persistor());
 
-            p.Mode = Persistor.ModeEnum.Serialize;
-            p.Persist(testRecord);
-
-            p.Mode = Persistor.ModeEnum.Deserialize;
+            p.Serialize(testRecord);
 
             testRecord.field2 = "Got blasted over";
-            p.Persist(testRecord);
-            Assert.AreEqual(TestRecord2.FIELD2_INITIAL_VALUE, testRecord.field1);
+            p.Deserialize(testRecord);
+
+            Assert.AreEqual(TestRecord2.FIELD2_INITIAL_VALUE, testRecord.field2);
+        }
+
+
+        [TestMethod]
+        public void JsonPersistor3Test()
+        {
+            /*
+            var testRecord = new TestRecord2();
+            var _p = new TestRecord2Persistor();
+            // ERROR: following line has a method group conversion error, even though there's only one Persist
+            // method in this class.  
+            var p = new Method3DelegatePersistor(_p.Persist);
+
+            p.Serialize(testRecord);
+
+            testRecord.field2 = "Got blasted over";
+            p.Deserialize(testRecord);
+
+            Assert.AreEqual(TestRecord2.FIELD2_INITIAL_VALUE, testRecord.field2);
+            */
+        }
+
+
+        public class Persistor<T> : Method3Persistor
+        {
+            public Persistor(Persistor method3) : base(method3)
+            {
+
+            }
+
+            public void DoPersist(T instance)
+            {
+                this.Persist(instance);
+            }
+        }
+
+
+        [TestMethod]
+        public void JsonPersistorContainerTest()
+        {
+            // since we don't have a full IoC container with named resolution , and/or
+            // the resolution we want to do is kind of a type factory anyway, try to 
+            // use the factory pattern (ala ILoggerFactory) with an IServiceProvider
+            // techniques discussed here:
+            // http://stackoverflow.com/questions/39029344/factory-pattern-with-open-generics
+            // http://dotnetliberty.com/index.php/2016/05/09/asp-net-core-factory-pattern-dependency-injection
+            var serviceCollection = new ServiceCollection();
+            var sd = new ServiceDescriptor(typeof(Persistor<>), provider =>
+            {
+                return null;
+            }, ServiceLifetime.Singleton);
+            //serviceCollection.AddSingleton(new Persistor<TestRecord2>())
+            //serviceCollection.Append(new Srev)
         }
     }
 }

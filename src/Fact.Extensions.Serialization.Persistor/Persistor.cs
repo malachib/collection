@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
-    public class Persistor<TTransport> : Persistor
+    public class PersistorBase<TTransport> : Persistor
     {
         readonly TTransport transport;
         readonly ISerializer<TTransport> serializer;
         readonly IDeserializer<TTransport> deserializer;
 
-        public Persistor(TTransport transport, ISerializer<TTransport> serializer, IDeserializer<TTransport> deserializer)
+        public PersistorBase(TTransport transport, ISerializer<TTransport> serializer, IDeserializer<TTransport> deserializer)
         {
             this.transport = transport;
             this.serializer = serializer;
