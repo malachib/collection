@@ -30,7 +30,7 @@ namespace Fact.Extensions.Serialization
             //System.Runtime.Serialization.SerializationInfo;
             //System.Runtime.Versioning.TargetFrameworkAttribute
             //SerializableAttribute
-            var fields = instance.GetType().GetTypeInfo().GetFields(BindingFlags.NonPublic);
+            var fields = instance.GetType().GetTypeInfo().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
             var persistFields = from f in fields
                                 let attr = f.GetCustomAttribute<PersistAttribute>()
                                 where attr != null
@@ -46,7 +46,7 @@ namespace Fact.Extensions.Serialization
                     var parameterValues = new object[parameters.Length];
                     var index = 0;
 
-                    foreach(var p in parameters)
+                    foreach (var p in parameters)
                     {
                         // match each parameter to a field
                         var field = fields.FirstOrDefault(x => x.Name == p.Name);
@@ -64,42 +64,13 @@ namespace Fact.Extensions.Serialization
                 }
                 else
                 {
-                    if (method3 != null)
+                    var writer = writerFactory();
+                    using (var ps = new JsonPropertySerializer(writer))
                     {
-                        // effectively map fields to method parameters
-                        var persistMethod = method3.GetType().GetTypeInfo().GetMethod("Persist");
-                        var parameters = persistMethod.GetParameters();
-                        var parameterValues = new object[parameters.Length];
-
-                        method3.Mode = ModeEnum.Deserialize;
-                        persistMethod.Invoke(method3, parameterValues);
-
-
-                        var index = 0;
-
-                        foreach (var p in parameters)
+                        foreach (var field in persistFields)
                         {
-                            // match each parameter to a field
-                            var field = fields.FirstOrDefault(x => x.Name == p.Name);
-
-                            // if no such field exists, then we abort method 3 processing
-                            if (field == null) throw new InvalidOperationException("Persist method specifies invalid parameters: " + p.Name);
-
-                            var value = parameterValues[index++];
-
-                            field.SetValue(instance, value);
-                        }
-                    }
-                    else
-                    {
-                        var writer = writerFactory();
-                        using (var ps = new JsonPropertySerializer(writer))
-                        {
-                            foreach (var field in persistFields)
-                            {
-                                var value = field.GetValue(instance);
-                                ps[field.Name, field.FieldType] = value;
-                            }
+                            var value = field.GetValue(instance);
+                            ps[field.Name, field.FieldType] = value;
                         }
                     }
                 }
@@ -108,6 +79,29 @@ namespace Fact.Extensions.Serialization
             {
                 if (method3 != null)
                 {
+                    // effectively map fields to method parameters
+                    var persistMethod = method3.GetType().GetTypeInfo().GetMethod("Persist");
+                    var parameters = persistMethod.GetParameters();
+                    var parameterValues = new object[parameters.Length];
+
+                    method3.Mode = ModeEnum.Deserialize;
+                    persistMethod.Invoke(method3, parameterValues);
+
+
+                    var index = 0;
+
+                    foreach (var p in parameters)
+                    {
+                        // match each parameter to a field
+                        var field = fields.FirstOrDefault(x => x.Name == p.Name);
+
+                        // if no such field exists, then we abort method 3 processing
+                        if (field == null) throw new InvalidOperationException("Persist method specifies invalid parameters: " + p.Name);
+
+                        var value = parameterValues[index++];
+
+                        field.SetValue(instance, value);
+                    }
                 }
                 else
                 {
