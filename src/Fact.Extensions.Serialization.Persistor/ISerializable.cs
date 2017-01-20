@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
-    public interface IPropertySerializer : ISetter
+    interface ISerializable
     {
-    }
-
-
-    public interface IPropertyDeserializer : IGetter
-    {
+        void Serialize(ISetter output, object context);
+        void Deserialize(IGetter input, object context);
     }
 }
