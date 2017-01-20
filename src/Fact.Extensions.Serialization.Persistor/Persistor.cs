@@ -19,7 +19,8 @@ namespace Fact.Extensions.Serialization
             this.deserializer = deserializer;
         }
 
-        public Persistor(object instance)
+
+        public void Persist(object instance)
         {
             //System.Runtime.Serialization.SerializationInfo;
             //System.Runtime.Versioning.TargetFrameworkAttribute

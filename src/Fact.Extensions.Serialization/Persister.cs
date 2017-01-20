@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
-    public class Persistor : IPersistor
+    public class Persistor
     {
         public ModeEnum Mode { get; set; }
         public enum ModeEnum
@@ -21,11 +21,6 @@ namespace Fact.Extensions.Serialization
             /// Move from outside data source to internal memory representation
             /// </summary>
             Deserialize
-        }
-
-        public void Persist(object instance)
-        {
-            throw new NotImplementedException();
         }
     }
 
