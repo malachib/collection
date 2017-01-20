@@ -14,7 +14,12 @@ namespace Fact.Extensions.Serialization
     ///       IPropertySerializer/IPropertyDeserializer similar to old SerializerInfo
     ///   3.  reflection based "Persist(ref T val1, ref T val2)"
     /// </summary>
-    public interface IPersister
+    /// <remarks>
+    /// SerializationInfo and friends feel so in-flux / detested that I am going to re-implement
+    /// some of its functionality my own way.  I personally liked SerializationInfo, but utilizing
+    /// it at this point is fighting a trend vs rolling my own
+    /// </remarks>
+    public interface IPersistor
     {
         void Persist(object instance);
     }

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
+using System.Reflection;
+#if NETSTANDARD1_6
+using System.Linq;
+#endif
 using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
-    public class Persister : IPersister
+    public class Persistor : IPersistor
     {
         public ModeEnum Mode { get; set; }
         public enum ModeEnum
@@ -27,24 +30,11 @@ namespace Fact.Extensions.Serialization
     }
 
 
-    public class Persister<TTransport> : Persister
+#if NETSTANDARD1_6
+#endif
+
+    public class PersistAttribute : Attribute
     {
-        readonly TTransport transport;
-        readonly ISerializer<TTransport> serializer;
-        readonly IDeserializer<TTransport> deserializer;
 
-        public Persister(TTransport transport, ISerializer<TTransport> serializer, IDeserializer<TTransport> deserializer)
-        {
-            this.transport = transport;
-            this.serializer = serializer;
-            this.deserializer = deserializer;
-        }
-
-        public Persister(object instance)
-        {
-            //System.Runtime.Serialization.SerializationInfo;
-                //System.Runtime.Versioning.TargetFrameworkAttribute
-            //SerializableAttribute
-        }
     }
 }

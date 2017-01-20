@@ -43,6 +43,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Configurati
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.StateAccessor", "Fact.Extensions.StateAccessor\Fact.Extensions.StateAccessor.xproj", "{3188DAE0-373A-4F93-8094-042A2104BFFA}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serialization.Persistors", "Fact.Extensions.Serialization.Persistor\Fact.Extensions.Serialization.Persistors.xproj", "{12128BC3-8C41-4A71-914A-D7E8EA4E5202}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,14 +99,14 @@ Global
 		{F4E828E3-F7DB-475C-8632-B624CAC2A10B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4E828E3-F7DB-475C-8632-B624CAC2A10B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4E828E3-F7DB-475C-8632-B624CAC2A10B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FD29BDBF-DF98-4F29-9AED-10A848D940E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FD29BDBF-DF98-4F29-9AED-10A848D940E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FD29BDBF-DF98-4F29-9AED-10A848D940E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FD29BDBF-DF98-4F29-9AED-10A848D940E3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3188DAE0-373A-4F93-8094-042A2104BFFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3188DAE0-373A-4F93-8094-042A2104BFFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3188DAE0-373A-4F93-8094-042A2104BFFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3188DAE0-373A-4F93-8094-042A2104BFFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12128BC3-8C41-4A71-914A-D7E8EA4E5202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12128BC3-8C41-4A71-914A-D7E8EA4E5202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12128BC3-8C41-4A71-914A-D7E8EA4E5202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12128BC3-8C41-4A71-914A-D7E8EA4E5202}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
