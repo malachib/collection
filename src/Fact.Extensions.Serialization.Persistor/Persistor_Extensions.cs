@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -68,6 +70,62 @@ namespace Fact.Extensions.Serialization
         {
             var p = new Method3Persistor(persistor);
             serviceCollection.AddPersistor<T>(p);
+        }
+
+
+        public static void AddPersistorSerializableJson(this IServiceCollection serviceCollection, 
+            Func<TextWriter> writerFactory,
+            Func<TextReader> readerFactory)
+        {
+
+            var p = new PersistorSerializable(() =>
+            {
+                var writer = writerFactory();
+                return new JsonPropertySerializer(new JsonTextWriter(writer));
+            }, () =>
+            {
+                var reader = readerFactory();
+                return new JsonPropertyDeserializer(new JsonTextReader(reader));
+            });
+            serviceCollection.AddSingleton(p);
+        }
+
+
+        /// <summary>
+        /// EXPERIMENTAL
+        /// I don't like hanging this as an extension right off IServiceProvider, but it has to live somewhere
+        /// so it's here for now
+        /// </summary>
+        /// <param name="sp"></param>
+        /// <param name="instance"></param>
+        /// <param name="mode"></param>
+        public static void Persist<T>(this IServiceProvider sp, T instance, Persistor.ModeEnum mode)
+        {
+            if(instance is ISerializable)
+            {
+                var p = sp.GetRequiredService<PersistorSerializable>();
+                p.Mode = mode;
+                p.Persist(instance);
+            }
+            else
+            {
+                // shim class primarily for "method 3" approach
+                var p = sp.GetService<Persistor<T>>();
+                if(p != null)
+                {
+                    p.Mode = mode;
+                    p.Persist(instance);
+                }
+                else
+                {
+                    // this is the default approach, which likely is reflection-based
+                    // peering in looking for "Persist" attributes
+                    var _p = sp.GetRequiredService<IPersistor>();
+
+                    _p.Mode = mode;
+                    _p.Persist(instance);
+                }
+            }
         }
     }
 }

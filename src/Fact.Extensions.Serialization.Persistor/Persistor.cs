@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -50,6 +51,47 @@ namespace Fact.Extensions.Serialization
                     var value = pds.Get(field.Name, field.FieldType);
                     field.SetValue(instance, value);
                 }
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Handles ISerializable cases
+    /// </summary>
+    /// <remarks>
+    /// UNTESTED
+    /// </remarks>
+    public class PersistorSerializable : Persistor, IPersistor
+    {
+        readonly Func<IPropertySerializer> serializerFactory;
+        readonly Func<IPropertyDeserializer> deserializerFactory;
+
+        public PersistorSerializable(Func<IPropertySerializer> serializer, Func<IPropertyDeserializer> deserializer)
+        {
+            this.serializerFactory = serializer;
+            this.deserializerFactory = deserializer;
+        }
+
+        public void Persist(object instance)
+        {
+            Debug.Assert(instance is ISerializable);
+
+            var s = (ISerializable)instance;
+
+            if(Mode == ModeEnum.Serialize)
+            {
+                var serializer = serializerFactory();
+                s.Serialize(serializer, null);
+                if(serializer is IDisposable)
+                {
+                    ((IDisposable)serializer).Dispose();
+                }
+            }
+            else
+            {
+                var deserializer = deserializerFactory();
+                s.Deserialize(deserializer, null);
             }
         }
     }
