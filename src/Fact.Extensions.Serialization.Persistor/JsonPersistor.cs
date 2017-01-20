@@ -144,7 +144,78 @@ namespace Fact.Extensions.Serialization
         }
     }
 
-    public class JsonPersistor : Persistor, IPersistor
+    public abstract class PropertySerializerPersistor : Persistor, IPersistor
+    {
+        protected readonly Func<IPropertySerializer> serializerFactory;
+        protected readonly Func<IPropertyDeserializer> deserializerFactory;
+
+        public PropertySerializerPersistor(Func<IPropertySerializer> serializer, Func<IPropertyDeserializer> deserializer)
+        {
+            this.serializerFactory = serializer;
+            this.deserializerFactory = deserializer;
+        }
+
+
+        protected abstract void Serialize(IPropertySerializer serializer, object instance);
+        protected abstract void Deserialize(IPropertyDeserializer deserializer, object instance);
+
+        public void Persist(object instance)
+        {
+            if (Mode == ModeEnum.Serialize)
+            {
+                var ps = serializerFactory();
+                Serialize(ps, instance);
+                if (ps is IDisposable) ((IDisposable)ps).Dispose();
+            }
+            else
+            {
+                var pds = deserializerFactory();
+                Deserialize(pds, instance);
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Persist object by reflecting over PersistAttribute-marked fields (not properties, and not public)
+    /// </summary>
+    public class ReflectionPersistor : PropertySerializerPersistor
+    {
+        public ReflectionPersistor(Func<IPropertySerializer> serializer, Func<IPropertyDeserializer> deserializer)
+            : base(serializer, deserializer) { }
+
+
+
+        static IEnumerable<FieldInfo> GetFields(object instance)
+        {
+            var fields = instance.GetType().GetTypeInfo().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            var persistFields = from f in fields
+                                let attr = f.GetCustomAttribute<PersistAttribute>()
+                                where attr != null
+                                select f;
+            return persistFields;
+        }
+
+        protected override void Serialize(IPropertySerializer serializer, object instance)
+        {
+            foreach (var field in GetFields(instance))
+            {
+                var value = field.GetValue(instance);
+                serializer[field.Name, field.FieldType] = value;
+            }
+        }
+
+        protected override void Deserialize(IPropertyDeserializer deserializer, object instance)
+        {
+            foreach (var field in GetFields(instance))
+            {
+                var value = deserializer.Get(field.Name, field.FieldType);
+                field.SetValue(instance, value);
+            }
+        }
+    }
+
+    public class JsonReflectionPersistor : Persistor, IPersistor
     {
         readonly Func<JsonReader> readerFactory;
         readonly Func<JsonWriter> writerFactory;
@@ -153,7 +224,7 @@ namespace Fact.Extensions.Serialization
         /// </summary>
         readonly Method3Persistor method3persistor;
 
-        public JsonPersistor(Func<JsonReader> readerFactory, Func<JsonWriter> writerFactory, Persistor method3 = null)
+        public JsonReflectionPersistor(Func<JsonReader> readerFactory, Func<JsonWriter> writerFactory, Persistor method3 = null)
         {
             this.readerFactory = readerFactory;
             this.writerFactory = writerFactory;

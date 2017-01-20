@@ -110,6 +110,8 @@ namespace Fact.Extensions.Serialization
             else
             {
                 // shim class primarily for "method 3" approach
+                // FIX: this is probably flawed in that callers will probably need to pass in a Type and not
+                // a generic T
                 var p = sp.GetService<Persistor<T>>();
                 if(p != null)
                 {
@@ -118,9 +120,9 @@ namespace Fact.Extensions.Serialization
                 }
                 else
                 {
-                    // this is the default approach, which likely is reflection-based
+                    // this is the default approach, which is reflection-based
                     // peering in looking for "Persist" attributes
-                    var _p = sp.GetRequiredService<IPersistor>();
+                    var _p = sp.GetRequiredService<ReflectionPersistor>();
 
                     _p.Mode = mode;
                     _p.Persist(instance);

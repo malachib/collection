@@ -62,37 +62,25 @@ namespace Fact.Extensions.Serialization
     /// <remarks>
     /// UNTESTED
     /// </remarks>
-    public class PersistorSerializable : Persistor, IPersistor
+    public class PersistorSerializable : PropertySerializerPersistor, IPersistor
     {
-        readonly Func<IPropertySerializer> serializerFactory;
-        readonly Func<IPropertyDeserializer> deserializerFactory;
-
         public PersistorSerializable(Func<IPropertySerializer> serializer, Func<IPropertyDeserializer> deserializer)
-        {
-            this.serializerFactory = serializer;
-            this.deserializerFactory = deserializer;
-        }
+            : base(serializer, deserializer) { }
 
-        public void Persist(object instance)
+        protected override void Serialize(IPropertySerializer serializer, object instance)
         {
             Debug.Assert(instance is ISerializable);
 
             var s = (ISerializable)instance;
+            s.Serialize(serializer, null);
+        }
 
-            if(Mode == ModeEnum.Serialize)
-            {
-                var serializer = serializerFactory();
-                s.Serialize(serializer, null);
-                if(serializer is IDisposable)
-                {
-                    ((IDisposable)serializer).Dispose();
-                }
-            }
-            else
-            {
-                var deserializer = deserializerFactory();
-                s.Deserialize(deserializer, null);
-            }
+        protected override void Deserialize(IPropertyDeserializer deserializer, object instance)
+        {
+            Debug.Assert(instance is ISerializable);
+
+            var s = (ISerializable)instance;
+            s.Deserialize(deserializer, null);
         }
     }
 }

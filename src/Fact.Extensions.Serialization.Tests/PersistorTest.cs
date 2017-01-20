@@ -66,7 +66,7 @@ namespace Fact.Extensions.Serialization.Tests
                 return jsonTextReader;
             };
 
-            var p = new JsonPersistor(readerFactory, writerFactory);
+            var p = new JsonReflectionPersistor(readerFactory, writerFactory);
 
             p.Mode = Persistor.ModeEnum.Serialize;
 
