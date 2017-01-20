@@ -7,15 +7,16 @@
   },
 
   "dependencies": {
+    "System.Runtime.Serialization.Formatters": "4.3.0"
     // Seems to be causing issues with my NuGet upload
     //"System.Diagnostics.Contracts": "4.0.1"
   },
 
   "frameworks": {
-    "netstandard1.1": {
+    "netstandard1.3": {
       "buildOptions": {
         "define": [
-          "NETSTANDARD1_1"
+          "NETSTANDARD1_3"
         ]
       },
 
