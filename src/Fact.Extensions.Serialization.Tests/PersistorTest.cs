@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Fact.Extensions.Serialization.Tests
     [TestClass]
     public class PersistorTest
     {
-        class TestRecord2
+        public class TestRecord2
         {
             internal const string FIELD1_INITIAL_VALUE = "I am field 1";
             internal const string FIELD2_INITIAL_VALUE = "I am field 2";
@@ -119,6 +120,45 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
+        public class TestRecord2Container
+        {
+            List<TestRecord2> records = new List<TestRecord2>();
+
+            public TestRecord2Container()
+            {
+                records.Add(new TestRecord2());
+                records.Add(new TestRecord2() { field1 = "record#2" });
+                records.Add(new TestRecord2() { field1 = "record#3" });
+            }
+        }
+
+
+        public class TestRecord2ContainerJsonPersistor : Persistor
+        {
+            readonly string fileName = "test.json";
+
+            public void Persist(ref List<TestRecord2> records)
+            {
+                if(Mode == ModeEnum.Serialize)
+                {
+                    using (StreamWriter file = File.CreateText(fileName))
+                    using (var writer = new JsonTextWriter(file))
+                    {
+                        writer.WriteStartArray();
+                        var p = new JsonReflectionPersistor(null, () => writer);
+                        p.Mode = ModeEnum.Serialize;
+                        foreach (var item in records)
+                        {
+                            p.Persist(item);
+                        }
+                    }
+                }
+                else
+                {
+
+                }
+            }
+        }
 
         [TestMethod]
         public void JsonPersistorContainerTest()
@@ -135,6 +175,13 @@ namespace Fact.Extensions.Serialization.Tests
                 return null;
             }, ServiceLifetime.Singleton);
             serviceCollection.AddMethod3Persistor<TestRecord2>(new TestRecord2Persistor());
+            var _p = new TestRecord2ContainerJsonPersistor();
+            var container = new TestRecord2Container();
+
+            var p = new Method3Persistor(_p);
+
+            p.Serialize(container);
+
             //serviceCollection.AddSingleton(new Persistor<TestRecord2>())
             //serviceCollection.Append(new Srev)
         }
