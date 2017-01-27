@@ -1,5 +1,6 @@
 ﻿#define NETCORE
 #define LWC_ENABLED
+#define CODECONTRACTS
 
 using Fact.Extensions.Collection;
 using System;

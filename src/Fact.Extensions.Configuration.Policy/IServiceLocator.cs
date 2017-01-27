@@ -63,5 +63,33 @@ namespace Fact.Extensions.Configuration
 
             return (T)resolvedType;
         }
+
+
+        public static bool TryResolve<T>(this IServiceLocator container, string key, out T value)
+        {
+            object output;
+            if (container.TryResolve(typeof(T), key, out output))
+            {
+                value = (T)output;
+                return true;
+            }
+            else
+            {
+                value = default(T);
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Registers a particular singleton instance of a type with provided key
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="key"></param>
+        public static void Register<T>(this IServiceRegistrar container, T value, string key = null)
+        {
+            container.Register(typeof(T), value, key);
+        }
     }
 }

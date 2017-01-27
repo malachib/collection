@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Fact.Extensions.Configuration;
+
 namespace Fact.Extensions.Collection
 {
     /// <summary>
@@ -13,7 +15,9 @@ namespace Fact.Extensions.Collection
     /// <remarks>
     /// TODO: Implement as a Factory 
     /// </remarks>
-    public class LightweightContainer //: Fact.Apprentice.Collection.IFactory<Type, object>
+    public class LightweightContainer : //: Fact.Apprentice.Collection.IFactory<Type, object>
+        IServiceLocator,
+        IServiceRegistrar
     {
         internal struct Item
         {
@@ -55,6 +59,7 @@ namespace Fact.Extensions.Collection
                 return lookup.First(x => x.key == key).value;
         }
 
+
         /// <summary>
         /// Attempts to resolve the most recently registered item
         /// </summary>
@@ -65,7 +70,7 @@ namespace Fact.Extensions.Collection
         public bool TryResolve<T>(out T value, string key = null)
         {
             object _value;
-            if (TryResolve(typeof(T), out _value, key))
+            if (TryResolve(typeof(T), key, out _value))
             {
                 value = (T)_value;
                 return true;
@@ -77,7 +82,7 @@ namespace Fact.Extensions.Collection
             }
         }
 
-        public bool TryResolve(Type type, out object value, string key = null)
+        public bool TryResolve(Type type, string key, out object value)
         {
             if (registered == null)
             {
@@ -160,35 +165,5 @@ namespace Fact.Extensions.Collection
         {
             return registered[id].First().value;
         } */
-    }
-
-
-    public static class LightweightContainer_Extensions
-    {
-        /// <summary>
-        /// Registers a particular singleton instance of a type with provided key
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="key"></param>
-        public static void Register<T>(this LightweightContainer container, T value, string key = null)
-        {
-            container.Register(typeof(T), value, key);
-        }
-
-        public static bool TryResolve<T>(this LightweightContainer container, string key, out T value)
-        {
-            object output;
-            if(container.TryResolve(typeof(T), out output, key))
-            {
-                value = (T)output;
-                return true;
-            }
-            else
-            {
-                value = default(T);
-                return false;
-            }
-        }
     }
 }
