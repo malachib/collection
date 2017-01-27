@@ -27,61 +27,17 @@ namespace Fact.Extensions.Collection
 
         Dictionary<Type, LinkedList<Item>> registered;
 
-        /// <summary>
-        /// Be aware this is an internal accessor, and as such sometimes registered will be NULL
-        /// </summary>
-        [Obsolete]
-        internal IEnumerable<KeyValuePair<Type, LinkedList<Item>>> Registrations
-        {
-            get { return registered; }
-        }
-
 
         public IEnumerable<Type> RegisteredTypes
         {
             get { return registered == null ? Enumerable.Empty<Type>() : registered.Keys; }
         }
 
-        public T Resolve<T>(string key = null)
-        {
-            return (T)Resolve(typeof(T));
-        }
-
-        public object Resolve(Type type, string key = null)
-        {
-            if (registered == null)
-                throw new KeyNotFoundException("No items registered");
-
-            var lookup = registered[type];
-            if (key == null)
-                return lookup.First.Value.value;
-            else
-                return lookup.First(x => x.key == key).value;
-        }
 
 
         /// <summary>
         /// Attempts to resolve the most recently registered item
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public bool TryResolve<T>(out T value, string key = null)
-        {
-            object _value;
-            if (TryResolve(typeof(T), key, out _value))
-            {
-                value = (T)_value;
-                return true;
-            }
-            else
-            {
-                value = default(T);
-                return false;
-            }
-        }
-
         public bool TryResolve(Type type, string key, out object value)
         {
             if (registered == null)

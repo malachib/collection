@@ -5,6 +5,10 @@
 using Fact.Extensions.Collection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+#if CODECONTRACTS
+using System.Diagnostics.Contracts;
+#endif
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -108,37 +112,26 @@ namespace Fact.Extensions.Configuration
         public void AddPolicy<T>(T policy, string key = null)
             where T : IPolicy
         {
+            AddPolicy(typeof(T), policy, key);
+        }
+
+        void AddPolicy(Type t, IPolicy policy, string key = null)
+        {
 #if CODECONTRACTS
-            global::System.Diagnostics.Contracts.Contract.Assert(policy != null);
+            Contract.Assert(policy != null);
 #endif
-            if (key == null)
-                key = GetPolicyName(typeof(T));
 
-            container.Register(policy, key);
+            container.Register(t, policy, key ?? GetPolicyName(t));
         }
 
-        internal void AddPolicy(Type t, IPolicy policy, string key = null)
-        {
-            if (key == null)
-                key = GetPolicyName(t);
-
-            container.Register(policy, key);
-        }
-
-
-        public T ResolvePolicy<T>(string key)
-            where T : IPolicy
-        {
-            return container.Resolve<T>(key);
-        }
 
         /// <summary>
         /// Try to grab the policy from the provider and if it doesn't exist, make a new default one
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
-        /// <param name="addToContainer">If true (default) adds this policy to container so that next retrieve will find it and
-        /// not create a new policy</param>
+        /// <param name="addToContainer">If true, adds this policy to container so that next retrieve will find it and
+        /// not create a new policy.  Defaults to false</param>
         /// <returns></returns>
         /// <remarks>
         /// Keep in mind that policy providers cascade among each other, but no cascading as of now occurs from within
@@ -149,20 +142,30 @@ namespace Fact.Extensions.Configuration
         /// walking up that chain - with any luck the "just in time" static intialization will cover us there, and once we get to "object"
         /// that will be System-singleton provider level
         /// </remarks>
-        public T GetPolicy<T>(string key = null, bool addToContainer = true)
-            where T : IPolicy, new()
+        public T GetPolicy<T>(string key = null, bool addToContainer = false)
+            where T : IPolicy
         {
             T policy;
 
             if (key == null)
                 key = GetPolicyName(typeof(T));
 
-            //if (!container.TryResolve<T>(out policy, key))
             if (!TryResolve(out policy, key))
             {
                 // TODO: Make policy creation itself policy-based to fine tune how
                 // policies even get created, rather than just when
-                policy = new T();
+                //policy = new T();
+                var ti = typeof(T).GetTypeInfo();
+                if (ti.IsInterface)
+                {
+                    var defaultPolicy = ti.GetCustomAttribute<DefaultPolicyAttribute>();
+                    Debug.Assert(defaultPolicy != null, "No default policy found for " + ti.Name);
+                    policy = (T)Activator.CreateInstance(defaultPolicy.Type);
+                }
+                else
+                {
+                    policy = Activator.CreateInstance<T>();
+                }
                 if (addToContainer)
                     container.Register(policy, key);
             }
@@ -181,7 +184,7 @@ namespace Fact.Extensions.Configuration
         bool TryResolve<T>(out T policy, string key)
         {
             // try for local container first
-            if (container.TryResolve(out policy, key))
+            if (container.TryResolve(key, out policy))
                 return true;
 
             // then do a simple cascade check:
@@ -191,30 +194,6 @@ namespace Fact.Extensions.Configuration
 
             // if neither succeed, no such policy exists
             return false;
-        }
-
-        /// <summary>
-        /// Acquires policy if it exists, otherwise returns defaultPolicy
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="defaultPolicy"></param>
-        /// <returns></returns>
-        public T GetPolicyExperimental<T>(string key = null, T defaultPolicy = default(T))
-            where T : IPolicy
-        {
-            T policy;
-
-            if (key == null)
-                key = GetPolicyName(typeof(T));
-
-            //if (container.TryResolve<T>(out policy, key))
-            if (TryResolve(out policy, key))
-            {
-                return policy;
-            }
-            else
-                return defaultPolicy;
         }
 
         /// <summary>

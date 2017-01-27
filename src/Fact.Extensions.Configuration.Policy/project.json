@@ -22,6 +22,7 @@
         "System.Reflection.Extensions": "4.3.0",
         "System.Linq": "4.3.0",
         "System.Collections": "4.3.0",
+        "System.Diagnostics.Debug": "4.3.0",
         "System.Diagnostics.Contracts": "4.3.0"
       }
     }
