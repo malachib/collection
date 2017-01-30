@@ -140,6 +140,8 @@ namespace Fact.Extensions.Serialization.Tests
 
         public class TestRecord2ContainerJsonPersistor : Persistor
         {
+            readonly IPersistorContainer pc;
+
             readonly string fileName = "test.json";
 
             public void Persist(ref List<TestRecord2> records)
@@ -150,8 +152,8 @@ namespace Fact.Extensions.Serialization.Tests
                     using (var writer = new JsonTextWriter(file))
                     {
                         writer.WriteStartArray();
-                        //var p = new JsonReflectionPersistor_OLD(null, () => writer);
                         var p = new JsonReflectionPersistor(null, () => writer);
+                        IPersistorExperimental _p = p;
                         p.Mode = ModeEnum.Serialize;
                         foreach (var item in records)
                         {

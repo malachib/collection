@@ -7,6 +7,7 @@ namespace Fact.Extensions.Serialization
 {
     /// <summary>
     /// Experimental
+    /// Place where all registered persistors live
     /// </summary>
     public interface IPersistorContainer
     {

@@ -37,6 +37,21 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    public interface IPersistorExperimental<TSerializationContext, TDeserializationContext>
+    {
+        void Serialize(TSerializationContext context, object instance);
+        object Deserialize(TDeserializationContext context, object instance = null);
+    }
+
+
+    public interface IPersistorExperimental<T, TSerializationContext, TDeserializationContext>
+        where T: class
+    {
+        void Serialize(TSerializationContext context, T instance);
+        T Deserialize(TDeserializationContext context, T instance = null);
+    }
+
+
     /// <summary>
     /// Experimental
     /// </summary>

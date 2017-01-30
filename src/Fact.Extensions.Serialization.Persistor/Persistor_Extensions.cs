@@ -56,8 +56,20 @@ namespace Fact.Extensions.Serialization
         public static void SetJsonFile(this IPersistorSerializationContext<IPropertySerializer> psc, string fileName)
         {
             StreamWriter file = File.CreateText(fileName);
-            var writer = new JsonTextWriter(file);
-            psc.Context = new JsonPropertySerializer(writer, true);
+            psc.SetJsonWriter(file, true);
+        }
+
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <param name="psc"></param>
+        /// <param name="writer"></param>
+        /// <param name="closeOnDispose"></param>
+        public static void SetJsonWriter(this IPersistorSerializationContext<IPropertySerializer> psc, TextWriter writer, bool closeOnDispose = false)
+        {
+            var jsonWriter = new JsonTextWriter(writer);
+            psc.Context = new JsonPropertySerializer(jsonWriter, closeOnDispose);
         }
 
 
@@ -70,9 +82,20 @@ namespace Fact.Extensions.Serialization
         public static void SetJsonFile(this IPersistorDeserializationContext<IPropertyDeserializer> pdc, string fileName)
         {
             StreamReader file = File.OpenText(fileName);
-            var reader = new JsonTextReader(file);
-            reader.Read();
-            pdc.Context = new JsonPropertyDeserializer(reader);
+            pdc.SetJsonReader(file);
+        }
+
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <param name="pdc"></param>
+        /// <param name="reader"></param>
+        public static void SetJsonReader(this IPersistorDeserializationContext<IPropertyDeserializer> pdc, TextReader reader)
+        {
+            var jsonReader = new JsonTextReader(reader);
+            jsonReader.Read();
+            pdc.Context = new JsonPropertyDeserializer(jsonReader);
         }
 
 
@@ -144,6 +167,21 @@ namespace Fact.Extensions.Serialization
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="pc"></param>
+        /// <param name="psc"></param>
+        /// <param name="instance"></param>
+        public static void Serialize<T>(this IPersistorContainer pc, IPropertySerializer ps, T instance)
+        {
+            var _p = pc.ServiceProvider.GetRequiredService<IPersistor<T>>();
+            var p = (IPersistorExperimental<IPropertySerializer, IPropertyDeserializer>)((PersistorShim<T>)_p).Persistor;
+            p.Serialize(ps, instance);
+        }
+
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="pc"></param>
         /// <param name="pdc"></param>
         /// <returns></returns>
         public static T Deserialize<T>(this IPersistorContainer pc, IPersistorDeserializationContext pdc)
@@ -189,6 +227,7 @@ namespace Fact.Extensions.Serialization
         {
             serviceCollection.AddSingleton<IPersistorFactory, PersistorFactory>();
             serviceCollection.AddSingleton(typeof(IPersistor<>), typeof(PersistorShim<>));
+            serviceCollection.AddSingleton(typeof(IPersistorExperimental<,,>), typeof(PersistorExperimentalShim<,,>));
             return serviceCollection;
         }
 
@@ -205,6 +244,7 @@ namespace Fact.Extensions.Serialization
 
             serviceCollection.AddSingleton<IPersistorFactory>(a);
             serviceCollection.AddSingleton(typeof(IPersistor<>), typeof(PersistorShim<>));
+            serviceCollection.AddSingleton(typeof(IPersistorExperimental<,,>), typeof(PersistorExperimentalShim<,,>));
             return serviceCollection;
         }
 

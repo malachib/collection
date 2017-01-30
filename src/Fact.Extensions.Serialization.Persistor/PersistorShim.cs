@@ -44,4 +44,27 @@ namespace Fact.Extensions.Serialization
             set { }
         }
     }
+
+
+    public class PersistorExperimentalShim<T, TSerializationContext, TDeserializationContext>
+        : IPersistorExperimental<T, TSerializationContext, TDeserializationContext>
+        where T: class
+    {
+        public readonly IPersistorExperimental<TSerializationContext, TDeserializationContext> Persistor;
+
+        public PersistorExperimentalShim(IPersistorFactory persistorFactory)
+        {
+            Persistor = (IPersistorExperimental<TSerializationContext, TDeserializationContext>)persistorFactory.Create(typeof(T));
+        }
+
+        public T Deserialize(TDeserializationContext context, T instance = default(T))
+        {
+            return (T) Persistor.Deserialize(context, instance);
+        }
+
+        public void Serialize(TSerializationContext context, T instance)
+        {
+            Persistor.Serialize(context, instance);
+        }
+    }
 }
