@@ -15,6 +15,11 @@ namespace Fact.Extensions.Configuration
     {
         T GetPolicy<T>(string key = null, bool addToContainer = true)
             where T : IPolicy;
+
+        /// <summary>
+        /// Associate this policy provider with the specified type
+        /// </summary>
+        void Register(Type t);
     }
 
 
@@ -28,5 +33,14 @@ namespace Fact.Extensions.Configuration
         public DefaultPolicyAttribute(Type type) { this.type = type; }
 
         public Type Type => type;
+    }
+
+
+    public static class IPolicyProvider_Extensions
+    {
+        public static void Register<T>(this IPolicyProvider policyProvider)
+        {
+            policyProvider.Register(typeof(T));
+        }
     }
 }

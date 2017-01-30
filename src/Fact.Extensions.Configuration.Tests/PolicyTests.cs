@@ -41,5 +41,30 @@ namespace Fact.Extensions.Configuration.Tests
 
             Assert.IsTrue(DateTime.Now.Subtract(p2.Now).TotalSeconds <= 0);
         }
+
+        class TestClass1
+        {
+
+        }
+
+
+        class TestClass2
+        {
+
+        }
+
+        [TestMethod]
+        public void ClassPolicyTest()
+        {
+            var pp = new PolicyProvider();
+
+            pp.Register<TestClass2>();
+
+            var pp1 = PolicyProvider.Get<TestClass1>();
+            var pp2 = PolicyProvider.Get<TestClass2>();
+
+            Assert.AreEqual(pp1, PolicyProvider.System);
+            Assert.AreEqual(pp2, pp);
+        }
     }
 }
