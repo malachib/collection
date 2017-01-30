@@ -33,7 +33,6 @@ namespace Fact.Extensions.Collection
         }
 
 
-#if NETSTANDARD1_3 || NETSTANDARD1_6 || NETSTANDARD1_6_2
         /// <summary>
         /// TEMPORARY
         /// until we get pluggable/composables up, fiddle with this layer
@@ -98,7 +97,6 @@ namespace Fact.Extensions.Collection
         {
             return new NamedBagWrapperWithKeys<string>(indexer);
         }
-#endif
 
         public static NamedIndexerWrapperWithKeys<TValue> ToIndexer<TValue>(this IDictionary<string, TValue> dictionary)
         {

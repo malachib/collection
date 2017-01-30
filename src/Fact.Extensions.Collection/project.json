@@ -36,10 +36,10 @@
       }
       //"imports": "dnxcore50"
     },*/
-    "netstandard1.3": {
+    "netstandard1.1": {
       "buildOptions": {
         "define": [
-          "NETSTANDARD1_3"
+          "NETSTANDARD1_1"
         ]
       },
 

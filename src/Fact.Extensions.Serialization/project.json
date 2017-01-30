@@ -7,6 +7,8 @@
   },
 
   "dependencies": {
+    // Need to pull in collctions because IPropertySerializer needs IGetter/ISetter
+    "Fact.Extensions.Collection": "1.0.0-*"
     // Seems to be causing issues with my NuGet upload
     //"System.Diagnostics.Contracts": "4.0.1"
   },
