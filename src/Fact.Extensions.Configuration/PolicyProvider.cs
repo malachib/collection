@@ -125,6 +125,8 @@ namespace Fact.Extensions.Configuration
         }
 
 
+
+
         /// <summary>
         /// Try to grab the policy from the provider and if it doesn't exist, make a new default one
         /// </summary>
@@ -142,29 +144,35 @@ namespace Fact.Extensions.Configuration
         /// walking up that chain - with any luck the "just in time" static intialization will cover us there, and once we get to "object"
         /// that will be System-singleton provider level
         /// </remarks>
-        public T GetPolicy<T>(string key = null, bool addToContainer = false)
-            where T : IPolicy
+        public object GetPolicy(Type t, string key = null, bool addToContainer = false)
         {
-            T policy;
+            object policy;
+
+#if CODECONTRACTS
+            var ti = t.GetTypeInfo();
+            Contract.Requires(ti.IsAssignableFrom(typeof(IPolicy).GetTypeInfo()));
+#endif
 
             if (key == null)
-                key = GetPolicyName(typeof(T));
+                key = GetPolicyName(t);
 
-            if (!TryResolve(out policy, key))
+            if (!TryResolve(t, key, out policy))
             {
                 // TODO: Make policy creation itself policy-based to fine tune how
                 // policies even get created, rather than just when
                 //policy = new T();
-                var ti = typeof(T).GetTypeInfo();
+#if !CODECONTRACTS
+                var ti = t.GetTypeInfo();
+#endif
                 if (ti.IsInterface)
                 {
                     var defaultPolicy = ti.GetCustomAttribute<DefaultPolicyAttribute>();
                     Debug.Assert(defaultPolicy != null, "No default policy found for " + ti.Name);
-                    policy = (T)Activator.CreateInstance(defaultPolicy.Type);
+                    policy = Activator.CreateInstance(defaultPolicy.Type);
                 }
                 else
                 {
-                    policy = Activator.CreateInstance<T>();
+                    policy = Activator.CreateInstance(t);
                 }
                 if (addToContainer)
                     container.Register(policy, key);
@@ -174,6 +182,7 @@ namespace Fact.Extensions.Configuration
         }
 
 
+
         /// <summary>
         /// Attempt to acquire policy from local container and then System container, in that order
         /// </summary>
@@ -181,20 +190,21 @@ namespace Fact.Extensions.Configuration
         /// <param name="policy"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        bool TryResolve<T>(out T policy, string key)
+        bool TryResolve(Type t, string key, out object policy)
         {
             // try for local container first
-            if (container.TryResolve(key, out policy))
+            if (container.TryResolve(t, key, out policy))
                 return true;
 
             // then do a simple cascade check:
             // try system container, if 'this' is not system container
             if (this != System)
-                return System.TryResolve(out policy, key);
+                return System.TryResolve(t, key, out policy);
 
             // if neither succeed, no such policy exists
             return false;
         }
+        
 
         /// <summary>
         /// Associate this policy provider with the specified type
