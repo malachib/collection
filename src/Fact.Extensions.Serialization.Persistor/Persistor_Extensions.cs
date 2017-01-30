@@ -74,21 +74,21 @@ namespace Fact.Extensions.Serialization
     /// </remarks>
     public class PersistorShim<T> : IPersistor
     {
-        readonly IPersistor persistor;
+        public readonly IPersistor Persistor;
 
         public PersistorShim(IPersistorFactory persistorFactory)
         {
-            this.persistor = persistorFactory.Create(typeof(T));
+            Persistor = persistorFactory.Create(typeof(T));
         }
 
         public Persistor.ModeEnum Mode
         {
-            set { persistor.Mode = value; }
+            set { Persistor.Mode = value; }
         }
 
         public void Persist(object instance)
         {
-            persistor.Persist(instance);
+            Persistor.Persist(instance);
         }
     }
 

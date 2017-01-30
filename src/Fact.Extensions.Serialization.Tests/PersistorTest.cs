@@ -189,6 +189,9 @@ namespace Fact.Extensions.Serialization.Tests
 
         public class PersistorFactory : IPersistorFactory
         {
+            // FIX: Only use this until proper IoC container is available (including LightweightContainer)
+            Dictionary<Type, IPersistor> persistors = new Dictionary<Type, IPersistor>();
+
             public bool CanCreate(Type id)
             {
                 return true;
@@ -196,7 +199,14 @@ namespace Fact.Extensions.Serialization.Tests
 
             public IPersistor Create(Type id)
             {
-                return new Method3Persistor(new TestRecord2Persistor());
+                return persistors[id];
+                //return new Method3Persistor(new TestRecord2Persistor());
+            }
+
+
+            public void Register<T>(IPersistor singleton)
+            {
+                persistors.Add(typeof(T), singleton);
             }
         }
 
@@ -204,11 +214,17 @@ namespace Fact.Extensions.Serialization.Tests
         public void PersistorContainer2Test()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<IPersistorFactory>(new PersistorFactory());
+            var pf = new PersistorFactory();
+            var _p = new Method3Persistor(new TestRecord2Persistor());
+
+            pf.Register<TestRecord2>(_p);
+            serviceCollection.AddSingleton<IPersistorFactory>(pf);
             serviceCollection.AddSingleton(typeof(PersistorShim<>));
             var sp = serviceCollection.BuildServiceProvider();
 
             var p = sp.GetService<PersistorShim<TestRecord2>>();
+
+            Assert.AreEqual(_p, p.Persistor);
         }
     }
 }
