@@ -37,7 +37,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serializati
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Caching.Tests", "Fact.Extensions.Caching.Tests\Fact.Extensions.Caching.Tests.xproj", "{51A693BB-66F5-444F-875A-73FF9E5A6932}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Configuration", "Fact.Extensions.Configuration.Policy\Fact.Extensions.Configuration.xproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Configuration", "Fact.Extensions.Configuration\Fact.Extensions.Configuration.xproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.StateAccessor", "Fact.Extensions.StateAccessor\Fact.Extensions.StateAccessor.xproj", "{3188DAE0-373A-4F93-8094-042A2104BFFA}"
 EndProject

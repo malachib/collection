@@ -4,8 +4,7 @@
   "testRunner": "mstest",
 
   "dependencies": {
-    "Fact.Extensions.Configuration": "1.0.0-*",
-    "Fact.Extensions.Configuration.Policy": "1.0.0-*"
+    "Fact.Extensions.Configuration": "1.0.0-*"
   },
 
   "frameworks": {

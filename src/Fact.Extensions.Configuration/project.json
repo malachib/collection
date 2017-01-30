@@ -1,9 +1,9 @@
 ﻿{
   "version": "1.0.0-*",
   "authors": [ "Malachi Burke" ],
-  "description": "Configuration utilities including IConfiguration extensions",
+  "description": "Configuration utilities: Policies",
   "packOptions": {
-    "releaseNotes": "Initial release"
+    "releaseNotes": ""
   },
 
   "buildOptions": {
@@ -13,18 +13,17 @@
   },
 
   "dependencies": {
-    "Fact.Extensions.Collection": "*",
-    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0"
+    //"Fact.Extensions.Collection": "*"
   },
 
   "frameworks": {
     "netstandard1.3": {
-
-    },
-    "netstandard1.6": {
-      "imports": "dnxcore50",
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
+        "System.Reflection.Extensions": "4.3.0",
+        "System.Linq": "4.3.0",
+        "System.Collections": "4.3.0",
+        "System.Diagnostics.Debug": "4.3.0",
+        "System.Diagnostics.Contracts": "4.3.0"
       }
     }
   }

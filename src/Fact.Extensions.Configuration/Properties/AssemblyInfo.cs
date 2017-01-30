@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Fact.Extensions.Configuration")]
+[assembly: AssemblyProduct("Fact.Extensions.Configuration.Policy")]
 [assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -17,5 +17,5 @@ using System.Runtime.InteropServices;
 
 #if NETSTANDARD1_6
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("0ed188bf-a5ec-4865-99ea-b458b5211602")]
+[assembly: Guid("f4e828e3-f7db-475c-8632-b624cac2a10b")]
 #endif
