@@ -28,20 +28,28 @@ namespace Fact.Extensions.Serialization
 
         protected override void Serialize(IPropertySerializer serializer, object instance)
         {
+            serializer.StartNode("test", null);
             foreach (var field in GetFields(instance))
             {
                 var value = field.GetValue(instance);
                 serializer[field.Name, field.FieldType] = value;
             }
+            serializer.EndNode();
         }
 
         protected override void Deserialize(IPropertyDeserializer deserializer, object instance)
         {
+            object key;
+            object[] attributes;
+            deserializer.StartNode(out key, out attributes);
+
             foreach (var field in GetFields(instance))
             {
                 var value = deserializer.Get(field.Name, field.FieldType);
                 field.SetValue(instance, value);
             }
+
+            deserializer.EndNode();
         }
     }
 }

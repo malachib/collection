@@ -119,11 +119,15 @@ namespace Fact.Extensions.Serialization
                     var writer = writerFactory();
                     using (var ps = new JsonPropertySerializer(writer))
                     {
+                        ps.StartNode(null);
+
                         foreach (var field in persistFields)
                         {
                             var value = field.GetValue(instance);
                             ps[field.Name, field.FieldType] = value;
                         }
+
+                        ps.EndNode();
                     }
                 }
             }
@@ -131,14 +135,20 @@ namespace Fact.Extensions.Serialization
             {
                 {
                     var reader = readerFactory();
+                    reader.Read();
                     var pds = new JsonPropertyDeserializer(reader);
                     {
+                        object key;
+                        object[] attributes;
+                        pds.StartNode(out key, out attributes);
 
                         foreach (var field in persistFields)
                         {
                             var value = pds.Get(field.Name, field.FieldType);
                             field.SetValue(instance, value);
                         }
+
+                        pds.EndNode();
                     }
                 }
             }

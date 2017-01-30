@@ -14,7 +14,7 @@ namespace Fact.Extensions.Serialization
         public JsonPropertySerializer(JsonWriter writer)
         {
             this.writer = writer;
-            writer.WriteStartObject();
+            //writer.WriteStartObject();
         }
 
         public object this[string key, Type type]
@@ -26,9 +26,20 @@ namespace Fact.Extensions.Serialization
             }
         }
 
-        public void Dispose()
+        public void StartNode(object key, object[] attributes = null)
+        {
+            writer.WriteStartObject();
+        }
+
+
+        public void EndNode()
         {
             writer.WriteEndObject();
+        }
+
+        public void Dispose()
+        {
+            //writer.WriteEndObject();
         }
     }
 
@@ -39,20 +50,33 @@ namespace Fact.Extensions.Serialization
         public JsonPropertyDeserializer(JsonReader reader)
         {
             this.reader = reader;
-            // FIX: debatable whether we want a read HERE.  Probably we want to read *AFTER* the assert
-            reader.Read();
+            //Debug.Assert(reader.TokenType == JsonToken.StartObject);
+            //reader.Read();
+        }
+
+
+        public void StartNode(out object key, out object[] attributes)
+        {
             Debug.Assert(reader.TokenType == JsonToken.StartObject);
+            reader.Read();
+            // JSON has no concept of node keys or attributes
+            key = null;
+            attributes = null;
+        }
+
+
+        public void EndNode()
+        {
+            Debug.Assert(reader.TokenType == JsonToken.EndObject);
+            reader.Read();
         }
 
         public object Get(string key, Type type)
         {
-            // FIX: again, debatable whether we want to read HERE.  Perhaps we should expect to already
-            // expect to be at propertyName, and instead move PAST the last property which is owned by us
-            // leaving the next (uninsterested by us) reader position at the ready
-            reader.Read();
             Debug.Assert(reader.TokenType == JsonToken.PropertyName);
             var propertyName = (string)reader.Value;
             reader.Read();
+#if DEBUG
             switch (reader.TokenType)
             {
                 case JsonToken.String:
@@ -63,7 +87,10 @@ namespace Fact.Extensions.Serialization
                     Debug.Assert(type == typeof(bool));
                     break;
             }
-            return reader.Value;
+#endif
+            var value = reader.Value;
+            reader.Read();
+            return value;
         }
     }
 }
