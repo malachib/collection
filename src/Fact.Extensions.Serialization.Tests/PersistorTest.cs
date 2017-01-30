@@ -246,5 +246,24 @@ namespace Fact.Extensions.Serialization.Tests
 
             p.Serialize(context);
         }
+
+
+        [TestMethod]
+        public void PersistorSerializationContextTest()
+        {
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddJsonPersistorFactory();
+            var sp = serviceCollection.BuildServiceProvider();
+
+            using (var psc = new PersistorSerializationContext<IPropertySerializer>())
+            {
+                var fileName = "persistorSerializationContextTest.json";
+                psc.SetJsonFile(fileName);
+                var _p = sp.GetRequiredService<IPersistor<TestRecord2>>();
+                var p = (IPersistorExperimental)((PersistorShim<TestRecord2>)_p).Persistor;
+                var record = new TestRecord2();
+                p.Serialize(psc, record);
+            }
+        }
     }
 }

@@ -58,19 +58,22 @@ namespace Fact.Extensions.Serialization
     /// <summary>
     /// Experimental
     /// </summary>
-    public interface IPersistorDeserializationContext
+    public class PersistorSerializationContext<TContext> : IPersistorSerializationContext<TContext>, IDisposable
     {
+        public TContext Context { get; set; }
 
+        public void Dispose()
+        {
+            if (Context is IDisposable)
+                ((IDisposable)Context).Dispose();
+        }
     }
-
 
 
     /// <summary>
     /// Experimental
     /// </summary>
-    public interface IPersistorPropertySerializerContext : 
-        IPersistorDeserializationContext<IPropertyDeserializer>,
-        IPersistorSerializationContext<IPropertySerializer>
+    public interface IPersistorDeserializationContext
     {
 
     }
@@ -82,6 +85,15 @@ namespace Fact.Extensions.Serialization
     public interface IPersistorDeserializationContext<TContext> : IPersistorDeserializationContext
     {
         TContext Context { get; set; }
+    }
+
+
+    /// <summary>
+    /// Experimental
+    /// </summary>
+    public class PersistorDeserializationContext<TContext> : IPersistorDeserializationContext<TContext>
+    {
+        public TContext Context { get; set; }
     }
 
 

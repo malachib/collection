@@ -39,6 +39,7 @@ namespace Fact.Extensions.Serialization
 
         public void Dispose()
         {
+            writer.Flush();
             //writer.WriteEndObject();
         }
     }

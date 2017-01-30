@@ -47,6 +47,18 @@ namespace Fact.Extensions.Serialization
             //Activator.CreateInstance()
             persistor.Deserialize(instance);
         }
+
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <param name="psc"></param>
+        public static void SetJsonFile(this IPersistorSerializationContext<IPropertySerializer> psc, string fileName)
+        {
+            StreamWriter file = File.CreateText(fileName);
+            var writer = new JsonTextWriter(file);
+            psc.Context = new JsonPropertySerializer(writer);
+        }
     }
 
 
