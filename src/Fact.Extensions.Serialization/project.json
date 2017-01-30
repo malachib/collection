@@ -8,7 +8,8 @@
 
   "dependencies": {
     // Need to pull in collctions because IPropertySerializer needs IGetter/ISetter
-    "Fact.Extensions.Collection": "1.0.0-*"
+    "Fact.Extensions.Collection": "1.0.0-*",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.1"
     // Seems to be causing issues with my NuGet upload
     //"System.Diagnostics.Contracts": "4.0.1"
   },
@@ -23,11 +24,23 @@
 
       "dependencies": {
         "System.IO": "4.1.0",
-        //"System.Text.Encoding": "4.0.11",
         "System.Threading.Tasks.Parallel": "4.0.1"
       }
-      //"imports": "dnxcore50"
     },
+    /*
+    "netstandard1.3": {
+      "buildOptions": {
+        "define": [
+          "NETSTANDARD1_3"
+        ]
+      },
+
+      "dependencies": {
+        "System.IO": "4.1.0",
+        "System.Threading.Tasks.Parallel": "4.0.1",
+        "System.Reflection.TypeExtensions": "4.1.0"
+      }
+    }, */
     "netstandard1.6": {
       "buildOptions": {
         "define": [
@@ -35,7 +48,8 @@
         ]
       },
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
+        "NETStandard.Library": "1.6.0",
+        "System.Reflection.TypeExtensions": "4.1.0"
       }
     }
   }
