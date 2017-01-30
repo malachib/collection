@@ -26,6 +26,9 @@ namespace Fact.Extensions.Serialization.Tests
             internal string field2 = FIELD2_INITIAL_VALUE;
 
             internal int field3 = 3;
+
+            [Persist]
+            internal float field4 = 5.0f;
         }
 
 
@@ -254,15 +257,16 @@ namespace Fact.Extensions.Serialization.Tests
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddJsonPersistorFactory();
             var sp = serviceCollection.BuildServiceProvider();
+            var pc = new PersistorContainer(sp);
             var record = new TestRecord2();
+
+            pc.SerializeToJsonFile(record, "temp/persistorSerializationContextTest2.json");
 
             using (var psc = new PersistorSerializationContext<IPropertySerializer>())
             {
-                var fileName = "persistorSerializationContextTest.json";
+                var fileName = "temp/persistorSerializationContextTest.json";
                 psc.SetJsonFile(fileName);
-
-                var _p = sp.GetRequiredService<IPersistor<TestRecord2>>();
-                _p.Serialize(psc, record);
+                pc.Serialize(psc, record);
             }
         }
     }

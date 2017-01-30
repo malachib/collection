@@ -10,11 +10,12 @@ namespace Fact.Extensions.Serialization
     public class JsonPropertySerializer : IPropertySerializer, IDisposable
     {
         readonly JsonWriter writer;
+        readonly bool closeOnDispose;
 
-        public JsonPropertySerializer(JsonWriter writer)
+        public JsonPropertySerializer(JsonWriter writer, bool closeOnDispose = false)
         {
             this.writer = writer;
-            //writer.WriteStartObject();
+            this.closeOnDispose = closeOnDispose;
         }
 
         public object this[string key, Type type]
@@ -40,7 +41,7 @@ namespace Fact.Extensions.Serialization
         public void Dispose()
         {
             writer.Flush();
-            //writer.WriteEndObject();
+            if (closeOnDispose) writer.Close();
         }
     }
 
@@ -87,8 +88,13 @@ namespace Fact.Extensions.Serialization
                 case JsonToken.Boolean:
                     Debug.Assert(type == typeof(bool));
                     break;
+
+                case JsonToken.Float:
+                    Debug.Assert(type == typeof(float));
+                    break;
             }
 #endif
+            var value2 = Convert.ChangeType(reader.Value, type);
             var value = reader.Value;
             reader.Read();
             return value;

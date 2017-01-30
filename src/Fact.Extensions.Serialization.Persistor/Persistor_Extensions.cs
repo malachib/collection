@@ -57,7 +57,7 @@ namespace Fact.Extensions.Serialization
         {
             StreamWriter file = File.CreateText(fileName);
             var writer = new JsonTextWriter(file);
-            psc.Context = new JsonPropertySerializer(writer);
+            psc.Context = new JsonPropertySerializer(writer, true);
         }
 
 
@@ -70,7 +70,35 @@ namespace Fact.Extensions.Serialization
         public static void Serialize<T>(this IPersistor _p, IPersistorSerializationContext psc, T instance)
         {
             var p = (IPersistorExperimental)((PersistorShim<T>)_p).Persistor;
+            p.Serialize(psc, instance);
+        }
 
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sp"></param>
+        /// <param name="instance"></param>
+        /// <param name="fileName"></param>
+        public static void SerializeToJsonFile<T>(this IPersistorContainer pc, T instance, string fileName)
+        {
+            using (var psc = new PersistorSerializationContext<IPropertySerializer>())
+            {
+                psc.SetJsonFile(fileName);
+
+                var _p = pc.ServiceProvider.GetRequiredService<IPersistor<T>>();
+                var p = (IPersistorExperimental)((PersistorShim<T>)_p).Persistor;
+                p.Serialize(psc, instance);
+            }
+        }
+
+
+        public static void Serialize<T>(this IPersistorContainer pc, IPersistorSerializationContext psc, T instance)
+        {
+            var _p = pc.ServiceProvider.GetRequiredService<IPersistor<T>>();
+            var p = (IPersistorExperimental)((PersistorShim<T>)_p).Persistor;
+            p.Serialize(psc, instance);
         }
     }
 
