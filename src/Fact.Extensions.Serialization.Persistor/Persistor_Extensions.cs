@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Fact.Extensions.Factories;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,41 @@ namespace Fact.Extensions.Serialization
             persistor.Persist(instance);
         }
     }
+
+
+    public interface IPersistorFactory : IFactory<Type, IPersistor>
+    {
+
+    }
+
+
+    /// <summary>
+    /// Shim for existing persistor instances to register in a DI container
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <remarks>
+    /// Technique shamelessly lifted from ILoggerFactory
+    /// </remarks>
+    public class PersistorShim<T> : IPersistor
+    {
+        readonly IPersistor persistor;
+
+        public PersistorShim(IPersistorFactory persistorFactory)
+        {
+            this.persistor = persistorFactory.Create(typeof(T));
+        }
+
+        public Persistor.ModeEnum Mode
+        {
+            set { persistor.Mode = value; }
+        }
+
+        public void Persist(object instance)
+        {
+            persistor.Persist(instance);
+        }
+    }
+
 
     public static class IServiceCollection_Extensions
     {

@@ -23,6 +23,6 @@ namespace Fact.Extensions.Serialization
     {
         void Persist(object instance);
 
-        Persistor.ModeEnum Mode { get; set; }
+        Persistor.ModeEnum Mode { set; }
     }
 }

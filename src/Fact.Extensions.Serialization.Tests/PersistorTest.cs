@@ -185,5 +185,30 @@ namespace Fact.Extensions.Serialization.Tests
             //serviceCollection.AddSingleton(new Persistor<TestRecord2>())
             //serviceCollection.Append(new Srev)
         }
+
+
+        public class PersistorFactory : IPersistorFactory
+        {
+            public bool CanCreate(Type id)
+            {
+                return true;
+            }
+
+            public IPersistor Create(Type id)
+            {
+                return new Method3Persistor(new TestRecord2Persistor());
+            }
+        }
+
+        [TestMethod]
+        public void PersistorContainer2Test()
+        {
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton<IPersistorFactory>(new PersistorFactory());
+            serviceCollection.AddSingleton(typeof(PersistorShim<>));
+            var sp = serviceCollection.BuildServiceProvider();
+
+            var p = sp.GetService<PersistorShim<TestRecord2>>();
+        }
     }
 }
