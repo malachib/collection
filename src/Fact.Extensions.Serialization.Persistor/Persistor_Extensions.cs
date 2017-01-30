@@ -66,7 +66,7 @@ namespace Fact.Extensions.Serialization
     {
         public static IServiceCollection AddPersistorFactory(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<IPersistorFactory>(new PersistorFactory());
+            serviceCollection.AddSingleton<IPersistorFactory, PersistorFactory>();
             serviceCollection.AddSingleton(typeof(IPersistor<>), typeof(PersistorShim<>));
             return serviceCollection;
         }
