@@ -89,7 +89,7 @@ namespace Fact.Extensions.Serialization.Tests
         {
             var testRecord = new TestRecord2();
             var _p = new TestRecord2Persistor();
-            var p = new Method3Persistor(_p);
+            var p = new RefPersistor(_p);
 
             p.Serialize(testRecord);
 
@@ -178,7 +178,7 @@ namespace Fact.Extensions.Serialization.Tests
             var _p = new TestRecord2ContainerJsonPersistor();
             var container = new TestRecord2Container();
 
-            var p = new Method3Persistor(_p);
+            var p = new RefPersistor(_p);
 
             p.Serialize(container);
 
@@ -187,44 +187,19 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
-        public class PersistorFactory : IPersistorFactory
-        {
-            // FIX: Only use this until proper IoC container is available (including LightweightContainer)
-            Dictionary<Type, IPersistor> persistors = new Dictionary<Type, IPersistor>();
-
-            public bool CanCreate(Type id)
-            {
-                return true;
-            }
-
-            public IPersistor Create(Type id)
-            {
-                return persistors[id];
-                //return new Method3Persistor(new TestRecord2Persistor());
-            }
-
-
-            public void Register<T>(IPersistor singleton)
-            {
-                persistors.Add(typeof(T), singleton);
-            }
-        }
-
         [TestMethod]
         public void PersistorContainer2Test()
         {
             var serviceCollection = new ServiceCollection();
-            var pf = new PersistorFactory();
-            var _p = new Method3Persistor(new TestRecord2Persistor());
-
-            pf.Register<TestRecord2>(_p);
-            serviceCollection.AddSingleton<IPersistorFactory>(pf);
-            serviceCollection.AddSingleton(typeof(PersistorShim<>));
+            serviceCollection.AddPersistorFactory();
             var sp = serviceCollection.BuildServiceProvider();
+
+            var pf = sp.GetRequiredService<IPersistorFactory>();
+            pf.AddRefPersistor<TestRecord2, TestRecord2Persistor>();
 
             var p = sp.GetService<PersistorShim<TestRecord2>>();
 
-            Assert.AreEqual(_p, p.Persistor);
+            Assert.AreEqual(typeof(RefPersistor), p.Persistor.GetType());
         }
     }
 }

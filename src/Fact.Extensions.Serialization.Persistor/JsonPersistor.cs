@@ -71,16 +71,22 @@ namespace Fact.Extensions.Serialization
         }
     }
 
-    public class Method3Persistor : Persistor, IPersistor
+
+    /// <summary>
+    /// Utilizing a combination of field-reflection on the instance and method reflection on this Persistor
+    /// class, we match up field names to parameter names and pass by ref so as to handle both
+    /// serialization and deserialization
+    /// </summary>
+    public class RefPersistor : Persistor, IPersistor
     {
         /// <summary>
         /// FIX: bad name, refers to method#3 described on IPersistor interface
         /// </summary>
-        readonly Persistor method3;
+        readonly Persistor refMethod;
 
-        public Method3Persistor(Persistor method3)
+        public RefPersistor(Persistor refMethod)
         {
-            this.method3 = method3;
+            this.refMethod = refMethod;
         }
 
         public void Persist(object instance)
@@ -94,7 +100,7 @@ namespace Fact.Extensions.Serialization
             if(Mode == ModeEnum.Serialize)
             {
                 // effectively map fields to method parameters
-                var persistMethod = method3.GetType().GetTypeInfo().GetMethod("Persist");
+                var persistMethod = refMethod.GetType().GetTypeInfo().GetMethod("Persist");
                 var parameters = persistMethod.GetParameters();
                 var parameterValues = new object[parameters.Length];
                 var index = 0;
@@ -112,18 +118,18 @@ namespace Fact.Extensions.Serialization
                     parameterValues[index++] = value;
                 }
 
-                method3.Mode = ModeEnum.Serialize;
-                persistMethod.Invoke(method3, parameterValues);
+                refMethod.Mode = ModeEnum.Serialize;
+                persistMethod.Invoke(refMethod, parameterValues);
             }
             else
             {
                 // effectively map fields to method parameters
-                var persistMethod = method3.GetType().GetTypeInfo().GetMethod("Persist");
+                var persistMethod = refMethod.GetType().GetTypeInfo().GetMethod("Persist");
                 var parameters = persistMethod.GetParameters();
                 var parameterValues = new object[parameters.Length];
 
-                method3.Mode = ModeEnum.Deserialize;
-                persistMethod.Invoke(method3, parameterValues);
+                refMethod.Mode = ModeEnum.Deserialize;
+                persistMethod.Invoke(refMethod, parameterValues);
 
 
                 var index = 0;
@@ -222,13 +228,13 @@ namespace Fact.Extensions.Serialization
         /// <summary>
         /// FIX: bad name, refers to method#3 described on IPersistor interface
         /// </summary>
-        readonly Method3Persistor method3persistor;
+        readonly RefPersistor method3persistor;
 
         public JsonReflectionPersistor(Func<JsonReader> readerFactory, Func<JsonWriter> writerFactory, Persistor method3 = null)
         {
             this.readerFactory = readerFactory;
             this.writerFactory = writerFactory;
-            if(method3 != null) method3persistor = new Method3Persistor(method3);
+            if(method3 != null) method3persistor = new RefPersistor(method3);
         }
 
 

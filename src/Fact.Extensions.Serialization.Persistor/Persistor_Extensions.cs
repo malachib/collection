@@ -61,7 +61,7 @@ namespace Fact.Extensions.Serialization
 
     public interface IPersistorFactory : IFactory<Type, IPersistor>
     {
-
+        void Register(Type t, IPersistor persistor);
     }
 
 
@@ -104,8 +104,38 @@ namespace Fact.Extensions.Serialization
 
         public static void AddMethod3Persistor<T>(this IServiceCollection serviceCollection, Persistor persistor)
         {
-            var p = new Method3Persistor(persistor);
+            var p = new RefPersistor(persistor);
             serviceCollection.AddPersistor<T>(p);
+        }
+
+
+        public static IPersistorFactory AddRefPersistor(this IPersistorFactory factory, Type t, Persistor persistor)
+        {
+            var p = new RefPersistor(persistor);
+            factory.Register(t, p);
+            return factory;
+        }
+
+
+        /// <summary>
+        /// Add a RefPersistor type of persistor and associate it with a class T
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TPersistor"></typeparam>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        public static IPersistorFactory AddRefPersistor<T, TPersistor>(this IPersistorFactory factory)
+            where TPersistor: Persistor, new()
+        {
+            return factory.AddRefPersistor(typeof(T), new TPersistor());
+        }
+
+
+        public static IServiceCollection AddPersistorFactory(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddSingleton<IPersistorFactory>(new PersistorFactory());
+            serviceCollection.AddSingleton(typeof(PersistorShim<>));
+            return serviceCollection;
         }
 
 
