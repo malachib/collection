@@ -82,6 +82,12 @@ namespace Fact.Extensions.Serialization
                 }
             }
         }
+
+
+        public override IPersistorContext Context
+        {
+            set { refMethod.Context = value; }
+        }
     }
 
 }

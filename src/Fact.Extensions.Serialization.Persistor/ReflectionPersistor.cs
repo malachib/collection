@@ -51,5 +51,13 @@ namespace Fact.Extensions.Serialization
 
             deserializer.EndNode();
         }
+
+
+        public override IPersistorContext Context
+        {
+            set
+            { // acquire IPropertySerializer etc thru here 
+            }
+        }
     }
 }

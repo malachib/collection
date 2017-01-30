@@ -38,6 +38,8 @@ namespace Fact.Extensions.Serialization
                 Deserialize(pds, instance);
             }
         }
+
+        public abstract IPersistorContext Context { set; }
     }
 
 

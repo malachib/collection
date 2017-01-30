@@ -69,5 +69,11 @@ namespace Fact.Extensions.Serialization
                 }
             }
         }
+
+
+        public IPersistorContext Context
+        {
+            set { }
+        }
     }
 }

@@ -33,5 +33,10 @@ namespace Fact.Extensions.Serialization
             var s = (ISerializable)instance;
             s.Deserialize(deserializer, null);
         }
+
+        public override IPersistorContext Context
+        {
+            set { }
+        }
     }
 }

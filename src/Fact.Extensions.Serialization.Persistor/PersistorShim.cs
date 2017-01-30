@@ -38,5 +38,10 @@ namespace Fact.Extensions.Serialization
         {
             Persistor.Persist(instance);
         }
+
+        public IPersistorContext Context
+        {
+            set { }
+        }
     }
 }

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
+    /// <summary>
+    /// Relationship between this and IPersistor still needs cleaning up
+    /// </summary>
     public class Persistor
     {
         public ModeEnum Mode { get; set; }
@@ -21,6 +24,12 @@ namespace Fact.Extensions.Serialization
             /// Move from outside data source to internal memory representation
             /// </summary>
             Deserialize
+        }
+
+
+        public virtual IPersistorContext Context
+        {
+            set { }
         }
     }
 
