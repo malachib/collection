@@ -33,13 +33,11 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serializati
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection.Interceptor", "Fact.Extensions.Collection.Interceptor\Fact.Extensions.Collection.Interceptor.xproj", "{12E69371-571C-4A4A-9F35-47DA507DEF57}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Configuration", "Fact.Extensions.Configuration\Fact.Extensions.Configuration.xproj", "{0ED188BF-A5EC-4865-99EA-B458B5211602}"
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serialization.Pipelines", "Fact.Extensions.Serialization.Pipelines\Fact.Extensions.Serialization.Pipelines.xproj", "{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Caching.Tests", "Fact.Extensions.Caching.Tests\Fact.Extensions.Caching.Tests.xproj", "{51A693BB-66F5-444F-875A-73FF9E5A6932}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Configuration.Policy", "Fact.Extensions.Configuration.Policy\Fact.Extensions.Configuration.Policy.xproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Configuration", "Fact.Extensions.Configuration.Policy\Fact.Extensions.Configuration.xproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.StateAccessor", "Fact.Extensions.StateAccessor\Fact.Extensions.StateAccessor.xproj", "{3188DAE0-373A-4F93-8094-042A2104BFFA}"
 EndProject
@@ -83,10 +81,6 @@ Global
 		{12E69371-571C-4A4A-9F35-47DA507DEF57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12E69371-571C-4A4A-9F35-47DA507DEF57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12E69371-571C-4A4A-9F35-47DA507DEF57}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0ED188BF-A5EC-4865-99EA-B458B5211602}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0ED188BF-A5EC-4865-99EA-B458B5211602}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0ED188BF-A5EC-4865-99EA-B458B5211602}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0ED188BF-A5EC-4865-99EA-B458B5211602}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
