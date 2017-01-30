@@ -40,6 +40,16 @@ namespace Fact.Extensions.Serialization
         object Deserialize(TIn input, Type type);
     }
 
+    /// <summary>
+    /// Sister of IAllocatingSerializer, this interface could also be known as INonAllocatingDeserializer
+    /// and relegates instance creation to an outside source
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    public interface IInPlaceDeserializer<TIn>
+    {
+        void Deserialize(TIn input, object instance, Type type = null);
+    }
+
     public interface ISerializerAsync<TOut>
     {
         Task SerializeAsync(TOut output, object inputValue, Type type = null);

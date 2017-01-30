@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
-#if NETSTANDARD1_3 || NETSTANDARD1_6
+#if NETSTANDARD1_6
     /// <summary>
-    /// Persist object by reflecting over PersistAttribute-marked fields (not properties, and not public)
+    /// Serializes object by reflecting over PersistAttribute-marked fields (not properties, and not public)
+    /// Utilizes IPropertySerializer & IPropertyDeserializer as its transport
     /// </summary>
-    public class FieldReflectionSerializer
+    public class FieldReflectionSerializer : 
+        ISerializer<IPropertySerializer>,
+        IDeserializer<IPropertyDeserializer>,
+        IInPlaceDeserializer<IPropertyDeserializer>
     {
         static IEnumerable<FieldInfo> GetFields(object instance)
         {
@@ -22,7 +26,7 @@ namespace Fact.Extensions.Serialization
             return persistFields;
         }
 
-        public void Serialize(IPropertySerializer serializer, object instance)
+        public void Serialize(IPropertySerializer serializer, object instance, Type type)
         {
             serializer.StartNode("test", null);
             foreach (var field in GetFields(instance))
@@ -34,7 +38,15 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public void Deserialize(IPropertyDeserializer deserializer, object instance)
+        public object Deserialize(IPropertyDeserializer deserializer, Type type)
+        {
+            var instance = Activator.CreateInstance(type);
+            Deserialize(deserializer, instance, type);
+            return instance;
+        }
+
+
+        public void Deserialize(IPropertyDeserializer deserializer, object instance, Type type)
         {
             string key;
             object[] attributes;
