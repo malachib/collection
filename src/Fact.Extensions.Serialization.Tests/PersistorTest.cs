@@ -64,10 +64,11 @@ namespace Fact.Extensions.Serialization.Tests
             {
                 var stringReader = new StringReader(stringWriter.ToString());
                 var jsonTextReader = new JsonTextReader(stringReader);
+                jsonTextReader.Read();
                 return jsonTextReader;
             };
 
-            var p = new JsonReflectionPersistor_OLD(readerFactory, writerFactory);
+            var p = new JsonReflectionPersistor(readerFactory, writerFactory);
 
             p.Mode = Persistor.ModeEnum.Serialize;
 
@@ -163,9 +164,9 @@ namespace Fact.Extensions.Serialization.Tests
                         p.Mode = ModeEnum.Deserialize;
                         reader.Read();
                         Debug.Assert(reader.TokenType == JsonToken.StartArray);
-                        //reader.Read();
+                        reader.Read();
                         records = new List<Tests.PersistorTest.TestRecord2>();
-                        for (;reader.TokenType != JsonToken.EndArray; reader.Read())
+                        while (reader.TokenType != JsonToken.EndArray)
                         {
                             //Debug.Assert(reader.TokenType == JsonToken.StartObject);
                             // FIX: could blame JSON for this, but actually its more of a shortcoming
@@ -205,7 +206,7 @@ namespace Fact.Extensions.Serialization.Tests
 
             // TODO: Need to change JsonPropertySerializers to 'expect token is already present' mode instead
             // of 'read once to get token' mode for this to work right.
-            //p.Deserialize(container);
+            p.Deserialize(container);
 
             //serviceCollection.AddSingleton(new Persistor<TestRecord2>())
             //serviceCollection.Append(new Srev)
