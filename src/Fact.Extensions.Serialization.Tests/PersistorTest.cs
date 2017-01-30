@@ -183,18 +183,8 @@ namespace Fact.Extensions.Serialization.Tests
         [TestMethod]
         public void JsonPersistorContainerTest()
         {
-            // since we don't have a full IoC container with named resolution , and/or
-            // the resolution we want to do is kind of a type factory anyway, try to 
-            // use the factory pattern (ala ILoggerFactory) with an IServiceProvider
-            // techniques discussed here:
-            // http://stackoverflow.com/questions/39029344/factory-pattern-with-open-generics
-            // http://dotnetliberty.com/index.php/2016/05/09/asp-net-core-factory-pattern-dependency-injection
-            var serviceCollection = new ServiceCollection();
-            var sd = new ServiceDescriptor(typeof(Persistor<>), provider =>
-            {
-                return null;
-            }, ServiceLifetime.Singleton);
-            serviceCollection.AddMethod3Persistor<TestRecord2>(new TestRecord2Persistor());
+            // FIX: Container test bad name (was related to old IoC references no longer present
+            // in this test), we're actually testing ref-peering-into-list 
             var _p = new TestRecord2ContainerJsonPersistor();
             var container = new TestRecord2Container();
             var container2 = new TestRecord2Container();
@@ -207,9 +197,6 @@ namespace Fact.Extensions.Serialization.Tests
             // TODO: Need to change JsonPropertySerializers to 'expect token is already present' mode instead
             // of 'read once to get token' mode for this to work right.
             p.Deserialize(container);
-
-            //serviceCollection.AddSingleton(new Persistor<TestRecord2>())
-            //serviceCollection.Append(new Srev)
         }
 
 
@@ -223,7 +210,7 @@ namespace Fact.Extensions.Serialization.Tests
             var pf = sp.GetRequiredService<IPersistorFactory>();
             pf.AddRefPersistor<TestRecord2, TestRecord2Persistor>();
 
-            var p = sp.GetService<PersistorShim<TestRecord2>>();
+            var p = (PersistorShim<TestRecord2>)sp.GetService<IPersistor<TestRecord2>>();
 
             Assert.AreEqual(typeof(RefPersistor), p.Persistor.GetType());
         }

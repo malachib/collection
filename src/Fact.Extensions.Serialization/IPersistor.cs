@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fact.Extensions.Factories;
+using System;
 using System.Collections.Generic;
 //using System.Linq;
 using System.Threading.Tasks;
@@ -24,5 +25,11 @@ namespace Fact.Extensions.Serialization
         void Persist(object instance);
 
         Persistor.ModeEnum Mode { set; }
+    }
+
+
+    public interface IPersistorFactory : IFactory<Type, IPersistor>
+    {
+        void Register(Type t, IPersistor persistor);
     }
 }

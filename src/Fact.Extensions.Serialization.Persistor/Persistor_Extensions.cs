@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
-    public static class Persistor_Extensions
+    public static class IPersistor_Extensions
     {
         public static void Serialize(this IPersistor persistor, object instance)
         {
@@ -37,78 +37,8 @@ namespace Fact.Extensions.Serialization
     }
 
 
-
-    /// <summary>
-    /// Shim for existing persistor instances to register in a DI container
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class Persistor<T> : Persistor, IPersistor
+    public static class IPersistorFactory_Extensions
     {
-        readonly IPersistor persistor;
-
-        public Persistor(IPersistor persistor)
-        {
-            this.persistor = persistor;
-        }
-
-        public void Persist(object instance)
-        {
-            persistor.Mode = Mode;
-            persistor.Persist(instance);
-        }
-    }
-
-
-    public interface IPersistorFactory : IFactory<Type, IPersistor>
-    {
-        void Register(Type t, IPersistor persistor);
-    }
-
-
-    /// <summary>
-    /// Shim for existing persistor instances to register in a DI container
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <remarks>
-    /// Technique shamelessly lifted from ILoggerFactory
-    /// </remarks>
-    public class PersistorShim<T> : IPersistor
-    {
-        public readonly IPersistor Persistor;
-
-        public PersistorShim(IPersistorFactory persistorFactory)
-        {
-            Persistor = persistorFactory.Create(typeof(T));
-        }
-
-        public Persistor.ModeEnum Mode
-        {
-            set { Persistor.Mode = value; }
-        }
-
-        public void Persist(object instance)
-        {
-            Persistor.Persist(instance);
-        }
-    }
-
-
-    public static class IServiceCollection_Extensions
-    {
-        public static void AddPersistor<T>(this IServiceCollection serviceCollection, IPersistor persistor)
-        {
-            var pShim = new Persistor<T>(persistor);
-            serviceCollection.AddSingleton(pShim);
-        }
-
-
-        public static void AddMethod3Persistor<T>(this IServiceCollection serviceCollection, Persistor persistor)
-        {
-            var p = new RefPersistor(persistor);
-            serviceCollection.AddPersistor<T>(p);
-        }
-
-
         public static IPersistorFactory AddRefPersistor(this IPersistorFactory factory, Type t, Persistor persistor)
         {
             var p = new RefPersistor(persistor);
@@ -125,16 +55,19 @@ namespace Fact.Extensions.Serialization
         /// <param name="factory"></param>
         /// <returns></returns>
         public static IPersistorFactory AddRefPersistor<T, TPersistor>(this IPersistorFactory factory)
-            where TPersistor: Persistor, new()
+            where TPersistor : Persistor, new()
         {
             return factory.AddRefPersistor(typeof(T), new TPersistor());
         }
+    }
 
 
+    public static class IServiceCollection_Extensions
+    {
         public static IServiceCollection AddPersistorFactory(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IPersistorFactory>(new PersistorFactory());
-            serviceCollection.AddSingleton(typeof(PersistorShim<>));
+            serviceCollection.AddSingleton(typeof(IPersistor<>), typeof(PersistorShim<>));
             return serviceCollection;
         }
 
@@ -186,7 +119,7 @@ namespace Fact.Extensions.Serialization
             else
             {
                 // shim class primarily for "method 3" approach
-                var p = sp.GetService<PersistorShim<T>>();
+                var p = sp.GetService<IPersistor<T>>();
                 if(p != null)
                 {
                     p.Mode = mode;
