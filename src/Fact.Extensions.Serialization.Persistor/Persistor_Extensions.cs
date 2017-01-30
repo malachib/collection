@@ -59,6 +59,19 @@ namespace Fact.Extensions.Serialization
             var writer = new JsonTextWriter(file);
             psc.Context = new JsonPropertySerializer(writer);
         }
+
+
+        /// <summary>
+        /// Experimental ONLY; even if other experimental stuff remains, this needs to go
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="psc"></param>
+        /// <param name="instance"></param>
+        public static void Serialize<T>(this IPersistor _p, IPersistorSerializationContext psc, T instance)
+        {
+            var p = (IPersistorExperimental)((PersistorShim<T>)_p).Persistor;
+
+        }
     }
 
 
