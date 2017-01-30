@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
-    interface ISerializable
+    public interface ISerializable
     {
         void Serialize(ISetter output, object context);
         void Deserialize(IGetter input, object context);

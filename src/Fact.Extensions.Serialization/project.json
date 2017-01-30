@@ -7,6 +7,7 @@
   },
 
   "dependencies": {
+    "Fact.Extensions.Collection": "1.0.0-*", // mainly used because of reference to IGetter/ISetter from IPropertySerializer
     "System.Reflection": "4.1.0"
     //"System.Runtime.Serialization.Formatters": "4.3.0"
     // Seems to be causing issues with my NuGet upload
