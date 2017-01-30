@@ -67,7 +67,7 @@ namespace Fact.Extensions.Serialization.Tests
                 return jsonTextReader;
             };
 
-            var p = new JsonReflectionPersistor(readerFactory, writerFactory);
+            var p = new JsonReflectionPersistor_OLD(readerFactory, writerFactory);
 
             p.Mode = Persistor.ModeEnum.Serialize;
 
@@ -122,7 +122,7 @@ namespace Fact.Extensions.Serialization.Tests
 
         public class TestRecord2Container
         {
-            List<TestRecord2> records = new List<TestRecord2>();
+            internal List<TestRecord2> records = new List<TestRecord2>();
 
             public TestRecord2Container()
             {
@@ -145,6 +145,7 @@ namespace Fact.Extensions.Serialization.Tests
                     using (var writer = new JsonTextWriter(file))
                     {
                         writer.WriteStartArray();
+                        //var p = new JsonReflectionPersistor_OLD(null, () => writer);
                         var p = new JsonReflectionPersistor(null, () => writer);
                         p.Mode = ModeEnum.Serialize;
                         foreach (var item in records)
@@ -155,6 +156,24 @@ namespace Fact.Extensions.Serialization.Tests
                 }
                 else
                 {
+                    using (StreamReader file = File.OpenText(fileName))
+                    using (var reader = new JsonTextReader(file))
+                    {
+                        var p = new JsonReflectionPersistor(() => reader, null);
+                        p.Mode = ModeEnum.Deserialize;
+                        reader.Read();
+                        Debug.Assert(reader.TokenType == JsonToken.StartArray);
+                        //reader.Read();
+                        records = new List<Tests.PersistorTest.TestRecord2>();
+                        for (;reader.TokenType != JsonToken.EndArray; reader.Read())
+                        {
+                            //Debug.Assert(reader.TokenType == JsonToken.StartObject);
+                            // FIX: could blame JSON for this, but actually its more of a shortcoming
+                            // of my persist code
+                            var record = new TestRecord2();
+                            p.Persist(record);
+                        }
+                    }
 
                 }
             }
@@ -177,10 +196,16 @@ namespace Fact.Extensions.Serialization.Tests
             serviceCollection.AddMethod3Persistor<TestRecord2>(new TestRecord2Persistor());
             var _p = new TestRecord2ContainerJsonPersistor();
             var container = new TestRecord2Container();
+            var container2 = new TestRecord2Container();
+            container2.records.Clear();
 
             var p = new RefPersistor(_p);
 
             p.Serialize(container);
+
+            // TODO: Need to change JsonPropertySerializers to 'expect token is already present' mode instead
+            // of 'read once to get token' mode for this to work right.
+            //p.Deserialize(container);
 
             //serviceCollection.AddSingleton(new Persistor<TestRecord2>())
             //serviceCollection.Append(new Srev)

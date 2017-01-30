@@ -139,7 +139,7 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static void AddPersistorSerializableJson(this IServiceCollection serviceCollection, 
+        public static void AddJsonSerializationInterfacePersistor(this IServiceCollection serviceCollection, 
             Func<TextWriter> writerFactory,
             Func<TextReader> readerFactory)
         {
@@ -154,6 +154,16 @@ namespace Fact.Extensions.Serialization
                 return new JsonPropertyDeserializer(new JsonTextReader(reader));
             });
             serviceCollection.AddSingleton(p);
+        }
+
+
+        public static IServiceCollection AddJsonReflectionPersistor(this IServiceCollection serviceCollection,
+            Func<JsonReader> readerFactory, Func<JsonWriter> writerFactory)
+        {
+            var p = new ReflectionPersistor(
+                () => new JsonPropertySerializer(writerFactory()),
+                () => new JsonPropertyDeserializer(readerFactory()));
+            return serviceCollection.AddSingleton(p);
         }
 
 
@@ -176,9 +186,7 @@ namespace Fact.Extensions.Serialization
             else
             {
                 // shim class primarily for "method 3" approach
-                // FIX: this is probably flawed in that callers will probably need to pass in a Type and not
-                // a generic T
-                var p = sp.GetService<Persistor<T>>();
+                var p = sp.GetService<PersistorShim<T>>();
                 if(p != null)
                 {
                     p.Mode = mode;

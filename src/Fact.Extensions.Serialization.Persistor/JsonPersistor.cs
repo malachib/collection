@@ -78,7 +78,7 @@ namespace Fact.Extensions.Serialization
     /// <remarks>
     /// FIX: Cleanup (perhaps use propertyserializerpersistor) and remove method3persistor code
     /// </remarks>
-    public class JsonReflectionPersistor : Persistor, IPersistor
+    public class JsonReflectionPersistor_OLD : Persistor, IPersistor
     {
         readonly Func<JsonReader> readerFactory;
         readonly Func<JsonWriter> writerFactory;
@@ -87,7 +87,7 @@ namespace Fact.Extensions.Serialization
         /// </summary>
         readonly RefPersistor method3persistor;
 
-        public JsonReflectionPersistor(Func<JsonReader> readerFactory, Func<JsonWriter> writerFactory, Persistor method3 = null)
+        public JsonReflectionPersistor_OLD(Func<JsonReader> readerFactory, Func<JsonWriter> writerFactory, Persistor method3 = null)
         {
             this.readerFactory = readerFactory;
             this.writerFactory = writerFactory;

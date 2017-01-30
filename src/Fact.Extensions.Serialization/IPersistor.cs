@@ -12,7 +12,7 @@ namespace Fact.Extensions.Serialization
     ///   1.  raw-field-based via reflection + PersistAttribute
     ///   2.  classic ISerializable-style interface with explicit save/restore via 
     ///       IPropertySerializer/IPropertyDeserializer similar to old SerializerInfo
-    ///   3.  reflection based "Persist(ref T val1, ref T val2)"
+    ///   3.  byref+reflection based "Persist(ref T val1, ref T val2)"
     /// </summary>
     /// <remarks>
     /// SerializationInfo and friends feel so in-flux / detested that I am going to re-implement
