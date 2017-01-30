@@ -5,6 +5,14 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Factories
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TInput"></typeparam>
+    /// <typeparam name="TOutput"></typeparam>
+    /// <remarks>
+    /// FIX: Thinking maybe this should be called AggregateFactory, sticking with the "type as a suffix" paradigm
+    /// </remarks>
     public class FactoryAggregator<TInput, TOutput> : IFactoryWithMeta<TInput, TOutput>
     {
         LinkedList<IFactory<TInput, TOutput>> candidates = new LinkedList<IFactory<TInput, TOutput>>();

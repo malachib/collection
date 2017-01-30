@@ -72,6 +72,22 @@ namespace Fact.Extensions.Serialization
         }
 
 
+        public static IServiceCollection AddJsonPersistorFactory(this IServiceCollection serviceCollection)
+        {
+            var a = new PersistorFactoryAggregator();
+            a.Add(new PersistorFactory());
+            a.Add(new SerializableInterfacePersistorFactory(null, null));
+            //a.Add(new JsonReflectionPersistorFactory());
+            a.Add(new DelegateFactory<Type, IPersistor>(
+                id => true, 
+                id => new JsonReflectionPersistor(null, null)));
+
+            serviceCollection.AddSingleton<IPersistorFactory>(a);
+            serviceCollection.AddSingleton(typeof(IPersistor<>), typeof(PersistorShim<>));
+            return serviceCollection;
+        }
+
+
         public static void AddJsonSerializationInterfacePersistor(this IServiceCollection serviceCollection, 
             Func<TextWriter> writerFactory,
             Func<TextReader> readerFactory)

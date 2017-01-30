@@ -36,6 +36,12 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    public interface IResourcePersisterContext
+    {
+
+    }
+
+
     public interface IPersistorFactory : IFactory<Type, IPersistor>
     {
         void Register(Type t, IPersistor persistor);

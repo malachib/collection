@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Fact.Extensions.Factories;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +15,7 @@ namespace Fact.Extensions.Serialization
 
         public bool CanCreate(Type id)
         {
-            return true;
+            return persistors.ContainsKey(id);
         }
 
         public IPersistor Create(Type id)
@@ -39,6 +41,27 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    public class JsonReflectionPersistorFactory : IPersistorFactory
+    {
+        readonly Func<JsonReader> readerFactory;
+        readonly Func<JsonWriter> writerFactory;
+
+        public bool CanCreate(Type id)
+        {
+            return true;
+        }
+
+        public IPersistor Create(Type id)
+        {
+            return new JsonReflectionPersistor(readerFactory, writerFactory);
+        }
+
+        public void Register(Type t, IPersistor persistor)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class SerializableInterfacePersistorFactory : IPersistorFactory
     {
         readonly Func<IPropertySerializer> psFactory;
@@ -60,6 +83,15 @@ namespace Fact.Extensions.Serialization
             return new PersistorSerializable(psFactory, pdsFactory);
         }
 
+        public void Register(Type t, IPersistor persistor)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    public class PersistorFactoryAggregator : FactoryAggregator<Type, IPersistor>, IPersistorFactory
+    {
         public void Register(Type t, IPersistor persistor)
         {
             throw new NotImplementedException();

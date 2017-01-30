@@ -1,4 +1,5 @@
 ﻿using Fact.Extensions.Collection;
+using Fact.Extensions.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -213,6 +214,22 @@ namespace Fact.Extensions.Serialization.Tests
             var p = (PersistorShim<TestRecord2>)sp.GetService<IPersistor<TestRecord2>>();
 
             Assert.AreEqual(typeof(RefPersistor), p.Persistor.GetType());
+        }
+
+
+        [TestMethod]
+        public void VariableDestinationPersistorTest()
+        {
+
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddJsonPersistorFactory();
+            var sp = serviceCollection.BuildServiceProvider();
+
+            var pf = sp.GetRequiredService<IPersistorFactory>();
+
+            var p = sp.GetService<IPersistor<TestRecord2>>();
+
+            //p.Context = 
         }
     }
 }
