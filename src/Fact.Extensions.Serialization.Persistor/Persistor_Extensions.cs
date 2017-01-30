@@ -61,6 +61,21 @@ namespace Fact.Extensions.Serialization
         }
 
 
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <param name="pdc"></param>
+        /// <param name="fileName"></param>
+        public static void SetJsonFile(this IPersistorDeserializationContext<IPropertyDeserializer> pdc, string fileName)
+        {
+            StreamReader file = File.OpenText(fileName);
+            var reader = new JsonTextReader(file);
+            reader.Read();
+            pdc.Context = new JsonPropertyDeserializer(reader);
+        }
+
+
         /// <summary>
         /// Experimental ONLY; even if other experimental stuff remains, this needs to go
         /// </summary>
@@ -87,18 +102,58 @@ namespace Fact.Extensions.Serialization
             {
                 psc.SetJsonFile(fileName);
 
-                var _p = pc.ServiceProvider.GetRequiredService<IPersistor<T>>();
-                var p = (IPersistorExperimental)((PersistorShim<T>)_p).Persistor;
-                p.Serialize(psc, instance);
+                pc.Serialize(psc, instance);
             }
         }
 
 
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="pc"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static T DeserializeFromJsonFile<T>(this IPersistorContainer pc, string fileName)
+            where T: new()
+        {
+            var pdc = new PersistorDeserializationContext<IPropertyDeserializer>();
+
+            pdc.SetJsonFile(fileName);
+            return pc.Deserialize<T>(pdc);
+        }
+
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="pc"></param>
+        /// <param name="psc"></param>
+        /// <param name="instance"></param>
         public static void Serialize<T>(this IPersistorContainer pc, IPersistorSerializationContext psc, T instance)
         {
             var _p = pc.ServiceProvider.GetRequiredService<IPersistor<T>>();
             var p = (IPersistorExperimental)((PersistorShim<T>)_p).Persistor;
             p.Serialize(psc, instance);
+        }
+
+
+        /// <summary>
+        /// Experimental
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="pc"></param>
+        /// <param name="pdc"></param>
+        /// <returns></returns>
+        public static T Deserialize<T>(this IPersistorContainer pc, IPersistorDeserializationContext pdc)
+            where T: new()
+        {
+            var _p = pc.ServiceProvider.GetRequiredService<IPersistor<T>>();
+            var p = (IPersistorExperimental)((PersistorShim<T>)_p).Persistor;
+            // FIX: bury factory within either IPersistor itself (probably) or maybe IPersistorContext
+            var instance = new T();
+            return (T) p.Deserialize(pdc, instance);
         }
     }
 

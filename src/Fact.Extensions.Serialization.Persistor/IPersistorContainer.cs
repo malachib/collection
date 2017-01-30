@@ -11,9 +11,15 @@ namespace Fact.Extensions.Serialization
     public interface IPersistorContainer
     {
         IServiceProvider ServiceProvider { get; }
+
+
     }
 
 
+    /// <summary>
+    /// Experimental
+    /// </summary>
+    /// <typeparam name="TContext"></typeparam>
     public class PersistorContainer : IPersistorContainer
     {
         readonly IServiceProvider sp;

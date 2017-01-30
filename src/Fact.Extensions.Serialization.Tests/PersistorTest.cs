@@ -247,7 +247,7 @@ namespace Fact.Extensions.Serialization.Tests
 
             context.Context = "file2.json";
 
-            p.Serialize(context);
+            //p.Serialize(context);
         }
 
 
@@ -262,12 +262,18 @@ namespace Fact.Extensions.Serialization.Tests
 
             pc.SerializeToJsonFile(record, "temp/persistorSerializationContextTest2.json");
 
+            var fileName = "temp/persistorSerializationContextTest.json";
+
             using (var psc = new PersistorSerializationContext<IPropertySerializer>())
             {
-                var fileName = "temp/persistorSerializationContextTest.json";
+                record.field4 = 7.7f;
                 psc.SetJsonFile(fileName);
                 pc.Serialize(psc, record);
             }
+
+            var record2 = pc.DeserializeFromJsonFile<TestRecord2>(fileName);
+
+            Assert.AreEqual(7.7f, record2.field4);
         }
     }
 }

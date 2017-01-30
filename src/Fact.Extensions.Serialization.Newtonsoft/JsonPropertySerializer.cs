@@ -78,7 +78,7 @@ namespace Fact.Extensions.Serialization
             Debug.Assert(reader.TokenType == JsonToken.PropertyName);
             var propertyName = (string)reader.Value;
             reader.Read();
-#if DEBUG
+            var value = reader.Value;
             switch (reader.TokenType)
             {
                 case JsonToken.String:
@@ -90,12 +90,17 @@ namespace Fact.Extensions.Serialization
                     break;
 
                 case JsonToken.Float:
-                    Debug.Assert(type == typeof(float));
+                    Debug.Assert(type == typeof(float) || type == typeof(double));
+                    // Because NewtonSoft always serializes as a double
+                    value = Convert.ChangeType(value, type);
+                    break;
+
+                case JsonToken.Integer:
+                    Debug.Assert(type == typeof(short) || type == typeof(int) || type == typeof(long));
+                    // Because NewtonSoft always serializes (probably) as a long
+                    value = Convert.ChangeType(value, type);
                     break;
             }
-#endif
-            var value2 = Convert.ChangeType(reader.Value, type);
-            var value = reader.Value;
             reader.Read();
             return value;
         }
