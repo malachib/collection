@@ -18,6 +18,19 @@ namespace Fact.Extensions.Serialization
         }
 
 
+        /// <summary>
+        /// EXPERIMENTAL
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="persistor"></param>
+        /// <param name="context"></param>
+        public static void Serialize<T>(this IPersistor persistor, IPersistorContext<T, object> context)
+        {
+            persistor.Mode = context.Mode;
+            persistor.Persist(context.Instance);
+        }
+
+
         public static void Deserialize(this IPersistor persistor, object instance)
         {
             persistor.Mode = Persistor.ModeEnum.Deserialize;

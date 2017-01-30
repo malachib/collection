@@ -35,8 +35,27 @@ namespace Fact.Extensions.Serialization
 
     }
 
+    /// <summary>
+    /// EXPERIMENTAL
+    /// </summary>
+    /// <typeparam name="T">Class of instance being persisted</typeparam>
+    /// <typeparam name="TContext">persist-specific context, perhaps a filename or a connection string</typeparam>
+    public interface IPersistorContext<T, TContext> : IPersistorContext
+    {
+        /// <summary>
+        /// Can be null, in which case a new T() is expected to work
+        /// </summary>
+        IFactory<T> InstanceFactory { get; set; }
 
-    public interface IResourcePersisterContext
+        Persistor.ModeEnum Mode { get; set; }
+
+        T Instance { get; set; }
+
+        TContext Context { get; set; }
+    }
+
+
+    public interface IResourcePersisterContext<T> : IPersistorContext<T, object>
     {
 
     }

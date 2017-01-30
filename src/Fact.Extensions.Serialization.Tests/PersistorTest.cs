@@ -216,6 +216,15 @@ namespace Fact.Extensions.Serialization.Tests
             Assert.AreEqual(typeof(RefPersistor), p.Persistor.GetType());
         }
 
+        public class ExperimentalContext : IPersistorContext<TestRecord2, object>
+        {
+            public IFactory<TestRecord2> InstanceFactory { get; set; }
+            public object Context { get; set; }
+
+            public TestRecord2 Instance { get; set; }
+
+            public Persistor.ModeEnum Mode { get; set; }
+        }
 
         [TestMethod]
         public void VariableDestinationPersistorTest()
@@ -229,7 +238,13 @@ namespace Fact.Extensions.Serialization.Tests
 
             var p = sp.GetService<IPersistor<TestRecord2>>();
 
-            //p.Context = 
+            //var _context = sp.GetService<IPersistorContext<TestRecord2, object>>();
+
+            var context = new ExperimentalContext() { Instance = new TestRecord2() };
+
+            context.Context = "file2.json";
+
+            p.Serialize(context);
         }
     }
 }
