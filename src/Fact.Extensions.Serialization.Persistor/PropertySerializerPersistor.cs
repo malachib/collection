@@ -9,7 +9,7 @@ namespace Fact.Extensions.Serialization
     /// Base abstract IPersistor class for scenarios which use IPropertySerializer/IPropertyDeserializer
     /// for serialization
     /// </summary>
-    public abstract class PropertySerializerPersistor : Persistor, IPersistor
+    public abstract class PropertySerializerPersistor : Persistor, IPersistor, IPersistorExperimental
     {
         protected readonly Func<IPropertySerializer> serializerFactory;
         protected readonly Func<IPropertyDeserializer> deserializerFactory;
@@ -39,7 +39,18 @@ namespace Fact.Extensions.Serialization
             }
         }
 
-        public abstract IPersistorContext Context { set; }
+        void IPersistorExperimental.Serialize(IPersistorSerializationContext context, object instance)
+        {
+            var c = (IPersistorSerializationContext<IPropertySerializer>)context;
+            Serialize(c.Context, instance);
+        }
+
+        object IPersistorExperimental.Deserialize(IPersistorDeserializationContext context, object instance)
+        {
+            var c = (IPersistorDeserializationContext<IPropertyDeserializer>)context;
+            Deserialize(c.Context, instance);
+            return instance;
+        }
     }
 
 

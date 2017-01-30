@@ -24,7 +24,7 @@ namespace Fact.Extensions.Serialization
         /// <typeparam name="T"></typeparam>
         /// <param name="persistor"></param>
         /// <param name="context"></param>
-        public static void Serialize<T>(this IPersistor persistor, IPersistorContext<T, object> context)
+        public static void Serialize<T, TContext>(this IPersistor persistor, IPersistorContext<T, TContext> context)
         {
             persistor.Mode = context.Mode;
             persistor.Persist(context.Instance);

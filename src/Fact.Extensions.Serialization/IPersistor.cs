@@ -30,6 +30,61 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    public interface IPersistorExperimental
+    {
+        void Serialize(IPersistorSerializationContext context, object instance);
+        object Deserialize(IPersistorDeserializationContext context, object instance = null);
+    }
+
+
+    /// <summary>
+    /// Experimental
+    /// </summary>
+    public interface IPersistorSerializationContext
+    {
+
+    }
+
+
+    /// <summary>
+    /// Experimental
+    /// </summary>
+    public interface IPersistorSerializationContext<TContext> : IPersistorSerializationContext
+    {
+        TContext Context { get; set; }
+    }
+
+
+    /// <summary>
+    /// Experimental
+    /// </summary>
+    public interface IPersistorDeserializationContext
+    {
+
+    }
+
+
+
+    /// <summary>
+    /// Experimental
+    /// </summary>
+    public interface IPersistorPropertySerializerContext : 
+        IPersistorDeserializationContext<IPropertyDeserializer>,
+        IPersistorSerializationContext<IPropertySerializer>
+    {
+
+    }
+
+
+    /// <summary>
+    /// Experimental
+    /// </summary>
+    public interface IPersistorDeserializationContext<TContext> : IPersistorDeserializationContext
+    {
+        TContext Context { get; set; }
+    }
+
+
     public interface IPersistorContext
     {
 
