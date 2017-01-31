@@ -10,6 +10,7 @@
     // Need to pull in collctions because IPropertySerializer needs IGetter/ISetter
     "Fact.Extensions.Collection": "1.0.0-*",
     "Fact.Extensions.Factories": "1.0.0-*",
+    "Fact.Extensions.Configuration": "1.0.0-*",
     "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.1"
     // Seems to be causing issues with my NuGet upload
     //"System.Diagnostics.Contracts": "4.0.1"
@@ -49,7 +50,6 @@
         ]
       },
       "dependencies": {
-        "Fact.Extensions.Configuration": "1.0.0-*",
         "NETStandard.Library": "1.6.0",
         "System.Reflection.TypeExtensions": "4.1.0"
       }

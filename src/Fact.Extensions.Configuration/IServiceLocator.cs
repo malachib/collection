@@ -37,6 +37,8 @@ namespace Fact.Extensions.Configuration
         void Register(Type registerType, object instance, string name = null);
     }
 
+    public interface IServiceContainer : IServiceLocator, IServiceRegistrar { }
+
     /// <summary>
     /// 
     /// </summary>

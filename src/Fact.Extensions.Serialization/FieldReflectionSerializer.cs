@@ -11,9 +11,8 @@ namespace Fact.Extensions.Serialization
     /// Serializes object by reflecting over PersistAttribute-marked fields (not properties, and not public)
     /// Utilizes IPropertySerializer & IPropertyDeserializer as its transport
     /// </summary>
-    public class FieldReflectionSerializer : 
-        ISerializer<IPropertySerializer>,
-        IDeserializer<IPropertyDeserializer>,
+    public class FieldReflectionSerializer :
+        ISerializationManager<IPropertyDeserializer, IPropertySerializer>,
         IInPlaceDeserializer<IPropertyDeserializer>
     {
         static IEnumerable<FieldInfo> GetFields(object instance)
@@ -59,6 +58,31 @@ namespace Fact.Extensions.Serialization
             }
 
             deserializer.EndNode();
+        }
+    }
+#else
+    public class FieldReflectionSerializer :
+        ISerializer<IPropertySerializer>,
+        IDeserializer<IPropertyDeserializer>,
+        IInPlaceDeserializer<IPropertyDeserializer>
+    {
+        public FieldReflectionSerializer()
+        {
+            throw new Exception("Shim class only for conditional-compile bug resolution. DO NOT USE");
+        }
+        object IDeserializer<IPropertyDeserializer>.Deserialize(IPropertyDeserializer input, Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IInPlaceDeserializer<IPropertyDeserializer>.Deserialize(IPropertyDeserializer input, object instance, Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ISerializer<IPropertySerializer>.Serialize(IPropertySerializer output, object inputValue, Type type)
+        {
+            throw new NotImplementedException();
         }
     }
 #endif
