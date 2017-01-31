@@ -12,13 +12,17 @@ using System.Threading.Tasks;
 /// </summary>
 namespace Fact.Extensions.Serialization
 {
-    public interface INodeSerializer
+    /// <summary>
+    /// Abstracts the traversing in and out of nodes, traditionally in an ISetter environment
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    public interface INodeSetter<TKey>
     {
         /// <summary>
         /// Creates a node/container and moves into it for all properties subsequently 
         /// to be set under
         /// </summary>
-        void StartNode(object key, object[] attributes);
+        void StartNode(TKey key, object[] attributes);
         /// <summary>
         /// Finishes a node/container and moves out of it, effectively moving the taxonomy
         /// up one level
@@ -26,12 +30,16 @@ namespace Fact.Extensions.Serialization
         void EndNode();
     }
 
-    public interface IPropertySerializer : ISetter, INodeSerializer
+    public interface IPropertySerializer : ISetter, INodeSetter<string>
     {
     }
 
 
-    public interface INodeDeserializer
+    /// <summary>
+    /// Abstracts the traversing in and out of nodes, traditionally in an IGetter environment
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    public interface INodeGetter<TKey>
     {
         /// <summary>
         /// Expects a node/container at this level and retrieves any key/attributes if
@@ -40,7 +48,7 @@ namespace Fact.Extensions.Serialization
         /// <param name="key"></param>
         /// <param name="attributes"></param>
         /// <remarks>Exception is thrown in DEBUG mode if start node not found as expected</remarks>
-        void StartNode(out object key, out object[] attributes);
+        void StartNode(out TKey key, out object[] attributes);
         /// <summary>
         /// Expects a node ending here
         /// </summary>
@@ -48,7 +56,7 @@ namespace Fact.Extensions.Serialization
     }
 
 
-    public interface IPropertyDeserializer : IGetter, INodeDeserializer
+    public interface IPropertyDeserializer : IGetter, INodeGetter<string>
     {
     }
 }
