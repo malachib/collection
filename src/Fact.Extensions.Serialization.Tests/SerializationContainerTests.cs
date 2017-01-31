@@ -20,8 +20,11 @@ namespace Fact.Extensions.Serialization.Tests
         public void Test1()
         {
             var _sc = new ServiceCollection();
+            //new FieldReflectionSerializer();
             // VS bugged out, can't find it
-            //var fieldReflectionSerializer = new FieldReflectionSerializer();
+            var fieldReflectionSerializer = new FieldReflectionSerializer();
+            _sc.AddSingleton<ISerializer<IPropertySerializer>>(fieldReflectionSerializer);
+            _sc.AddSingleton<IDeserializer<IPropertyDeserializer>>(fieldReflectionSerializer);
             var sp = _sc.BuildServiceProvider();
             var sc = new SerializationContainer(sp);
         }
