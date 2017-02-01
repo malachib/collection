@@ -52,19 +52,51 @@ namespace Fact.Extensions.Serialization.Tests
             var record = new TestRecord1();
             var s = new FieldReflectionSerializer();
             var key = typeof(TestRecord1).Name;
+            var fileName = "temp/serializationContainer2.json";
             //sc.Register(s, typeof(TestRecord1));
             sc.container.Register<ISerializer<IPropertySerializer>>(s, key);
             sc.container.Register<IDeserializer<IPropertyDeserializer>>(s, key);
-            var ds = sc.GetSerializer<IPropertySerializer>(typeof(TestRecord1));
-            using (var file = File.CreateText("temp/serializationContainer2.json"))
-            {
-                using (var writer = new JsonTextWriter(file))
-                {
-                    var jps = new JsonPropertySerializer(writer);
 
-                    ds.Serialize(jps, record);
-                }
+            sc.SerializeToJsonFile(fileName, record);
+            var record2 = sc.DeserializeFromJsonFile<TestRecord1>(fileName);
+        }
+    }
+
+    public static class ISerializationContainer_Extensions
+    {
+        public static void SerializeToJsonFile<T>(this ISerializationContainer sc, string fileName, T instance)
+        {
+            using (var file = File.CreateText(fileName))
+            using (var writer = new JsonTextWriter(file))
+            {
+                sc.SerializeToJsonWriter(writer, instance);
             }
+        }
+
+        public static void SerializeToJsonWriter<T>(this ISerializationContainer sc, JsonWriter writer, T instance)
+        {
+            IPropertySerializer jps = new JsonPropertySerializer(writer);
+
+            sc.Serialize(jps, instance);
+        }
+
+
+        public static T DeserializeFromJsonFile<T>(this ISerializationContainer sc, string fileName)
+        {
+            using (var file = File.OpenText(fileName))
+            using (var reader = new JsonTextReader(file))
+            {
+                reader.Read();
+                return sc.DeserializeFromJsonReader<T>(reader);
+            }
+        }
+
+
+        public static T DeserializeFromJsonReader<T>(this ISerializationContainer sc, JsonReader reader)
+        {
+            var jpds = new JsonPropertyDeserializer(reader);
+
+            return sc.Deserialize<T, IPropertyDeserializer>(jpds);
         }
     }
 }

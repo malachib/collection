@@ -58,12 +58,17 @@ namespace Fact.Extensions.Serialization
     }
 
 
-    public class SerializationContainer2
+    public interface ISerializationContainer
+    {
+        ISerializer<TOut> GetSerializer<TOut>(Type type);
+        IDeserializer<TIn> GetDeserializer<TIn>(Type type);
+    }
+
+    public class SerializationContainer2 : ISerializationContainer
     {
         public readonly LightweightContainer container = new LightweightContainer();
 
-        public void Register<TPersistor, TOut, TIn>(TPersistor persistor, Type t)
-            where TPersistor : ISerializer<TOut>, IDeserializer<TIn>
+        public void Register<TIn, TOut>(ISerializationManager<TIn, TOut> persistor, Type t)
         {
             // NOTE: We should make one unified container for these registrations, since
             // the TPersistor + key can disambiguate nicely
@@ -76,6 +81,24 @@ namespace Fact.Extensions.Serialization
 
         public IDeserializer<TIn> GetDeserializer<TIn>(Type type) =>
             container.Resolve<IDeserializer<TIn>>(type.Name);
+    }
+
+
+
+    public static class SerializationContainer2_Extensions
+    {
+        public static void Serialize<T, TOut>(this ISerializationContainer sc, TOut context, T instance)
+        {
+            var s = sc.GetSerializer<TOut>(typeof(T));
+            s.Serialize(context, instance);
+        }
+
+
+        public static T Deserialize<T, TIn>(this ISerializationContainer sc, TIn context)
+        {
+            var ds = sc.GetDeserializer<TIn>(typeof(T));
+            return (T) ds.Deserialize(context, typeof(T));
+        }
     }
 
     public class SerializationFactory<TOut> : IFactory<Type, TOut>
