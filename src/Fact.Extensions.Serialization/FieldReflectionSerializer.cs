@@ -15,6 +15,17 @@ namespace Fact.Extensions.Serialization
         ISerializationManager<IPropertyDeserializer, IPropertySerializer>,
         IInPlaceDeserializer<IPropertyDeserializer>
     {
+        /// <summary>
+        /// EXPERIMENTAL
+        /// delegate to discover what the Node key name should be for a particular instance
+        /// </summary>
+        readonly Func<object, string> keyFinder;
+
+        public FieldReflectionSerializer(Func<object, string> keyFinder = null)
+        {
+            this.keyFinder = keyFinder;
+        }
+
         static IEnumerable<FieldInfo> GetFields(object instance)
         {
             var fields = instance.GetType().GetTypeInfo().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
@@ -27,7 +38,11 @@ namespace Fact.Extensions.Serialization
 
         public void Serialize(IPropertySerializer serializer, object instance, Type type)
         {
-            serializer.StartNode("test", null);
+            // FIX: Need to get proper key (or nothing)
+            // keyFinder is experimental at this time
+            string key = keyFinder?.Invoke(instance);
+            serializer.StartNode(key, null);
+
             foreach (var field in GetFields(instance))
             {
                 var value = field.GetValue(instance);
@@ -39,7 +54,9 @@ namespace Fact.Extensions.Serialization
 
         public object Deserialize(IPropertyDeserializer deserializer, Type type)
         {
+            // FIX: We'll probably want a configurable factory/container for this
             var instance = Activator.CreateInstance(type);
+
             Deserialize(deserializer, instance, type);
             return instance;
         }
@@ -70,6 +87,12 @@ namespace Fact.Extensions.Serialization
         {
             throw new Exception("Shim class only for conditional-compile bug resolution. DO NOT USE");
         }
+
+            public FieldReflectionSerializer(Func<object, string> keyFinder = null)
+    {
+            throw new Exception("Shim class only for conditional-compile bug resolution. DO NOT USE");
+    }
+
         object IDeserializer<IPropertyDeserializer>.Deserialize(IPropertyDeserializer input, Type type)
         {
             throw new NotImplementedException();

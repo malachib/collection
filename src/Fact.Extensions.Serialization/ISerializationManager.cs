@@ -101,6 +101,16 @@ namespace Fact.Extensions.Serialization
     {
     }
 
+
+    /// <summary>
+    /// EXPERIMENTAL
+    /// </summary>
+    /// <typeparam name="TTransport"></typeparam>
+    public interface ISerializationContext<TTransport>
+    {
+        TTransport Transport { get; set; }
+    }
+
     /// <summary>
     /// Use for ISerializationManagers which have a constant encoding
     /// </summary>

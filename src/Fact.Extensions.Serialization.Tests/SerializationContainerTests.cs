@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace Fact.Extensions.Serialization.Tests
 {
@@ -16,9 +17,9 @@ namespace Fact.Extensions.Serialization.Tests
         public class TestRecord1
         {
             [Persist]
-            int field1 = 11;
+            internal int field1;
             [Persist]
-            string field2 = "Field #2";
+            internal string field2;
         }
 
         [TestMethod]
@@ -50,26 +51,44 @@ namespace Fact.Extensions.Serialization.Tests
         {
             var sc = new SerializationContainer2();
             var record = new TestRecord1();
-            var s = new FieldReflectionSerializer();
+            var s = new FieldReflectionSerializer(instance => "testInstance");
             var key = typeof(TestRecord1).Name;
             var fileName = "temp/serializationContainer2.json";
+            var newValue = 77;
+
+            record.field1 = newValue;
             //sc.Register(s, typeof(TestRecord1));
             sc.container.Register<ISerializer<IPropertySerializer>>(s, key);
             sc.container.Register<IDeserializer<IPropertyDeserializer>>(s, key);
 
             sc.SerializeToJsonFile(fileName, record);
             var record2 = sc.DeserializeFromJsonFile<TestRecord1>(fileName);
+
+            Assert.AreEqual(newValue, record2.field1);
         }
     }
 
     public static class ISerializationContainer_Extensions
     {
-        public static void SerializeToJsonFile<T>(this ISerializationContainer sc, string fileName, T instance)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sc"></param>
+        /// <param name="fileName"></param>
+        /// <param name="instance"></param>
+        /// <param name="autoWrap">
+        /// Whether to automatically wrap the entire file operation with an anonymous object,
+        /// which is a default of JSON files I've encountered.
+        /// </param>
+        public static void SerializeToJsonFile<T>(this ISerializationContainer sc, string fileName, T instance, bool autoWrap = true)
         {
             using (var file = File.CreateText(fileName))
             using (var writer = new JsonTextWriter(file))
             {
+                if(autoWrap) writer.WriteStartObject();
                 sc.SerializeToJsonWriter(writer, instance);
+                if(autoWrap) writer.WriteEndObject();
             }
         }
 
@@ -81,13 +100,24 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
-        public static T DeserializeFromJsonFile<T>(this ISerializationContainer sc, string fileName)
+        public static T DeserializeFromJsonFile<T>(this ISerializationContainer sc, string fileName, bool autoUnwrap = true)
         {
             using (var file = File.OpenText(fileName))
             using (var reader = new JsonTextReader(file))
             {
                 reader.Read();
-                return sc.DeserializeFromJsonReader<T>(reader);
+                if (autoUnwrap)
+                {
+                    Debug.Assert(reader.TokenType == JsonToken.StartObject);
+                    reader.Read();
+                }
+                var instance = sc.DeserializeFromJsonReader<T>(reader);
+                if (autoUnwrap)
+                {
+                    Debug.Assert(reader.TokenType == JsonToken.EndObject);
+                    reader.Read();
+                }
+                return instance;
             }
         }
 

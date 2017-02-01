@@ -30,7 +30,7 @@ namespace Fact.Extensions.Serialization
         public void StartNode(string key, object[] attributes = null)
         {
             // FIX: If present, we need to write a leading object key here
-            //if (key != null) writer.WritePropertyName(key);
+            if (key != null) writer.WritePropertyName(key);
             writer.WriteStartObject();
         }
 
@@ -59,10 +59,13 @@ namespace Fact.Extensions.Serialization
 
         public void StartNode(out string key, out object[] attributes)
         {
+            Debug.Assert(reader.TokenType == JsonToken.PropertyName);
+            key = (string)reader.Value;
+            reader.Read();
             Debug.Assert(reader.TokenType == JsonToken.StartObject);
             reader.Read();
             // JSON has no concept of node keys or attributes
-            key = null;
+            //key = null;
             attributes = null;
         }
 
