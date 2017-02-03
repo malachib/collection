@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
-#if NETSTANDARD1_6
     /// <summary>
     /// Serializes object by reflecting over PersistAttribute-marked fields (not properties, and not public)
     /// Utilizes IPropertySerializer & IPropertyDeserializer as its transport
     /// </summary>
+#if NETSTANDARD1_6
     public class FieldReflectionSerializer :
         ISerializationManager<IPropertyDeserializer, IPropertySerializer>,
         IInPlaceDeserializer<IPropertyDeserializer>

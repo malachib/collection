@@ -57,4 +57,24 @@ namespace Fact.Extensions.Serialization.Newtonsoft
             }
         }
     }
+
+
+    /// <summary>
+    /// Very confusing name
+    /// This class applies "JsonPropertySerializer" ISetter as a transport with which to serialize
+    /// objects who implement the ISerializable[IPropertySerializer] interface
+    /// </summary>
+    public class JsonPropertySerializerSerializableSerializer :
+        SerializableSerializer<IPropertySerializer, IPropertyDeserializer>
+    {
+        protected override IPropertyDeserializer GetDeserializer()
+        {
+            return new JsonPropertyDeserializer(null);
+        }
+
+        protected override IPropertySerializer GetSerializer()
+        {
+            return new JsonPropertySerializer(null);
+        }
+    }
 }
