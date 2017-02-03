@@ -84,13 +84,15 @@ namespace Fact.Extensions.Serialization.Tests
         public void JsonSerializableTest()
         {
             var sc = new SerializationContainer2();
-            var s = new SerializableSerializer<
+            /*var s = new SerializableSerializer<
                 IPropertySerializer,
-                IPropertyDeserializer>();
+                IPropertyDeserializer>(); */
             var key = typeof(TestRecord1).Name;
 
-            sc.container.Register<ISerializer<IPropertySerializer>>(s, key);
-            sc.container.Register<IDeserializer<IPropertyDeserializer>>(s, key);
+            sc.container.Register<ISerializer<IPropertySerializer>>(
+                new SerializableSerializer<IPropertySerializer>(), key);
+            sc.container.Register<IDeserializer<IPropertyDeserializer>>(
+                new SerializableDeserializer<IPropertyDeserializer>(), key);
 
             doTestRecord1Test(sc, "temp/jsonSerializableTest.json");
         }

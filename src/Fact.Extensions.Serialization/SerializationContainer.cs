@@ -59,10 +59,29 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// TODO: Either reimplemnt this as IFactory or place in calls to HasSerializer & HasDeserializer
+    /// so that aggregation can be done more cleanly
+    /// </remarks>
     public interface ISerializationContainer
     {
         ISerializer<TOut> GetSerializer<TOut>(Type type);
         IDeserializer<TIn> GetDeserializer<TIn>(Type type);
+    }
+
+
+    /// <summary>
+    /// EXPERIMENTAL
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    /// <typeparam name="TOut"></typeparam>
+    public class IPersistor<TIn, TOut>
+    {
+        IFactory<Type, IDeserializable<TIn>> DeserializerFactory { get; }
+        IFactory<Type, ISerializer<TOut>> SerializerFactory { get; }
     }
 
     public class SerializationContainer2 : ISerializationContainer
@@ -101,8 +120,7 @@ namespace Fact.Extensions.Serialization
             //else if (type.GetTypeInfo().IsAssignableFrom(typeof(IDeserializable<TIn>).GetTypeInfo()))
             else if (typeof(IDeserializable<TIn>).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
-                // FIX: Kludgey, decouple Serializable & Deserializable from each other
-                return new SerializableSerializer<object, TIn>();
+                return new SerializableDeserializer<TIn>();
             }
             else if (typeof(IDeserializer<TIn>) == typeof(IDeserializer<IPropertyDeserializer>))
             {
@@ -126,8 +144,7 @@ namespace Fact.Extensions.Serialization
             //else if (type.GetTypeInfo().IsAssignableFrom(typeof(ISerializable<TOut>).GetTypeInfo()))
             else if (typeof(ISerializable<TOut>).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
-                // FIX: Kludgey, decouple Serializable & Deserializable from each other
-                return new SerializableSerializer<TOut, object>();
+                return new SerializableSerializer<TOut>();
             }
             else if (typeof(ISerializer<TOut>) == typeof(ISerializer<IPropertySerializer>))
             {
