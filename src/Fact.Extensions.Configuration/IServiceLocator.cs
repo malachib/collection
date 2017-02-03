@@ -83,6 +83,13 @@ namespace Fact.Extensions.Configuration
         }
 
 
+        public static bool CanResolve<T>(this IServiceLocator container, string key)
+        {
+            object output;
+            return container.TryResolve(typeof(T), key, out output);
+        }
+
+
         /// <summary>
         /// Registers a particular singleton instance of a type with provided key
         /// </summary>

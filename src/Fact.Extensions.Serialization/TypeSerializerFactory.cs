@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Fact.Extensions.Factories;
 
 namespace Fact.Extensions.Serialization.Newtonsoft
 {
@@ -13,33 +14,19 @@ namespace Fact.Extensions.Serialization.Newtonsoft
     /// <typeparam name="TIn"></typeparam>
     /// <typeparam name="TOut"></typeparam>
     public class TypeSerializerFactory<TIn, TOut> :
-        SerializerFactory<TIn, TOut>
+        ISerializerFactory<TIn, TOut>
     {
-        readonly LightweightContainer container = new LightweightContainer();
+        readonly IServiceContainer container;
 
-        protected override IDeserializer<TIn> GetDeserializer(Type id)
+        public TypeSerializerFactory(IServiceContainer container)
         {
-            // FIX: implement proper CanResolve code here and in parent
-            try
-            {
-                return container.Resolve<IDeserializer<TIn>>(id.Name);
-            }
-            catch
-            {
-                return null;
-            }
+            this.container = container;
         }
 
-        protected override ISerializer<TOut> GetSerializer(Type id)
+
+        public TypeSerializerFactory() : this(new LightweightContainer())
         {
-            try
-            {
-                return container.Resolve<ISerializer<TOut>>(id.Name);
-            }
-            catch
-            {
-                return null;
-            }
+
         }
 
         public void RegisterSerializer(ISerializer<TOut> serializer, Type key)
@@ -59,6 +46,26 @@ namespace Fact.Extensions.Serialization.Newtonsoft
         {
             RegisterSerializer(t, key);
             RegisterDeserializer(t, key);
+        }
+
+        bool IFactory<Type, ISerializer<TOut>>.CanCreate(Type id)
+        {
+            return container.CanResolve<ISerializer<TOut>>(id.Name);
+        }
+
+        ISerializer<TOut> IFactory<Type, ISerializer<TOut>>.Create(Type id)
+        {
+            return container.Resolve<ISerializer<TOut>>(id.Name);
+        }
+
+        bool IFactory<Type, IDeserializer<TIn>>.CanCreate(Type id)
+        {
+            return container.CanResolve<IDeserializer<TIn>>(id.Name);
+        }
+
+        IDeserializer<TIn> IFactory<Type, IDeserializer<TIn>>.Create(Type id)
+        {
+            return container.Resolve<IDeserializer<TIn>>(id.Name);
         }
     }
 }

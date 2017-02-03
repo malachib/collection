@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
+    public interface ISerializerFactory<TIn, TOut> :
+        IFactory<Type, ISerializer<TOut>>,
+        IFactory<Type, IDeserializer<TIn>>
+    {
+
+    }
 
     /// <summary>
     /// EXPERIMENTAL
     /// </summary>
-    public abstract class SerializerFactory<TIn, TOut> :
-        IFactory<Type, ISerializer<TOut>>,
-        IFactory<Type, IDeserializer<TIn>>
+    public abstract class SerializerFactory<TIn, TOut> : ISerializerFactory<TIn, TOut>
     {
         protected abstract IDeserializer<TIn> GetDeserializer(Type id);
         protected abstract ISerializer<TOut> GetSerializer(Type id);
