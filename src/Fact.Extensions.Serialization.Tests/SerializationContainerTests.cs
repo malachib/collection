@@ -162,10 +162,7 @@ namespace Fact.Extensions.Serialization.Tests
         {
             var sc = new SerializationProvider();
 
-            sc.ConfigurePropertySerializer(tsf =>
-            {
-                tsf.RegisterFieldReflection<TestRecord1>(o => "record1");
-            });
+            sc.UsePropertySerializer();
 
             doTestRecord1Test(sc, "temp/serializerFactoryTest3.json");
         }

@@ -48,8 +48,8 @@ namespace Fact.Extensions.Serialization
         /// </summary>
         /// <param name="sp"></param>
         /// <param name="configureTypeSerializerFactory"></param>
-        public static void ConfigurePropertySerializer(this SerializationProvider sp, 
-            Action<TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>> configureTypeSerializerFactory)
+        public static void UsePropertySerializer(this SerializationProvider sp, 
+            Action<TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>> configureTypeSerializerFactory = null)
         {
             var p = sp.RegisterPropertySerializerAggregate();
 
@@ -73,7 +73,7 @@ namespace Fact.Extensions.Serialization
         {
             var tsf = new TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>();
 
-            configureTypeSerializerFactory(tsf);
+            configureTypeSerializerFactory?.Invoke(tsf);
 
             p.Add(tsf);
             p.AddSerializable();

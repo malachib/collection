@@ -40,15 +40,19 @@ namespace Fact.Extensions.Serialization
         {
             // FIX: Need to get proper key (or nothing)
             // keyFinder is experimental at this time
-            string key = keyFinder?.Invoke(instance);
-            serializer.StartNode(key, null);
+            if (keyFinder != null)
+            {
+                string key = keyFinder(instance);
+                serializer.StartNode(key, null);
+            }
 
             foreach (var field in GetFields(instance))
             {
                 var value = field.GetValue(instance);
                 serializer[field.Name, field.FieldType] = value;
             }
-            serializer.EndNode();
+
+            if(keyFinder != null) serializer.EndNode();
         }
 
 
