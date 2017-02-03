@@ -13,17 +13,42 @@ namespace Fact.Extensions.Serialization
     /// </summary>
     /// <remarks>
     /// </remarks>
-    public interface ISerializationProvider
+    public interface ISerializerProvider
     {
         ISerializer<TOut> GetSerializer<TOut>(Type type);
+    }
+
+
+    public interface IDeserializerProvider
+    {
         IDeserializer<TIn> GetDeserializer<TIn>(Type type);
     }
+
+
+    public interface ISerializationProvider : ISerializerProvider, IDeserializerProvider { }
+
+
+    public interface ISerializerRegistrar
+    {
+        void Register<TOut>(IFactory<Type, ISerializer<TOut>> factory);
+    }
+
+
+    public interface IDeserializerRegistrar
+    {
+        void Register<TIn>(IFactory<Type, IDeserializer<TIn>> factory);
+    }
+
+
+    public interface ISerializationRegistrar : ISerializerRegistrar, IDeserializerRegistrar { }
 
 
     /// <summary>
     /// Home where all serializers and deserializers are registered
     /// </summary>
-    public class SerializationProvider : ISerializationProvider
+    public class SerializationProvider :
+        ISerializationProvider,
+        ISerializationRegistrar
     {
         readonly IServiceContainer container;
 
@@ -60,7 +85,7 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public void Register<TIn, TOut>(SerializerFactory<TIn, TOut> factory)
+        public void Register<TIn, TOut>(ISerializerFactory<TIn, TOut> factory)
         {
             container.Register<IFactory<Type, ISerializer<TOut>>>(factory);
             container.Register<IFactory<Type, IDeserializer<TIn>>>(factory);

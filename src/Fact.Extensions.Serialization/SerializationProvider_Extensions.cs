@@ -7,28 +7,28 @@ namespace Fact.Extensions.Serialization
 {
     public static class SerializationProvider_Extensions
     {
-        public static void Serialize<T, TOut>(this ISerializationProvider sc, TOut context, T instance)
+        public static void Serialize<T, TOut>(this ISerializerProvider sc, TOut context, T instance)
         {
             var s = sc.GetSerializer<TOut>(typeof(T));
             s.Serialize(context, instance);
         }
 
 
-        public static T Deserialize<T, TIn>(this ISerializationProvider sc, TIn context)
+        public static T Deserialize<T, TIn>(this IDeserializerProvider sc, TIn context)
         {
             var ds = sc.GetDeserializer<TIn>(typeof(T));
             return (T)ds.Deserialize(context, typeof(T));
         }
 
 
-        public static void Register<TIn, TOut>(this SerializationProvider sc, ISerializerFactoryContainer<TIn, TOut> persistor)
+        public static void Register<TIn, TOut>(this ISerializationRegistrar sc, ISerializerFactoryContainer<TIn, TOut> persistor)
         {
             sc.Register(persistor.SerializerFactory);
             sc.Register(persistor.DeserializerFactory);
         }
 
 
-        public static AggregateSerializerFactoryContainer<TIn, TOut> RegisterAggregate<TIn, TOut>(this SerializationProvider sp)
+        public static AggregateSerializerFactoryContainer<TIn, TOut> RegisterAggregate<TIn, TOut>(this ISerializationRegistrar sp)
         {
             var p = new AggregateSerializerFactoryContainer<TIn, TOut>();
             sp.Register(p);
@@ -36,7 +36,7 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static AggregateSerializerFactoryContainer<IPropertyDeserializer, IPropertySerializer> RegisterPropertySerializerAggregate(this SerializationProvider sp)
+        public static AggregateSerializerFactoryContainer<IPropertyDeserializer, IPropertySerializer> RegisterPropertySerializerAggregate(this ISerializationRegistrar sp)
         {
             return sp.RegisterAggregate<IPropertyDeserializer, IPropertySerializer>();
         }
@@ -48,7 +48,7 @@ namespace Fact.Extensions.Serialization
         /// </summary>
         /// <param name="sp"></param>
         /// <param name="configureTypeSerializerFactory"></param>
-        public static void UsePropertySerializer(this SerializationProvider sp,
+        public static void UsePropertySerializer(this ISerializationRegistrar sp,
             SerializationProviderPropertySerializerConfig config = null)
         {
             var p = sp.RegisterPropertySerializerAggregate();

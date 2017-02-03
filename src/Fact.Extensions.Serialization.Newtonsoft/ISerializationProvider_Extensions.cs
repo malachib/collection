@@ -21,7 +21,7 @@ namespace Fact.Extensions.Serialization.Newtonsoft
         /// Whether to automatically wrap the entire file operation with an anonymous object,
         /// which is a default of JSON files I've encountered.
         /// </param>
-        public static void SerializeToJsonFile<T>(this ISerializationProvider sc, string fileName, T instance, bool autoWrap = true)
+        public static void SerializeToJsonFile<T>(this ISerializerProvider sc, string fileName, T instance, bool autoWrap = true)
         {
             using (var file = File.CreateText(fileName))
             using (var writer = new JsonTextWriter(file))
@@ -32,7 +32,7 @@ namespace Fact.Extensions.Serialization.Newtonsoft
             }
         }
 
-        public static void SerializeToJsonWriter<T>(this ISerializationProvider sc, JsonWriter writer, T instance)
+        public static void SerializeToJsonWriter<T>(this ISerializerProvider sc, JsonWriter writer, T instance)
         {
             IPropertySerializer jps = new JsonPropertySerializer(writer);
 
@@ -40,7 +40,7 @@ namespace Fact.Extensions.Serialization.Newtonsoft
         }
 
 
-        public static T DeserializeFromJsonFile<T>(this ISerializationProvider sc, string fileName, bool autoUnwrap = true)
+        public static T DeserializeFromJsonFile<T>(this IDeserializerProvider sc, string fileName, bool autoUnwrap = true)
         {
             using (var file = File.OpenText(fileName))
             using (var reader = new JsonTextReader(file))
@@ -62,7 +62,7 @@ namespace Fact.Extensions.Serialization.Newtonsoft
         }
 
 
-        public static T DeserializeFromJsonReader<T>(this ISerializationProvider sc, JsonReader reader)
+        public static T DeserializeFromJsonReader<T>(this IDeserializerProvider sc, JsonReader reader)
         {
             var jpds = new JsonPropertyDeserializer(reader);
 

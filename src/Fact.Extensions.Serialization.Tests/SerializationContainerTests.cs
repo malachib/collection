@@ -169,15 +169,15 @@ namespace Fact.Extensions.Serialization.Tests
 
 
 
-        static void doTestRecord1Test(ISerializationProvider sc, string fileName)
+        static void doTestRecord1Test(ISerializationProvider sp, string fileName)
         {
             var record = new TestRecord1();
             var newValue = 77;
 
             record.field1 = newValue;
 
-            sc.SerializeToJsonFile(fileName, record);
-            var record2 = sc.DeserializeFromJsonFile<TestRecord1>(fileName);
+            sp.SerializeToJsonFile(fileName, record);
+            var record2 = sp.DeserializeFromJsonFile<TestRecord1>(fileName);
 
             Assert.AreEqual(newValue, record2.field1);
         }
