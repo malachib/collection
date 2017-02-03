@@ -8,18 +8,37 @@ using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using Fact.Extensions.Serialization.Newtonsoft;
+using Fact.Extensions.Collection;
 
 namespace Fact.Extensions.Serialization.Tests
 {
     [TestClass]
     public class SerializationContainerTests
     {
-        public class TestRecord1
+        public class TestRecord1 : 
+            ISerializable<IPropertySerializer>, 
+            IDeserializable<IPropertyDeserializer>
         {
             [Persist]
             internal int field1;
             [Persist]
             internal string field2;
+
+
+            public TestRecord1() { }
+
+            public TestRecord1(IPropertyDeserializer deserializer)
+            {
+                field1 = deserializer.Get<int>("field1-named");
+                field2 = deserializer.Get<string>("field2-named");
+            }
+
+            public void Serialize(IPropertySerializer serializer)
+            {
+                serializer.Set("field1-named", field1);
+                serializer.Set("field2-named", field2);
+            }
         }
 
         [TestMethod]
@@ -54,6 +73,30 @@ namespace Fact.Extensions.Serialization.Tests
             var s = new FieldReflectionSerializer(instance => "testInstance");
             var key = typeof(TestRecord1).Name;
             var fileName = "temp/serializationContainer2.json";
+            var newValue = 77;
+
+            record.field1 = newValue;
+            //sc.Register(s, typeof(TestRecord1));
+            sc.container.Register<ISerializer<IPropertySerializer>>(s, key);
+            sc.container.Register<IDeserializer<IPropertyDeserializer>>(s, key);
+
+            sc.SerializeToJsonFile(fileName, record);
+            var record2 = sc.DeserializeFromJsonFile<TestRecord1>(fileName);
+
+            Assert.AreEqual(newValue, record2.field1);
+        }
+
+
+        [TestMethod]
+        public void JsonSerializableTest()
+        {
+            var sc = new SerializationContainer2();
+            var record = new TestRecord1();
+            var s = new SerializableSerializer<
+                IPropertySerializer,
+                IPropertyDeserializer>();
+            var key = typeof(TestRecord1).Name;
+            var fileName = "temp/jsonSerializableTest.json";
             var newValue = 77;
 
             record.field1 = newValue;

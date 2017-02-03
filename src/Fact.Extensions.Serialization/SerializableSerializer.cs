@@ -13,26 +13,31 @@ namespace Fact.Extensions.Serialization
     /// <typeparam name="TOut"></typeparam>
     /// <typeparam name="TIn"></typeparam>
     /// <remarks>TODO: decouple this from Deserializer portion</remarks>
-    public abstract class SerializableSerializer<TOut, TIn> : ISerializationManager<TIn, TOut>
+    public class SerializableSerializer<TOut, TIn> : ISerializationManager<TIn, TOut>
+        where TIn: class
     {
-        protected abstract TOut GetSerializer();
-        protected abstract TIn GetDeserializer();
-
         public object Deserialize(TIn input, Type type)
         {
-            TIn deserializer = GetDeserializer();
+            // Have to #if out this area instead of entire class because of VS2015 compilation glitch
+#if NETSTANDARD1_6
+            //var constructor = type.GetTypeInfo().GetConstructor(new[] { typeof(TIn) });
             // assert that the incoming type implements IDeserializer<TOut>
             //Debug.Assert(type.GetTypeInfo().IsAssignableFrom()
-            object serializable = Activator.CreateInstance(type, deserializer);
+            //object serializable = constructor.Invoke(new[] { input });
+
+            // this can't find the protected constructor with this
+            object serializable = Activator.CreateInstance(type, input);
             return serializable;
+#else
+            throw new InvalidOperationException();
+#endif
         }
 
         public void Serialize(TOut output, object inputValue, Type type = null)
         {
-            TOut serializer = GetSerializer();
             var serializable = (ISerializable<TOut>)inputValue;
 
-            serializable.Serialize(serializer);
+            serializable.Serialize(output);
         }
     }
 }
