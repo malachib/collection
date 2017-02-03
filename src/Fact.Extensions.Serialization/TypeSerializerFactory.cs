@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Fact.Extensions.Factories;
 
-namespace Fact.Extensions.Serialization.Newtonsoft
+namespace Fact.Extensions.Serialization
 {
     /// <summary>
     /// Experimental
@@ -66,6 +66,16 @@ namespace Fact.Extensions.Serialization.Newtonsoft
         IDeserializer<TIn> IFactory<Type, IDeserializer<TIn>>.Create(Type id)
         {
             return container.Resolve<IDeserializer<TIn>>(id.Name);
+        }
+    }
+
+
+    public static class TypeSerializerFactory_Extensions
+    {
+        public static void RegisterFieldReflection<T>(this TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer> tsf, 
+            Func<T, string> keyFinder)
+        {
+
         }
     }
 }

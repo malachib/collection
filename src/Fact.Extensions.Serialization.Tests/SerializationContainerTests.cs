@@ -110,7 +110,7 @@ namespace Fact.Extensions.Serialization.Tests
         [TestMethod]
         public void SerializerFactoryTest()
         {
-            var sc = new SerializationContainer3();
+            var sc = new SerializationProvider();
 
             var a = new AggregateFactory<Type, ISerializer<IPropertySerializer>>();
             var a1 = new AggregateFactory<Type, IDeserializer<IPropertyDeserializer>>();
@@ -138,7 +138,8 @@ namespace Fact.Extensions.Serialization.Tests
         [TestMethod]
         public void SerializerFactoryTest2()
         {
-            var sc = new SerializationContainer3();
+            var sc = new SerializationProvider();
+
             var p = new AggregatePersistor<IPropertyDeserializer, IPropertySerializer>();
 
             var tsf = new TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>();
@@ -156,7 +157,22 @@ namespace Fact.Extensions.Serialization.Tests
 
 
 
-        static void doTestRecord1Test(ISerializationContainer sc, string fileName)
+        [TestMethod]
+        public void SerializerFactoryTest3()
+        {
+            var sc = new SerializationProvider();
+
+            sc.ConfigurePropertySerializer(tsf =>
+            {
+                tsf.RegisterFieldReflection<TestRecord1>(o => "record1");
+            });
+
+            doTestRecord1Test(sc, "temp/serializerFactoryTest3.json");
+        }
+
+
+
+        static void doTestRecord1Test(ISerializationProvider sc, string fileName)
         {
             var record = new TestRecord1();
             var newValue = 77;
@@ -183,7 +199,7 @@ namespace Fact.Extensions.Serialization.Tests
         /// Whether to automatically wrap the entire file operation with an anonymous object,
         /// which is a default of JSON files I've encountered.
         /// </param>
-        public static void SerializeToJsonFile<T>(this ISerializationContainer sc, string fileName, T instance, bool autoWrap = true)
+        public static void SerializeToJsonFile<T>(this ISerializationProvider sc, string fileName, T instance, bool autoWrap = true)
         {
             using (var file = File.CreateText(fileName))
             using (var writer = new JsonTextWriter(file))
@@ -194,7 +210,7 @@ namespace Fact.Extensions.Serialization.Tests
             }
         }
 
-        public static void SerializeToJsonWriter<T>(this ISerializationContainer sc, JsonWriter writer, T instance)
+        public static void SerializeToJsonWriter<T>(this ISerializationProvider sc, JsonWriter writer, T instance)
         {
             IPropertySerializer jps = new JsonPropertySerializer(writer);
 
@@ -202,7 +218,7 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
-        public static T DeserializeFromJsonFile<T>(this ISerializationContainer sc, string fileName, bool autoUnwrap = true)
+        public static T DeserializeFromJsonFile<T>(this ISerializationProvider sc, string fileName, bool autoUnwrap = true)
         {
             using (var file = File.OpenText(fileName))
             using (var reader = new JsonTextReader(file))
@@ -224,7 +240,7 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
-        public static T DeserializeFromJsonReader<T>(this ISerializationContainer sc, JsonReader reader)
+        public static T DeserializeFromJsonReader<T>(this ISerializationProvider sc, JsonReader reader)
         {
             var jpds = new JsonPropertyDeserializer(reader);
 

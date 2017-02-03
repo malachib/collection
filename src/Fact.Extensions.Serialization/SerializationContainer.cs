@@ -7,6 +7,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
 
+/// <summary>
+/// All the SerializationContainer code itself is defunct - 
+/// stepping stones to SerializationProvider
+/// </summary>
 namespace Fact.Extensions.Serialization
 {
     public class SerializationContainer
@@ -60,22 +64,7 @@ namespace Fact.Extensions.Serialization
 
 
     /// <summary>
-    /// 
-    /// </summary>
-    /// <remarks>
-    /// TODO: Either reimplemnt this as IFactory or place in calls to HasSerializer & HasDeserializer
-    /// so that aggregation can be done more cleanly
-    /// TODO: Rename this to ISerializationProvider
-    /// </remarks>
-    public interface ISerializationContainer
-    {
-        ISerializer<TOut> GetSerializer<TOut>(Type type);
-        IDeserializer<TIn> GetDeserializer<TIn>(Type type);
-    }
-
-
-    /// <summary>
-    /// EXPERIMENTAL
+    /// FIX: Needs naming cleanup
     /// </summary>
     /// <typeparam name="TIn"></typeparam>
     /// <typeparam name="TOut"></typeparam>
@@ -86,6 +75,11 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    /// <summary>
+    /// FIX: Needs naming cleanup
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    /// <typeparam name="TOut"></typeparam>
     public class AggregatePersistor<TIn, TOut> : IPersistor<TIn, TOut>
     {
         readonly AggregateFactory<Type, ISerializer<TOut>> serializerFactory = 
@@ -119,7 +113,7 @@ namespace Fact.Extensions.Serialization
         }
     }
 
-    public class SerializationContainer2 : ISerializationContainer
+    public class SerializationContainer2 : ISerializationProvider
     {
         public readonly LightweightContainer container = new LightweightContainer();
 
@@ -139,48 +133,7 @@ namespace Fact.Extensions.Serialization
     }
 
 
-    /// <summary>
-    /// EXPERIMENTAL
-    /// </summary>
-    public class SerializationContainer3 : ISerializationContainer
-    {
-        IServiceContainer container = new LightweightContainer();
-
-        public ISerializer<TOut> GetSerializer<TOut>(Type type)
-        {
-            // Find a factory for this type of serializer
-            var factory = container.Resolve<IFactory<Type, ISerializer<TOut>>>();
-            return factory.Create(type);
-        }
-
-        public IDeserializer<TIn> GetDeserializer<TIn>(Type type)
-        {
-            // Find a factory for this type of deserializer
-            var factory = container.Resolve<IFactory<Type, IDeserializer<TIn>>>();
-            return factory.Create(type);
-        }
-
-        public void Register<TOut>(IFactory<Type, ISerializer<TOut>> factory)
-        {
-            container.Register(factory);
-        }
-
-
-        public void Register<TIn>(IFactory<Type, IDeserializer<TIn>> factory)
-        {
-            container.Register(factory);
-        }
-
-
-        public void Register<TIn, TOut>(SerializerFactory<TIn, TOut> factory)
-        {
-            container.Register<IFactory<Type, ISerializer<TOut>>>(factory);
-            container.Register<IFactory<Type, IDeserializer<TIn>>>(factory);
-        }
-    }
-
-
-    public class _SerializationContainer : ISerializationContainer
+    public class _SerializationContainer : ISerializationProvider
     {
         public readonly SerializationContainer2 registeredContainer = new SerializationContainer2();
 
@@ -233,30 +186,6 @@ namespace Fact.Extensions.Serialization
         }
     }
 
-
-
-    public static class ISerializationContainer_Extensions
-    {
-        public static void Serialize<T, TOut>(this ISerializationContainer sc, TOut context, T instance)
-        {
-            var s = sc.GetSerializer<TOut>(typeof(T));
-            s.Serialize(context, instance);
-        }
-
-
-        public static T Deserialize<T, TIn>(this ISerializationContainer sc, TIn context)
-        {
-            var ds = sc.GetDeserializer<TIn>(typeof(T));
-            return (T) ds.Deserialize(context, typeof(T));
-        }
-
-
-        public static void Register<TIn, TOut>(this SerializationContainer3 sc, IPersistor<TIn, TOut> persistor)
-        {
-            sc.Register(persistor.SerializerFactory);
-            sc.Register(persistor.DeserializerFactory);
-        }
-    }
 
 
     public class SerializationFactory<TOut> : IFactory<Type, TOut>
