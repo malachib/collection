@@ -69,21 +69,14 @@ namespace Fact.Extensions.Serialization.Tests
         public void Test3()
         {
             var sc = new SerializationContainer2();
-            var record = new TestRecord1();
             var s = new FieldReflectionSerializer(instance => "testInstance");
             var key = typeof(TestRecord1).Name;
             var fileName = "temp/serializationContainer2.json";
-            var newValue = 77;
 
-            record.field1 = newValue;
-            //sc.Register(s, typeof(TestRecord1));
             sc.container.Register<ISerializer<IPropertySerializer>>(s, key);
             sc.container.Register<IDeserializer<IPropertyDeserializer>>(s, key);
 
-            sc.SerializeToJsonFile(fileName, record);
-            var record2 = sc.DeserializeFromJsonFile<TestRecord1>(fileName);
-
-            Assert.AreEqual(newValue, record2.field1);
+            doTestRecord1Test(sc, fileName);
         }
 
 
@@ -91,18 +84,32 @@ namespace Fact.Extensions.Serialization.Tests
         public void JsonSerializableTest()
         {
             var sc = new SerializationContainer2();
-            var record = new TestRecord1();
             var s = new SerializableSerializer<
                 IPropertySerializer,
                 IPropertyDeserializer>();
             var key = typeof(TestRecord1).Name;
-            var fileName = "temp/jsonSerializableTest.json";
+
+            sc.container.Register<ISerializer<IPropertySerializer>>(s, key);
+            sc.container.Register<IDeserializer<IPropertyDeserializer>>(s, key);
+
+            doTestRecord1Test(sc, "temp/jsonSerializableTest.json");
+        }
+
+
+        [TestMethod]
+        public void AggregateSerializationContainerTest()
+        {
+            var sc = new _SerializationContainer();
+            doTestRecord1Test(sc, "temp/aggregateSerializationContainerTest.json");
+        }
+
+
+        static void doTestRecord1Test(ISerializationContainer sc, string fileName)
+        {
+            var record = new TestRecord1();
             var newValue = 77;
 
             record.field1 = newValue;
-            //sc.Register(s, typeof(TestRecord1));
-            sc.container.Register<ISerializer<IPropertySerializer>>(s, key);
-            sc.container.Register<IDeserializer<IPropertyDeserializer>>(s, key);
 
             sc.SerializeToJsonFile(fileName, record);
             var record2 = sc.DeserializeFromJsonFile<TestRecord1>(fileName);

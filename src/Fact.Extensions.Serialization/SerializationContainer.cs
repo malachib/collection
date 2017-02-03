@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Fact.Extensions.Serialization
 {
@@ -81,6 +82,62 @@ namespace Fact.Extensions.Serialization
 
         public IDeserializer<TIn> GetDeserializer<TIn>(Type type) =>
             container.Resolve<IDeserializer<TIn>>(type.Name);
+    }
+
+
+    public class _SerializationContainer : ISerializationContainer
+    {
+        public readonly SerializationContainer2 registeredContainer = new SerializationContainer2();
+
+        public IDeserializer<TIn> GetDeserializer<TIn>(Type type)
+        {
+            IDeserializer<TIn> deserializer;
+
+            // First find any specifically registered deserializers
+            if (registeredContainer.container.TryResolve(type.Name, out deserializer))
+                return deserializer;
+            // If none exist, see if this type implements IDeserializable and use our
+            // standard approach for that
+            //else if (type.GetTypeInfo().IsAssignableFrom(typeof(IDeserializable<TIn>).GetTypeInfo()))
+            else if (typeof(IDeserializable<TIn>).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
+            {
+                // FIX: Kludgey, decouple Serializable & Deserializable from each other
+                return new SerializableSerializer<object, TIn>();
+            }
+            else if (typeof(IDeserializer<TIn>) == typeof(IDeserializer<IPropertyDeserializer>))
+            {
+                // falling back to field-reflction if nothing else works
+                // FIX: Very kludgey
+                return (IDeserializer<TIn>)new FieldReflectionSerializer();
+            }
+            else
+                throw new InvalidOperationException();
+        }
+
+        public ISerializer<TOut> GetSerializer<TOut>(Type type)
+        {
+            ISerializer<TOut> serializer;
+
+            // First find any specifically registered deserializers
+            if (registeredContainer.container.TryResolve(type.Name, out serializer))
+                return serializer;
+            // If none exist, see if this type implements IDeserializable and use our
+            // standard approach for that
+            //else if (type.GetTypeInfo().IsAssignableFrom(typeof(ISerializable<TOut>).GetTypeInfo()))
+            else if (typeof(ISerializable<TOut>).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
+            {
+                // FIX: Kludgey, decouple Serializable & Deserializable from each other
+                return new SerializableSerializer<TOut, object>();
+            }
+            else if (typeof(ISerializer<TOut>) == typeof(ISerializer<IPropertySerializer>))
+            {
+                // falling back to field-reflction if nothing else works
+                // FIX: Very kludgey
+                return (ISerializer<TOut>)new FieldReflectionSerializer(x => "TEST");
+            }
+            else
+                throw new InvalidOperationException();
+        }
     }
 
 

@@ -14,7 +14,7 @@ namespace Fact.Extensions.Serialization
     /// <typeparam name="TIn"></typeparam>
     /// <remarks>TODO: decouple this from Deserializer portion</remarks>
     public class SerializableSerializer<TOut, TIn> : ISerializationManager<TIn, TOut>
-        where TIn: class
+        //where TIn: class
     {
         public object Deserialize(TIn input, Type type)
         {
