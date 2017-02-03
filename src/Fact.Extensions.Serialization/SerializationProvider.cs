@@ -46,6 +46,12 @@ namespace Fact.Extensions.Serialization
     /// <summary>
     /// Home where all serializers and deserializers are registered
     /// </summary>
+    /// <remarks>
+    /// Specifically, serialization factories are registered here which can differenciate your needs by a combination of:
+    /// 1) specified transport
+    /// 2) specified type
+    /// Cascading styles of serialization per above combination is achieved through AggregateFactory
+    /// </remarks>
     public class SerializationProvider :
         ISerializationProvider,
         ISerializationRegistrar

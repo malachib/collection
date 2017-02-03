@@ -168,6 +168,42 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
+        [TestMethod]
+        public void RefSerializerTest()
+        {
+            var sp = new SerializationProvider();
+
+            sp.UsePropertySerializer(new SerializationProviderPropertySerializerConfig()
+            {
+                ConfigureTypeSerializerFactory = tsf =>
+                {
+                    var s = new TestRecordRefSerializer();
+                    tsf.Register(new RefSerializer<IPropertyDeserializer, IPropertySerializer>(s), typeof(TestRecord1));
+                }
+            });
+
+            //doTestRecord1Test(sp, "temp/refSerializerTest.json");
+        }
+
+
+        public class TestRecordRefSerializer
+        {
+            int holder;
+
+            public void Persist(IRefSerializerContext context, ref int field1)
+            {
+                if(context.IsSerializing)
+                {
+                    holder = field1;
+                }
+                else
+                {
+                    field1 = holder;
+                }
+            }
+        }
+
+
 
         static void doTestRecord1Test(ISerializationProvider sp, string fileName)
         {
