@@ -72,10 +72,15 @@ namespace Fact.Extensions.Serialization
 
 
     /// <summary>
-    /// EXPERIMENTAL
+    /// Needs more work
     /// </summary>
     public class FieldReflectionSerializerFactory : SerializerFactory<IPropertyDeserializer, IPropertySerializer>
     {
+        /// <summary>
+        /// EXPERIMENTAL
+        /// </summary>
+        readonly Dictionary<object, string> registeredKeys = new Dictionary<object, string>();
+
         protected override IDeserializer<IPropertyDeserializer> GetDeserializer(Type id)
         {
             return new FieldReflectionSerializer(o => "TEST");
@@ -84,6 +89,12 @@ namespace Fact.Extensions.Serialization
         protected override ISerializer<IPropertySerializer> GetSerializer(Type id)
         {
             return new FieldReflectionSerializer(o => "TEST");
+        }
+
+
+        public void Register(object instance, string key)
+        {
+            registeredKeys.Add(instance, key);
         }
     }
 }

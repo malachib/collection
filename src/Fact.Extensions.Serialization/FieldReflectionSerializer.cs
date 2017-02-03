@@ -17,13 +17,27 @@ namespace Fact.Extensions.Serialization
     {
         /// <summary>
         /// EXPERIMENTAL
-        /// delegate to discover what the Node key name should be for a particular instance
+        /// magic value to denote on return from keyFinder that actually no node should be rendered
+        /// must match ref EXACTLY this is not a string compare, but a ref address compare
         /// </summary>
-        readonly Func<object, string> keyFinder;
+        static readonly string NONODE = "nonode";
+
+        /// <summary>
+        /// EXPERIMENTAL
+        /// delegate to discover what the Node key name should be for a particular instance
+        /// Also serves as a flag indicating that a node should be created on serialize (unless NONODE is used)
+        /// </summary>
+        readonly Func<object, string> keyGetter;
+        /// <summary>
+        /// EXPERIMENTAL
+        /// delegate to use retrieved node key name and (potentially) announce/assign it to an external interested party
+        /// Also serves as a flag indicating that a node exists at all on deserialize
+        /// </summary>
+        readonly Action<object, string> keySetter;
 
         public FieldReflectionSerializer(Func<object, string> keyFinder = null)
         {
-            this.keyFinder = keyFinder;
+            this.keyGetter = keyFinder;
         }
 
         static IEnumerable<FieldInfo> GetFields(object instance)
@@ -38,12 +52,15 @@ namespace Fact.Extensions.Serialization
 
         public void Serialize(IPropertySerializer serializer, object instance, Type type)
         {
+            string key = null;
+
             // FIX: Need to get proper key (or nothing)
             // keyFinder is experimental at this time
-            if (keyFinder != null)
+            if (keyGetter != null)
             {
-                string key = keyFinder(instance);
-                serializer.StartNode(key, null);
+                key = keyGetter(instance);
+                if(key != NONODE)
+                    serializer.StartNode(key, null);
             }
 
             foreach (var field in GetFields(instance))
@@ -52,7 +69,7 @@ namespace Fact.Extensions.Serialization
                 serializer[field.Name, field.FieldType] = value;
             }
 
-            if(keyFinder != null) serializer.EndNode();
+            if(keyGetter != null && key != NONODE) serializer.EndNode();
         }
 
 
@@ -68,9 +85,15 @@ namespace Fact.Extensions.Serialization
 
         public void Deserialize(IPropertyDeserializer deserializer, object instance, Type type)
         {
-            string key;
-            object[] attributes;
-            deserializer.StartNode(out key, out attributes);
+            bool nonode = keyGetter == null ? true : (keyGetter(instance) == NONODE);
+
+            if (!nonode)
+            {
+                string key;
+                object[] attributes;
+                deserializer.StartNode(out key, out attributes);
+                keySetter?.Invoke(instance, key);
+            }
 
             foreach (var field in GetFields(instance))
             {
@@ -78,7 +101,8 @@ namespace Fact.Extensions.Serialization
                 field.SetValue(instance, value);
             }
 
-            deserializer.EndNode();
+            if (!nonode)
+                deserializer.EndNode();
         }
     }
 #else

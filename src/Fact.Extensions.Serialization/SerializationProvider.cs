@@ -66,4 +66,10 @@ namespace Fact.Extensions.Serialization
             container.Register<IFactory<Type, IDeserializer<TIn>>>(factory);
         }
     }
+
+
+    public class SerializationProviderPropertySerializerConfig
+    {
+        public Action<TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>> ConfigureTypeSerializerFactory;
+    }
 }

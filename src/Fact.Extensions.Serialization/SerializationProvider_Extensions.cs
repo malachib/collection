@@ -48,12 +48,12 @@ namespace Fact.Extensions.Serialization
         /// </summary>
         /// <param name="sp"></param>
         /// <param name="configureTypeSerializerFactory"></param>
-        public static void UsePropertySerializer(this SerializationProvider sp, 
-            Action<TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>> configureTypeSerializerFactory = null)
+        public static void UsePropertySerializer(this SerializationProvider sp,
+            SerializationProviderPropertySerializerConfig config = null)
         {
             var p = sp.RegisterPropertySerializerAggregate();
 
-            p.Configure(configureTypeSerializerFactory);
+            p.Configure(config?.ConfigureTypeSerializerFactory);
         }
 
 
