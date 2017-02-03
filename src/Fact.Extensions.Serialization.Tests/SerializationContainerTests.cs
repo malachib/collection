@@ -116,10 +116,15 @@ namespace Fact.Extensions.Serialization.Tests
             var a1 = new AggregateFactory<Type, IDeserializer<IPropertyDeserializer>>();
 
             var tsf = new TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>();
+            var ssf = new SerializableSerializerFactory<IPropertyDeserializer, IPropertySerializer>();
             var frsf = new FieldReflectionSerializerFactory();
 
+            tsf.Register(new FieldReflectionSerializer(o => "record1"), typeof(TestRecord1));
+
             a.Add(tsf);
-            a1.Add(frsf);
+            a1.Add(tsf);
+            a.Add(ssf);
+            a1.Add(ssf);
             a.Add(frsf);
             a1.Add(frsf);
 

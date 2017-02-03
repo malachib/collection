@@ -41,5 +41,24 @@ namespace Fact.Extensions.Serialization.Newtonsoft
                 return null;
             }
         }
+
+        public void RegisterSerializer(ISerializer<TOut> serializer, Type key)
+        {
+            container.Register(serializer, key.Name);
+        }
+
+
+        public void RegisterDeserializer(IDeserializer<TIn> deserializer, Type key)
+        {
+            container.Register(deserializer, key.Name);
+        }
+
+
+        public void Register<T>(T t, Type key)
+            where T: IDeserializer<TIn>, ISerializer<TOut>
+        {
+            RegisterSerializer(t, key);
+            RegisterDeserializer(t, key);
+        }
     }
 }
