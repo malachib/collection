@@ -65,6 +65,7 @@ namespace Fact.Extensions.Serialization
     /// <remarks>
     /// TODO: Either reimplemnt this as IFactory or place in calls to HasSerializer & HasDeserializer
     /// so that aggregation can be done more cleanly
+    /// TODO: Rename this to ISerializationProvider
     /// </remarks>
     public interface ISerializationContainer
     {
@@ -78,10 +79,44 @@ namespace Fact.Extensions.Serialization
     /// </summary>
     /// <typeparam name="TIn"></typeparam>
     /// <typeparam name="TOut"></typeparam>
-    public class IPersistor<TIn, TOut>
+    public interface IPersistor<TIn, TOut>
     {
-        IFactory<Type, IDeserializable<TIn>> DeserializerFactory { get; }
+        IFactory<Type, IDeserializer<TIn>> DeserializerFactory { get; }
         IFactory<Type, ISerializer<TOut>> SerializerFactory { get; }
+    }
+
+
+    public class AggregatePersistor<TIn, TOut> : IPersistor<TIn, TOut>
+    {
+        readonly AggregateFactory<Type, ISerializer<TOut>> serializerFactory = 
+            new AggregateFactory<Type, ISerializer<TOut>>();
+
+        readonly AggregateFactory<Type, IDeserializer<TIn>> deserializerFactory =
+            new AggregateFactory<Type, IDeserializer<TIn>>();
+
+        public IFactory<Type, IDeserializer<TIn>> DeserializerFactory => deserializerFactory;
+        public IFactory<Type, ISerializer<TOut>> SerializerFactory => serializerFactory;
+
+        public void Add(ISerializerFactory<TIn, TOut> sf)
+        {
+            serializerFactory.Add(sf);
+            deserializerFactory.Add(sf);
+        }
+    }
+
+
+    public static class AggregatePersistor_Extensions
+    {
+        public static void AddFieldReflection(this AggregatePersistor<IPropertyDeserializer, IPropertySerializer> a)
+        {
+            a.Add(new FieldReflectionSerializerFactory());
+        }
+
+
+        public static void AddSerializable<TIn, TOut>(this AggregatePersistor<TIn, TOut> a)
+        {
+            a.Add(new SerializableSerializerFactory<TIn, TOut>());
+        }
     }
 
     public class SerializationContainer2 : ISerializationContainer
@@ -200,7 +235,7 @@ namespace Fact.Extensions.Serialization
 
 
 
-    public static class SerializationContainer2_Extensions
+    public static class ISerializationContainer_Extensions
     {
         public static void Serialize<T, TOut>(this ISerializationContainer sc, TOut context, T instance)
         {
@@ -214,7 +249,15 @@ namespace Fact.Extensions.Serialization
             var ds = sc.GetDeserializer<TIn>(typeof(T));
             return (T) ds.Deserialize(context, typeof(T));
         }
+
+
+        public static void Register<TIn, TOut>(this SerializationContainer3 sc, IPersistor<TIn, TOut> persistor)
+        {
+            sc.Register(persistor.SerializerFactory);
+            sc.Register(persistor.DeserializerFactory);
+        }
     }
+
 
     public class SerializationFactory<TOut> : IFactory<Type, TOut>
     {

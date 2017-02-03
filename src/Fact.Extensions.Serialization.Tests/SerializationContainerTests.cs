@@ -135,6 +135,27 @@ namespace Fact.Extensions.Serialization.Tests
         }
 
 
+        [TestMethod]
+        public void SerializerFactoryTest2()
+        {
+            var sc = new SerializationContainer3();
+            var p = new AggregatePersistor<IPropertyDeserializer, IPropertySerializer>();
+
+            var tsf = new TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>();
+
+            tsf.Register(new FieldReflectionSerializer(o => "record1"), typeof(TestRecord1));
+
+            p.Add(tsf);
+            p.AddSerializable();
+            p.AddFieldReflection();
+
+            sc.Register(p);
+
+            doTestRecord1Test(sc, "temp/serializerFactoryTest2.json");
+        }
+
+
+
         static void doTestRecord1Test(ISerializationContainer sc, string fileName)
         {
             var record = new TestRecord1();
