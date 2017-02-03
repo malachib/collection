@@ -104,6 +104,47 @@ namespace Fact.Extensions.Serialization
     }
 
 
+    /// <summary>
+    /// EXPERIMENTAL
+    /// </summary>
+    public class SerializationContainer3 : ISerializationContainer
+    {
+        IServiceContainer container = new LightweightContainer();
+
+        public ISerializer<TOut> GetSerializer<TOut>(Type type)
+        {
+            // Find a factory for this type of serializer
+            var factory = container.Resolve<IFactory<Type, ISerializer<TOut>>>();
+            return factory.Create(type);
+        }
+
+        public IDeserializer<TIn> GetDeserializer<TIn>(Type type)
+        {
+            // Find a factory for this type of deserializer
+            var factory = container.Resolve<IFactory<Type, IDeserializer<TIn>>>();
+            return factory.Create(type);
+        }
+
+        public void Register<TOut>(IFactory<Type, ISerializer<TOut>> factory)
+        {
+            container.Register(factory);
+        }
+
+
+        public void Register<TIn>(IFactory<Type, IDeserializer<TIn>> factory)
+        {
+            container.Register(factory);
+        }
+
+
+        public void Register<TIn, TOut>(SerializerFactory<TIn, TOut> factory)
+        {
+            container.Register<IFactory<Type, ISerializer<TOut>>>(factory);
+            container.Register<IFactory<Type, IDeserializer<TIn>>>(factory);
+        }
+    }
+
+
     public class _SerializationContainer : ISerializationContainer
     {
         public readonly SerializationContainer2 registeredContainer = new SerializationContainer2();

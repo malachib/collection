@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using Fact.Extensions.Serialization.Newtonsoft;
 using Fact.Extensions.Collection;
+using Fact.Extensions.Factories;
 
 namespace Fact.Extensions.Serialization.Tests
 {
@@ -103,6 +104,29 @@ namespace Fact.Extensions.Serialization.Tests
         {
             var sc = new _SerializationContainer();
             doTestRecord1Test(sc, "temp/aggregateSerializationContainerTest.json");
+        }
+
+
+        [TestMethod]
+        public void SerializerFactoryTest()
+        {
+            var sc = new SerializationContainer3();
+
+            var a = new AggregateFactory<Type, ISerializer<IPropertySerializer>>();
+            var a1 = new AggregateFactory<Type, IDeserializer<IPropertyDeserializer>>();
+
+            var tsf = new TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>();
+            var frsf = new FieldReflectionSerializerFactory();
+
+            a.Add(tsf);
+            a1.Add(frsf);
+            a.Add(frsf);
+            a1.Add(frsf);
+
+            sc.Register(a);
+            sc.Register(a1);
+
+            doTestRecord1Test(sc, "temp/serializerFactoryTest.json");
         }
 
 
