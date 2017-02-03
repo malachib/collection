@@ -20,7 +20,7 @@ namespace Fact.Extensions.Serialization
         /// magic value to denote on return from keyFinder that actually no node should be rendered
         /// must match ref EXACTLY this is not a string compare, but a ref address compare
         /// </summary>
-        static readonly string NONODE = "nonode";
+        public static readonly string NONODE = "nonode";
 
         /// <summary>
         /// EXPERIMENTAL
@@ -111,6 +111,8 @@ namespace Fact.Extensions.Serialization
         IDeserializer<IPropertyDeserializer>,
         IInPlaceDeserializer<IPropertyDeserializer>
     {
+        public static readonly string NONODE = "nonode";
+
         public FieldReflectionSerializer()
         {
             throw new Exception("Shim class only for conditional-compile bug resolution. DO NOT USE");

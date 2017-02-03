@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Serialization
 {
+    /// <summary>
+    /// dual factories in one instance: handlers serializers and deserializers
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    /// <typeparam name="TOut"></typeparam>
     public interface ISerializerFactory<TIn, TOut> :
         IFactory<Type, ISerializer<TOut>>,
         IFactory<Type, IDeserializer<TIn>>
@@ -15,7 +20,6 @@ namespace Fact.Extensions.Serialization
     }
 
     /// <summary>
-    /// EXPERIMENTAL
     /// </summary>
     public abstract class SerializerFactory<TIn, TOut> : ISerializerFactory<TIn, TOut>
     {
@@ -43,58 +47,6 @@ namespace Fact.Extensions.Serialization
         {
             var serializer = GetSerializer(id);
             return serializer;
-        }
-    }
-
-
-
-    /// <summary>
-    /// EXPERIMENTAL
-    /// </summary>
-    public class SerializableSerializerFactory<TIn, TOut> : SerializerFactory<TIn, TOut>
-    {
-        protected override IDeserializer<TIn> GetDeserializer(Type id)
-        {
-            if (typeof(IDeserializable<TIn>).GetTypeInfo().IsAssignableFrom(id.GetTypeInfo()))
-                return new SerializableDeserializer<TIn>();
-            else
-                return null;
-        }
-
-        protected override ISerializer<TOut> GetSerializer(Type id)
-        {
-            if (typeof(ISerializable<TOut>).GetTypeInfo().IsAssignableFrom(id.GetTypeInfo()))
-                return new SerializableSerializer<TOut>();
-            else
-                return null;
-        }
-    }
-
-
-    /// <summary>
-    /// Needs more work
-    /// </summary>
-    public class FieldReflectionSerializerFactory : SerializerFactory<IPropertyDeserializer, IPropertySerializer>
-    {
-        /// <summary>
-        /// EXPERIMENTAL
-        /// </summary>
-        readonly Dictionary<object, string> registeredKeys = new Dictionary<object, string>();
-
-        protected override IDeserializer<IPropertyDeserializer> GetDeserializer(Type id)
-        {
-            return new FieldReflectionSerializer(o => "TEST");
-        }
-
-        protected override ISerializer<IPropertySerializer> GetSerializer(Type id)
-        {
-            return new FieldReflectionSerializer(o => "TEST");
-        }
-
-
-        public void Register(object instance, string key)
-        {
-            registeredKeys.Add(instance, key);
         }
     }
 }
