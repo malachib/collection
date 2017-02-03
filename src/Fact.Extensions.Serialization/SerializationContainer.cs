@@ -63,56 +63,6 @@ namespace Fact.Extensions.Serialization
     }
 
 
-    /// <summary>
-    /// FIX: Needs naming cleanup
-    /// </summary>
-    /// <typeparam name="TIn"></typeparam>
-    /// <typeparam name="TOut"></typeparam>
-    public interface IPersistor<TIn, TOut>
-    {
-        IFactory<Type, IDeserializer<TIn>> DeserializerFactory { get; }
-        IFactory<Type, ISerializer<TOut>> SerializerFactory { get; }
-    }
-
-
-    /// <summary>
-    /// FIX: Needs naming cleanup
-    /// </summary>
-    /// <typeparam name="TIn"></typeparam>
-    /// <typeparam name="TOut"></typeparam>
-    public class AggregatePersistor<TIn, TOut> : IPersistor<TIn, TOut>
-    {
-        readonly AggregateFactory<Type, ISerializer<TOut>> serializerFactory = 
-            new AggregateFactory<Type, ISerializer<TOut>>();
-
-        readonly AggregateFactory<Type, IDeserializer<TIn>> deserializerFactory =
-            new AggregateFactory<Type, IDeserializer<TIn>>();
-
-        public IFactory<Type, IDeserializer<TIn>> DeserializerFactory => deserializerFactory;
-        public IFactory<Type, ISerializer<TOut>> SerializerFactory => serializerFactory;
-
-        public void Add(ISerializerFactory<TIn, TOut> sf)
-        {
-            serializerFactory.Add(sf);
-            deserializerFactory.Add(sf);
-        }
-    }
-
-
-    public static class AggregatePersistor_Extensions
-    {
-        public static void AddFieldReflection(this AggregatePersistor<IPropertyDeserializer, IPropertySerializer> a)
-        {
-            a.Add(new FieldReflectionSerializerFactory());
-        }
-
-
-        public static void AddSerializable<TIn, TOut>(this AggregatePersistor<TIn, TOut> a)
-        {
-            a.Add(new SerializableSerializerFactory<TIn, TOut>());
-        }
-    }
-
     public class SerializationContainer2 : ISerializationProvider
     {
         public readonly LightweightContainer container = new LightweightContainer();

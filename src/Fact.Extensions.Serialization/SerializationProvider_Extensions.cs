@@ -21,22 +21,22 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static void Register<TIn, TOut>(this SerializationProvider sc, IPersistor<TIn, TOut> persistor)
+        public static void Register<TIn, TOut>(this SerializationProvider sc, ISerializerFactoryContainer<TIn, TOut> persistor)
         {
             sc.Register(persistor.SerializerFactory);
             sc.Register(persistor.DeserializerFactory);
         }
 
 
-        public static AggregatePersistor<TIn, TOut> RegisterAggregate<TIn, TOut>(this SerializationProvider sp)
+        public static AggregateSerializerFactoryContainer<TIn, TOut> RegisterAggregate<TIn, TOut>(this SerializationProvider sp)
         {
-            var p = new AggregatePersistor<TIn, TOut>();
+            var p = new AggregateSerializerFactoryContainer<TIn, TOut>();
             sp.Register(p);
             return p;
         }
 
 
-        public static AggregatePersistor<IPropertyDeserializer, IPropertySerializer> RegisterPropertySerializerAggregate(this SerializationProvider sp)
+        public static AggregateSerializerFactoryContainer<IPropertyDeserializer, IPropertySerializer> RegisterPropertySerializerAggregate(this SerializationProvider sp)
         {
             return sp.RegisterAggregate<IPropertyDeserializer, IPropertySerializer>();
         }
@@ -68,7 +68,7 @@ namespace Fact.Extensions.Serialization
         /// </summary>
         /// <param name="p"></param>
         /// <param name="configureTypeSerializerFactory"></param>
-        public static void Configure(this AggregatePersistor<IPropertyDeserializer, IPropertySerializer> p,
+        public static void Configure(this AggregateSerializerFactoryContainer<IPropertyDeserializer, IPropertySerializer> p,
             Action<TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>> configureTypeSerializerFactory)
         {
             var tsf = new TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>();

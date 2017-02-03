@@ -140,7 +140,7 @@ namespace Fact.Extensions.Serialization.Tests
         {
             var sc = new SerializationProvider();
 
-            var p = new AggregatePersistor<IPropertyDeserializer, IPropertySerializer>();
+            var p = new AggregateSerializerFactoryContainer<IPropertyDeserializer, IPropertySerializer>();
 
             var tsf = new TypeSerializerFactory<IPropertyDeserializer, IPropertySerializer>();
 
