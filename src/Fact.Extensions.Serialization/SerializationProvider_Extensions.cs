@@ -79,5 +79,18 @@ namespace Fact.Extensions.Serialization
             p.AddSerializable();
             p.AddFieldReflection();
         }
+
+
+        /// <summary>
+        /// EXPERIMENTAL
+        /// retrieve a strongly-typed-wrapped serialization provider based on the specified serialization provider
+        /// </summary>
+        /// <param name="sp"></param>
+        public static WrapperSerializationProvider<IPropertyDeserializer, IPropertySerializer>
+            GetPropertySerializationProvider(this ISerializationProvider sp)
+        {
+            var _sp = (SerializationProvider)sp;
+            return new WrapperSerializationProvider<IPropertyDeserializer, IPropertySerializer>(_sp);
+        }
     }
 }

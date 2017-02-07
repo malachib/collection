@@ -160,11 +160,11 @@ namespace Fact.Extensions.Serialization.Tests
         [TestMethod]
         public void SerializerFactoryTest3()
         {
-            var sc = new SerializationProvider();
+            var sp = new SerializationProvider();
 
-            sc.UsePropertySerializer();
+            sp.UsePropertySerializer();
 
-            doTestRecord1Test(sc, "temp/serializerFactoryTest3.json");
+            doTestRecord1Test(sp, "temp/serializerFactoryTest3.json");
         }
 
 

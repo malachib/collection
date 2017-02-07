@@ -34,6 +34,7 @@ namespace Fact.Extensions.Serialization.Newtonsoft
 
         public static void SerializeToJsonWriter<T>(this ISerializerProvider sc, JsonWriter writer, T instance)
         {
+            // NOTE: this code presumes that sc can provide an IPropertySerializer transport
             IPropertySerializer jps = new JsonPropertySerializer(writer);
 
             sc.Serialize(jps, instance);

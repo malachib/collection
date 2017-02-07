@@ -80,6 +80,16 @@ namespace Fact.Extensions.Serialization
 
         public IDeserializer<TIn> GetDeserializer<TIn>(Type type) =>
             container.Resolve<IDeserializer<TIn>>(type.Name);
+
+        bool ISerializerProvider.HasSerializer<TOut>(Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IDeserializerProvider.HasDeserializer<TIn>(Type type)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 
@@ -133,6 +143,16 @@ namespace Fact.Extensions.Serialization
             }
             else
                 throw new InvalidOperationException();
+        }
+
+        bool IDeserializerProvider.HasDeserializer<TIn>(Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool ISerializerProvider.HasSerializer<TOut>(Type type)
+        {
+            throw new NotImplementedException();
         }
     }
 
