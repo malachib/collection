@@ -19,4 +19,6 @@ else
 	((branch_version++))
 
 	echo $branch_version > $filename
+
+	git commit -am "Version bump to $branch_version on branch: $branch_name"
 fi
