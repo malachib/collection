@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26206.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection", "Fact.Extensions.Collection\Fact.Extensions.Collection.xproj", "{8EBB3E70-9F01-46A6-AC53-285CAF1F1BE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection", "Fact.Extensions.Collection\Fact.Extensions.Collection.csproj", "{8EBB3E70-9F01-46A6-AC53-285CAF1F1BE1}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Caching", "Fact.Extensions.Caching\Fact.Extensions.Caching.xproj", "{8AB0D287-F597-4ACC-9DBC-29753BDEB5AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Caching", "Fact.Extensions.Caching\Fact.Extensions.Caching.csproj", "{8AB0D287-F597-4ACC-9DBC-29753BDEB5AC}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection.Tests", "Fact.Extensions.Collection.Tests\Fact.Extensions.Collection.Tests.xproj", "{CBA21DBC-1140-4717-968F-7014CE53BD26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection.Tests", "Fact.Extensions.Collection.Tests\Fact.Extensions.Collection.Tests.csproj", "{CBA21DBC-1140-4717-968F-7014CE53BD26}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{00900FD9-475E-47E0-B728-AC3F3A474456}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,11 +18,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{00900FD9
 		upload_project.sh = upload_project.sh
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serialization", "Fact.Extensions.Serialization\Fact.Extensions.Serialization.xproj", "{3294BCB2-602F-4C65-AAE6-62BEE99FB329}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization", "Fact.Extensions.Serialization\Fact.Extensions.Serialization.csproj", "{3294BCB2-602F-4C65-AAE6-62BEE99FB329}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serialization.Newtonsoft", "Fact.Extensions.Serialization.Newtonsoft\Fact.Extensions.Serialization.Newtonsoft.xproj", "{3CF2291A-675D-4880-A5A8-CF6E960E5FF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.Newtonsoft", "Fact.Extensions.Serialization.Newtonsoft\Fact.Extensions.Serialization.Newtonsoft.csproj", "{3CF2291A-675D-4880-A5A8-CF6E960E5FF0}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serialization.Tests", "Fact.Extensions.Serialization.Tests\Fact.Extensions.Serialization.Tests.xproj", "{7298DA9D-5704-44C8-8B3A-B210FD7ECD81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.Tests", "Fact.Extensions.Serialization.Tests\Fact.Extensions.Serialization.Tests.csproj", "{7298DA9D-5704-44C8-8B3A-B210FD7ECD81}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8702DCD0-E599-4CE3-8AC3-A5537BBDC3EF}"
 	ProjectSection(SolutionItems) = preProject
@@ -30,21 +30,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serialization.MessagePack", "Fact.Extensions.Serialization.MessagePack\Fact.Extensions.Serialization.MessagePack.xproj", "{8568AF60-7372-44C0-9203-EE0C08A28996}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.MessagePack", "Fact.Extensions.Serialization.MessagePack\Fact.Extensions.Serialization.MessagePack.csproj", "{8568AF60-7372-44C0-9203-EE0C08A28996}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Collection.Interceptor", "Fact.Extensions.Collection.Interceptor\Fact.Extensions.Collection.Interceptor.xproj", "{12E69371-571C-4A4A-9F35-47DA507DEF57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection.Interceptor", "Fact.Extensions.Collection.Interceptor\Fact.Extensions.Collection.Interceptor.csproj", "{12E69371-571C-4A4A-9F35-47DA507DEF57}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Serialization.Pipelines", "Fact.Extensions.Serialization.Pipelines\Fact.Extensions.Serialization.Pipelines.xproj", "{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.Pipelines", "Fact.Extensions.Serialization.Pipelines\Fact.Extensions.Serialization.Pipelines.csproj", "{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Caching.Tests", "Fact.Extensions.Caching.Tests\Fact.Extensions.Caching.Tests.xproj", "{51A693BB-66F5-444F-875A-73FF9E5A6932}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Caching.Tests", "Fact.Extensions.Caching.Tests\Fact.Extensions.Caching.Tests.csproj", "{51A693BB-66F5-444F-875A-73FF9E5A6932}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Configuration", "Fact.Extensions.Configuration\Fact.Extensions.Configuration.xproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Configuration", "Fact.Extensions.Configuration\Fact.Extensions.Configuration.csproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.StateAccessor", "Fact.Extensions.StateAccessor\Fact.Extensions.StateAccessor.xproj", "{3188DAE0-373A-4F93-8094-042A2104BFFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.StateAccessor", "Fact.Extensions.StateAccessor\Fact.Extensions.StateAccessor.csproj", "{3188DAE0-373A-4F93-8094-042A2104BFFA}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Configuration.Tests", "Fact.Extensions.Configuration.Tests\Fact.Extensions.Configuration.Tests.xproj", "{9BCF5234-CD4F-442C-81D6-67624EEB660E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Configuration.Tests", "Fact.Extensions.Configuration.Tests\Fact.Extensions.Configuration.Tests.csproj", "{9BCF5234-CD4F-442C-81D6-67624EEB660E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Fact.Extensions.Factories", "Fact.Extensions.Factories\Fact.Extensions.Factories.xproj", "{F7D3F4F3-549A-484E-B71F-6EF98AD92571}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Factories", "Fact.Extensions.Factories\Fact.Extensions.Factories.csproj", "{F7D3F4F3-549A-484E-B71F-6EF98AD92571}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
