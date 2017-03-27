@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Fact.Extensions.Configuration\Fact.Extensions.Configuration.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Serialization.Pipelines\Fact.Extensions.Serialization.Pipelines.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Serialization.MessagePack\Fact.Extensions.Serialization.MessagePack.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Serialization.Newtonsoft\Fact.Extensions.Serialization.Newtonsoft.csproj" />
@@ -28,6 +29,12 @@
 
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="temp\readme.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0.1' ">
