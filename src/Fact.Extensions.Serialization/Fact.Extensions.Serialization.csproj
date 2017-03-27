@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <PackageReference Include="System.IO" Version="4.1.0" />
+    <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.0.1" />
   </ItemGroup>
 
