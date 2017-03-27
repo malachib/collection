@@ -40,6 +40,53 @@ namespace Fact.Extensions.Serialization
         object Deserialize(TIn input, Type type);
     }
 
+
+    /// <summary>
+    /// Classic "is-a" style serializer, designed to be put ON the class
+    /// itself being serialized
+    /// </summary>
+    /// <typeparam name="TSerializer"></typeparam>
+    /// <remarks>
+    /// We gently avoid this style, perhaps even when using a very generic serializer (such as IPropertySerializer) so
+    /// as to avoid implementation-specific (read: serialize destination specific) serialization code
+    /// </remarks>
+    public interface ISerializable<TSerializer>
+    {
+        void Serialize(TSerializer serializer);
+    }
+
+
+    /// <summary>
+    /// Classic "is-a" deserializer, designed to be put ON the class being deserialized
+    /// </summary>
+    /// <typeparam name="TDeserializer"></typeparam>
+    public interface IInPlaceDeserializable<TDeserializer>
+    {
+        void Deserialize(TDeserializer deserializer);
+    }
+
+
+    /// <summary>
+    /// Classic "is-a" deserializer, designed to be put ON the class being deserialized
+    /// 
+    /// This interface means that the class shall implement a classic SerializationInfo style
+    /// deserialize on the constructor, using the signature:
+    /// 
+    /// Constructor(TDeserializer deserializer)
+    /// </summary>
+    public interface IDeserializable<TDeserializer> { }
+
+
+    /// <summary>
+    /// Sister of IAllocatingSerializer, this interface could also be known as INonAllocatingDeserializer
+    /// and relegates instance creation to an outside source
+    /// </summary>
+    /// <typeparam name="TIn"></typeparam>
+    public interface IInPlaceDeserializer<TIn>
+    {
+        void Deserialize(TIn input, object instance, Type type = null);
+    }
+
     public interface ISerializerAsync<TOut>
     {
         Task SerializeAsync(TOut output, object inputValue, Type type = null);
@@ -89,6 +136,16 @@ namespace Fact.Extensions.Serialization
     public interface ISerializationManager<TTransport> : 
         ISerializationManager<TTransport, TTransport>
     {
+    }
+
+
+    /// <summary>
+    /// EXPERIMENTAL
+    /// </summary>
+    /// <typeparam name="TTransport"></typeparam>
+    public interface ISerializationContext<TTransport>
+    {
+        TTransport Transport { get; set; }
     }
 
     /// <summary>

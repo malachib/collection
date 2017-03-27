@@ -37,6 +37,8 @@ namespace Fact.Extensions.Configuration
         void Register(Type registerType, object instance, string name = null);
     }
 
+    public interface IServiceContainer : IServiceLocator, IServiceRegistrar { }
+
     /// <summary>
     /// 
     /// </summary>
@@ -78,6 +80,13 @@ namespace Fact.Extensions.Configuration
                 value = default(T);
                 return false;
             }
+        }
+
+
+        public static bool CanResolve<T>(this IServiceLocator container, string key)
+        {
+            object output;
+            return container.TryResolve(typeof(T), key, out output);
         }
 
 
