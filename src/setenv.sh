@@ -8,6 +8,9 @@ branch_name=$(git symbolic-ref -q HEAD)
 branch_name=${branch_name##refs/heads/}
 branch_name=${branch_name:-HEAD}
 
+# Utilize .NET Core nuget, which is v4 as of this writing
+export NUGET='dotnet nuget'
+
 branch_version=$(<../.version.$branch_name)
 
 project_version=$(<../.project-version)
