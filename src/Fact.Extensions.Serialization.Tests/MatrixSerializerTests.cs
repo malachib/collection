@@ -1,4 +1,5 @@
 ﻿#define SUPPRESS_OFFICE
+#define MATRIXSERIALIZERTESTS_FULL
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
@@ -14,6 +15,11 @@ using System.IO;
 using Fact.Extensions.Collection;
 using Fact.Extensions.Configuration;
 using Fact.Extensions.Serialization.Matrix;
+
+
+#if !MATRIXSERIALIZERTESTS_FULL
+#warning "Disabling some matrix serializer tests"
+#endif
 
 namespace TestProject1
 {
@@ -46,7 +52,7 @@ namespace TestProject1
             }
         }
 
-        #region Additional test attributes
+#region Additional test attributes
         // 
         //You can use the following additional attributes as you write your tests:
         //
@@ -74,7 +80,7 @@ namespace TestProject1
         //{
         //}
         //
-        #endregion
+#endregion
 
         public class Contact
         {
@@ -360,11 +366,14 @@ namespace TestProject1
             }
         }
 
+
         [TestMethod]
         [DeploymentItem("Data\\empty.csv")]
         public void DeserializeEmptyCSVTest()
         {
-            var d = new CSVMatrixDeserializer("empty.csv", true);
+            var baseDirectory = System.AppContext.BaseDirectory;
+            var filename = baseDirectory + "\\Data\\empty.csv";
+            var d = new CSVMatrixDeserializer(filename, true);
 
             foreach (var row in d.List)
             {

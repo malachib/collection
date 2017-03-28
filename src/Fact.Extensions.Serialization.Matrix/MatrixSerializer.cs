@@ -979,6 +979,12 @@ namespace Fact.Extensions.Serialization.Matrix
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// TODO: Can make a width-deducer if a proper header is present
+    /// </remarks>
     public class FixedLengthMatrixDeserializer : StringMatrixDeserializer,
         IMatrixFixedLengthColumnHandler
     {
@@ -1002,11 +1008,7 @@ namespace Fact.Extensions.Serialization.Matrix
         }
 
         public FixedLengthMatrixDeserializer(string filename, bool hasHeader, params int[] lengths)
-#if NETCORE
-            : this(new StreamReader(new FileStream(filename, FileMode.Open)), hasHeader, lengths) { }
-#else
-            : this(new StreamReader(filename), hasHeader, lengths) { }
-#endif
+            : this(new StreamReader(new FileStream(filename, FileMode.Open, FileAccess.Read)), hasHeader, lengths) { }
 
         public FixedLengthMatrixDeserializer(StreamReader input, bool hasHeader, params int[] lengths)
             : base(input)
