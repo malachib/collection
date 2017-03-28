@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_3
+﻿#if NETSTANDARD1_3 || NETSTANDARD1_4
 #define NETCORE
 #else
 #define TRANSACTIONS_ENABLED
@@ -9,9 +9,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Reflection;
 
 using System.Data;
-using System.Reflection;
+
+using Fact.Extensions.Collection;
+using Fact.Extensions.Configuration;
+
 #if TRANSACTIONS_ENABLED
 using System.Transactions;
 #endif
@@ -187,7 +191,7 @@ namespace Fact.Apprentice.Core
 
     public class EnumerableMatrixDeserializer<T> : IMatrixDeserializer
     {
-        PropertyInfo[] properties = typeof(T).GetProperties();
+        PropertyInfo[] properties = typeof(T).GetTypeInfo().DeclaredProperties.ToArray();
         IEnumerable<T> enumerable;
 
         public EnumerableMatrixDeserializer(IEnumerable<T> enumerable)
@@ -1852,8 +1856,8 @@ namespace Fact.Apprentice.Core
         /// <returns></returns>
         IEnumerable<PropertyInfo> InitializeProperties(IEnumerable<string> propertyOrder)
         {
-            var properties = (from n in type.GetProperties()
-                              let columnNameAttribute = n.GetCustomAttribute<ColumnNameAttribute>()
+            var properties = (from n in type.GetTypeInfo().DeclaredProperties
+                              let columnNameAttribute = n.GetCustomAttribute<AliasAttribute>()
                               let columnName = columnNameAttribute != null ? columnNameAttribute.Name : n.Name
                               where n.CanWrite
                               select new { n, columnName }).ToArray();
@@ -1955,6 +1959,7 @@ namespace Fact.Apprentice.Core
     public class PropertyColumnBuilder : ColumnBuilder
     {
         Type type;
+        Func<PropertyInfo, bool> propFilter;
 
         public PropertyColumnBuilder(IMatrixSerializerColumns serializer, Type type,
             Func<PropertyInfo, bool> propFilter = null)
@@ -1962,10 +1967,10 @@ namespace Fact.Apprentice.Core
             this.Serializer = serializer;
             this.type = type;
 
-            propFilter = propFilter ?? (x => true);
+            this.propFilter = propFilter = propFilter ?? (x => true);
 
             int i = 0;
-            foreach (var prop in type.GetProperties().Where(propFilter))
+            foreach (var prop in type.GetTypeInfo().DeclaredProperties.Where(propFilter))
             {
                 serializer.SetColumnName(i, prop.Name);
 
@@ -1974,7 +1979,7 @@ namespace Fact.Apprentice.Core
                 var c = serializer[i] as FixedLengthMatrixSerializer.IColumnDescriptor;
                 if (c != null)
                 {
-                    var lengthAttrib = prop.Attributes.FirstOccurrence<LengthAttribute>();
+                    var lengthAttrib = prop.CustomAttributes.OfType<LengthAttribute>().FirstOrDefault();
                     if (lengthAttrib != null)
                     {
                         c.Length = lengthAttrib.Max;
@@ -1999,7 +2004,10 @@ namespace Fact.Apprentice.Core
             // NOTE: be careful with this code, this particular variant of
             // GoLightweight produces items in the same order every time,
             // but others may not
+#if FEATURE_WALKER
             foreach (var prop in Walker.GoLightweight(type, propFilter))
+#endif
+            foreach (var prop in type.GetTypeInfo().DeclaredProperties.Where(propFilter) )
             {
                 yield return prop.GetValue(entity, null);
             }

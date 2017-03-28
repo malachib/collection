@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Fact.Extensions.Collection
 {
@@ -19,6 +20,35 @@ namespace Fact.Extensions.Collection
                 return (T[])enumeration;
             else
                 return enumeration.ToArray();
+        }
+
+
+#if !NETSTANDARD1_6
+        /// <summary>
+        /// Prepend particular value at the head of the enumeration
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumeration"></param>
+        /// <param name="prependedValue"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> Prepend<T>(this IEnumerable<T> enumeration, T prependedValue)
+        {
+            yield return prependedValue;
+
+            foreach (T item in enumeration) yield return item;
+        }
+#endif
+    }
+
+
+    // TODO: Put this elsewhere
+    public static class TypeExtensions
+    {
+        public static bool IsNullable(this Type type)
+        {
+            if(type.GetTypeInfo().IsValueType) return true;
+
+            return Nullable.GetUnderlyingType(type) != null;
         }
     }
 }
