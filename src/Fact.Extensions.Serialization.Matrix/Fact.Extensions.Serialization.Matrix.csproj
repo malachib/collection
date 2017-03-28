@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>Data-level 2D Matrix serialization (CSV, direct-DB, etc)</Description>
+    <Authors>Malachi Burke</Authors>
     <TargetFramework>netstandard1.3</TargetFramework>
+    <PackageId>Fact.Extensions.Serialization.Matrix</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

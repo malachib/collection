@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define FEATURE_ENUMEXTENSIONS_PREPEND
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +25,7 @@ namespace Fact.Extensions.Collection
         }
 
 
-#if !NETSTANDARD1_6
+#if FEATURE_ENUMEXTENSIONS_PREPEND
         /// <summary>
         /// Prepend particular value at the head of the enumeration
         /// </summary>
@@ -44,9 +46,15 @@ namespace Fact.Extensions.Collection
     // TODO: Put this elsewhere
     public static class TypeExtensions
     {
+        /// <summary>
+        /// Return true if underlying type is comparable to null
+        /// Be advised, this includes string types
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static bool IsNullable(this Type type)
         {
-            if(type.GetTypeInfo().IsValueType) return true;
+            if(!type.GetTypeInfo().IsValueType) return true;
 
             return Nullable.GetUnderlyingType(type) != null;
         }

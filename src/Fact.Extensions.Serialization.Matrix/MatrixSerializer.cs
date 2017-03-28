@@ -31,7 +31,7 @@ using System.Collections;
  * Important to know: ColumnDescriptor and associated interfaces from MatrixSerializer hierarchy also DIRECTLY get used
  * in MatrixDeserializer classes
  */
-namespace Fact.Apprentice.Core
+namespace Fact.Extensions.Serialization.Matrix
 {
     /// <summary>
     /// Pull grid-based information from a data store into memory
@@ -694,6 +694,10 @@ namespace Fact.Apprentice.Core
                     var row = SplitAndParse(line);
                     yield return row;
                 }
+
+                // EXPERIMENTAL
+                if (streamReader.EndOfStream)
+                    Cleanup();
             }
         }
 
@@ -828,11 +832,7 @@ namespace Fact.Apprentice.Core
         /// </summary>
         /// <param name="reader"></param>
         public CSVMatrixDeserializer(string filename)
-#if NETCORE
-            : base(new StreamReader(new FileStream(filename, FileMode.Open)))
-#else
-            : base(new StreamReader(filename))
-#endif
+            : base(new StreamReader(new FileStream(filename, FileMode.Open, FileAccess.Read)))
         {
         }
 
@@ -842,11 +842,7 @@ namespace Fact.Apprentice.Core
         /// <param name="filename"></param>
         /// <param name="hasHeader"></param>
         public CSVMatrixDeserializer(string filename, bool hasHeader) :
-#if NETCORE
-            this(new StreamReader(new FileStream(filename, FileMode.Open)), hasHeader)
-#else
-            this(new StreamReader(filename), hasHeader)
-#endif
+            this(new StreamReader(new FileStream(filename, FileMode.Open, FileAccess.Read)), hasHeader)
         {
         }
 
@@ -1068,11 +1064,7 @@ namespace Fact.Apprentice.Core
         public FixedLengthMatrixSerializer(StreamWriter output) : base(output) { }
 
         public FixedLengthMatrixSerializer(string filename, params int[] lengths) :
-#if NETCORE
             base(new StreamWriter(new FileStream(filename, FileMode.Create)))
-#else
-            base(new StreamWriter(filename))
-#endif
         {
             foreach (var length in lengths)
             {
@@ -1906,9 +1898,9 @@ namespace Fact.Apprentice.Core
                 {
 
                     var _type = property.PropertyType;
+                    var __type = Nullable.GetUnderlyingType(_type);
 
-                    if (_type.IsNullable())
-                        _type = Nullable.GetUnderlyingType(_type);
+                    if (__type != null) _type = null;
 
                     var value = Convert.ChangeType(rawValue, _type);
                     property.SetValue(entity, value, null);
