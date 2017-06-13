@@ -3,10 +3,9 @@
 # TODO: move this out into "useful-scripts" project
 
 . ../ext/myget/setenv_nuget.sh
+. ../ext/useful-scripts/setenv.sh
 
-branch_name=$(git symbolic-ref -q HEAD)
-branch_name=${branch_name##refs/heads/}
-branch_name=${branch_name:-HEAD}
+branch_name=$(${MB_USEFUL_SCRIPTS}/scm/get-branch-name.sh)
 
 # Utilize .NET Core nuget, which is v4 as of this writing
 export NUGET='dotnet nuget'
