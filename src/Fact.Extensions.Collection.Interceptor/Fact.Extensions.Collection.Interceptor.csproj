@@ -18,16 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Core" Version="4.0.0-beta002" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.0.2" />
+    <PackageReference Include="Castle.Core" Version="4.2.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard13' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD1_3</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard16' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD1_6</DefineConstants>
-  </PropertyGroup>
-
 </Project>

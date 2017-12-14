@@ -24,8 +24,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170106-08" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.8-rc" />
     <PackageReference Include="MSTest.TestFramework" Version="1.0.8-rc" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.0.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>

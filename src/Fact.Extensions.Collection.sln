@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection", "Fact.Extensions.Collection\Fact.Extensions.Collection.csproj", "{8EBB3E70-9F01-46A6-AC53-285CAF1F1BE1}"
 EndProject
@@ -46,7 +46,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Configurati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Factories", "Fact.Extensions.Factories\Fact.Extensions.Factories.csproj", "{F7D3F4F3-549A-484E-B71F-6EF98AD92571}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Serialization.Matrix", "Fact.Extensions.Serialization.Matrix\Fact.Extensions.Serialization.Matrix.csproj", "{F00AC344-B5B5-42FC-A463-EE39F10D9633}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.Matrix", "Fact.Extensions.Serialization.Matrix\Fact.Extensions.Serialization.Matrix.csproj", "{F00AC344-B5B5-42FC-A463-EE39F10D9633}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -117,5 +117,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {40017D9B-CA0E-45B2-BB72-867DC60A2417}
 	EndGlobalSection
 EndGlobal
