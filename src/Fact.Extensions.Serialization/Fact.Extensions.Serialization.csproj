@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersionGetter">
 
   <PropertyGroup>
     <Description>Utility interface abstractions for serialization</Description>
@@ -26,5 +26,7 @@
     <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
   </ItemGroup>
+
+  <Import Project="../VersionGetter.targets" />
 
 </Project>
