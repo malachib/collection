@@ -16,7 +16,7 @@
     <ProjectReference Include="..\Fact.Extensions.Serialization.Newtonsoft\Fact.Extensions.Serialization.Newtonsoft.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard16' ">
+  <ItemGroup>
     <PackageReference Include="System.IO.Pipelines" Version="0.1.0-e161214-2" />
   </ItemGroup>
 
