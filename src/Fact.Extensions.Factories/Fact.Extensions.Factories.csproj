@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersionGetter">
 
   <PropertyGroup>
     <Description>Factory pattern helpers</Description>
@@ -8,14 +8,13 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Fact.Extensions.Factories</AssemblyName>
     <PackageId>Fact.Extensions.Factories</PackageId>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
   </ItemGroup>
+
+  <Import Project="../VersionGetter.targets" />
 
 </Project>

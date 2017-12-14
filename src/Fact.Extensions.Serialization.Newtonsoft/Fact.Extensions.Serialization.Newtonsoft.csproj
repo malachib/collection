@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersionGetter">
 
   <PropertyGroup>
     <Description>ISerializationManager specific implementation for Newtonsoft JSON serialization</Description>
@@ -6,9 +6,6 @@
     <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
     <AssemblyName>Fact.Extensions.Serialization.Newtonsoft</AssemblyName>
     <PackageId>Fact.Extensions.Serialization.Newtonsoft</PackageId>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,5 +15,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
+
+  <Import Project="../VersionGetter.targets" />
 
 </Project>

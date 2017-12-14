@@ -1,3 +1,5 @@
+<!-- Flawed but useful autoversioner.  Going to be x.x.x.y where y is branched build #.  branch itself must be derived
+     discretely, potentially throwing off redirect-style version greater-than-version comparisons -->
 <Project InitialTargets="VersionGetter">
   <Target Name="VersionGetter">
     <PropertyGroup>
