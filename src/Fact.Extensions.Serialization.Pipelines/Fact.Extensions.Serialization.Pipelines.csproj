@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Experimental Pipeline implementations of ISerializationManager</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFramework>netstandard16</TargetFramework>
+    <TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
     <AssemblyName>Fact.Extensions.Serialization.Pipelines</AssemblyName>
     <PackageId>Fact.Extensions.Serialization.Pipelines</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
