@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>ISerializationManager specific implementation for Newtonsoft JSON serialization</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFramework>netstandard16</TargetFramework>
+    <TargetFrameworks>netstandard1.6</TargetFrameworks>
     <AssemblyName>Fact.Extensions.Serialization.Newtonsoft</AssemblyName>
     <PackageId>Fact.Extensions.Serialization.Newtonsoft</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
