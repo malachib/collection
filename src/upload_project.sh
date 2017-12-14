@@ -1,3 +1,3 @@
 #!/bin/bash
 
-../ext/useful-scripts/nuget/upload_project_v4.sh $1 $2 $3 $4
+$MB_USEFUL_SCRIPTS/nuget/upload_project_v4_4 $1 $2 $3 $4
