@@ -34,7 +34,7 @@ namespace Fact.Extensions.Collection
             return result;
         }
 
-#if NETSTANDARD1_3 || NETSTANDARD1_6 || NET46
+#if NETSTANDARD1_3 || NETSTANDARD1_6 || NETSTANDARD1_6_2 || NET46
         /// <summary>
         /// Converts the given enumeration to a string, each item separated by a delimiter.  Be mindful 
         /// empty strings don't get included
