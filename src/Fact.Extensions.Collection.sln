@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{00900FD9
 		setenv_windows.sh = setenv_windows.sh
 		upload_all.sh = upload_all.sh
 		upload_project.sh = upload_project.sh
+		VersionGetter.targets = VersionGetter.targets
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization", "Fact.Extensions.Serialization\Fact.Extensions.Serialization.csproj", "{3294BCB2-602F-4C65-AAE6-62BEE99FB329}"

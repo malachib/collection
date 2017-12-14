@@ -1,0 +1,18 @@
+<Project InitialTargets="VersionGetter">
+  <Target Name="VersionGetter">
+    <PropertyGroup>
+      <FEBranch>alpha</FEBranch>
+    </PropertyGroup>
+    <ReadLinesFromFile File="..\..\.version\$(FEBranch)">
+      <Output TaskParameter="Lines" PropertyName="BuildVersion" />
+    </ReadLinesFromFile>
+    <ReadLinesFromFile File="..\..\.project-version">
+      <Output TaskParameter="Lines" PropertyName="ProjectVersion" />
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <FETestVersion>$(ProjectVersion).$(BuildVersion)</FETestVersion>
+    </PropertyGroup>
+    <Message Text="Got version: $(ProjectVersion)-$(FEBranch)$(BuildVersion) / FileVersion = $(FETestVersion)" Importance="high">
+    </Message>
+  </Target>
+</Project>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersionGetter">
 
   <PropertyGroup>
     <Description>Utility interfaces to consolidate different bag-like targets in .NET Core, such as caching</Description>
@@ -11,6 +11,10 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <FileVersion>$(FETestVersion)</FileVersion>
+    <ProductVersion>$(FETestVersion)</ProductVersion>
+    <ProductName>$(AssemblyName) - $(FEBranch)</ProductName>
+    <AssemblyTitle>$(AssemblyName) - $(FEBranch)</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
@@ -24,4 +28,13 @@
     <DefineConstants>$(DefineConstants);NETSTANDARD1_6_2</DefineConstants>
   </PropertyGroup>
 
+  <Import Project="../VersionGetter.targets" />
+
+  <Target Name="test">
+    <PropertyGroup>
+      <FEBranch>alpha</FEBranch>
+    </PropertyGroup>
+    <Message Importance="high" Text="Property test=$(FEBranch)" />
+  </Target>
+  
 </Project>
