@@ -8,7 +8,8 @@
 branch_name=$(${MB_USEFUL_SCRIPTS}/scm/get-branch-name.sh)
 
 # Utilize .NET Core nuget, which is v4 as of this writing
-export NUGET='dotnet nuget'
+# We must depend on setenv_windows or setenv_unix to set this
+#export NUGET='dotnet nuget'
 
 branch_version=$(<../.version.$branch_name)
 
