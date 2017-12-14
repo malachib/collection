@@ -1,4 +1,7 @@
-﻿using Fact.Extensions.Collection;
+﻿// Introduces kind of a gnarly UNSAFE assembly chain, so reserve only for netstandard 2.0, for now
+#if NETSTANDARD2_0
+
+using Fact.Extensions.Collection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,3 +26,4 @@ namespace Fact.Extensions.Configuration
         }
     }
 }
+#endif
