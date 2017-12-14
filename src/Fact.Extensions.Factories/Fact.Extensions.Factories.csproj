@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Factory pattern helpers</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFramework>netstandard1.1</TargetFramework>
+    <TargetFrameworks>netstandard1.1;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Fact.Extensions.Factories</AssemblyName>
