@@ -11,7 +11,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+  <ItemGroup>
     <ProjectReference Include="..\Fact.Extensions.Serialization\Fact.Extensions.Serialization.csproj" />
   </ItemGroup>
 

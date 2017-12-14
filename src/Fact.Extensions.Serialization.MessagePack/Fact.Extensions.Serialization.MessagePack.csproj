@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard16</TargetFramework>
+    <TargetFrameworks>netstandard11;netstandard16</TargetFrameworks>
     <AssemblyName>Fact.Extensions.Serialization.MessagePack</AssemblyName>
     <PackageId>Fact.Extensions.Serialization.MessagePack</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
