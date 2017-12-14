@@ -1,3 +1,3 @@
 #!/bin/bash
 
-../ext/useful-scripts/scm/bump.sh
+$MB_USEFUL_SCRIPTS/scm/bump.sh
