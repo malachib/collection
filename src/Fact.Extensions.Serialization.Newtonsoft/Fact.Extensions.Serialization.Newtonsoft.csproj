@@ -3,11 +3,9 @@
   <PropertyGroup>
     <Description>ISerializationManager specific implementation for Newtonsoft JSON serialization</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard16</TargetFramework>
     <AssemblyName>Fact.Extensions.Serialization.Newtonsoft</AssemblyName>
     <PackageId>Fact.Extensions.Serialization.Newtonsoft</PackageId>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -16,10 +14,6 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <ProjectReference Include="..\Fact.Extensions.Serialization\Fact.Extensions.Serialization.csproj" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD1_6</DefineConstants>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />

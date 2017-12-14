@@ -3,10 +3,9 @@
   <PropertyGroup>
     <Description>Utility interface abstractions for serialization</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFrameworks>netstandard1.1;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>netstandard1.1;netstandard16</TargetFrameworks>
     <AssemblyName>Fact.Extensions.Serialization</AssemblyName>
     <PackageId>Fact.Extensions.Serialization</PackageId>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.0</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -27,13 +26,5 @@
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.0.1" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD1_1</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD1_6</DefineConstants>
-  </PropertyGroup>
 
 </Project>

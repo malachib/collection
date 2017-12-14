@@ -3,13 +3,11 @@
   <PropertyGroup>
     <Description>Caching wrappers for Fact.Extensions.Collection: Handles IMemoryCache and IDistributedCache</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFrameworks>netstandard1.3;netstandard1.6</TargetFrameworks>
+    <TargetFrameworks>netstandard13;netstandard16</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Fact.Extensions.Caching</AssemblyName>
     <PackageId>Fact.Extensions.Caching</PackageId>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.0</NetStandardImplicitPackageVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -24,11 +22,11 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="1.0.1" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard13' ">
     <DefineConstants>$(DefineConstants);NETSTANDARD1_3</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard16' ">
     <DefineConstants>$(DefineConstants);NETSTANDARD1_6</DefineConstants>
   </PropertyGroup>
 
