@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Castle interceptors for IBag and Caching</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFrameworks>netstandard13;netstandard16</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;netstandard1.6;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Fact.Extensions.Collection.Interceptor</AssemblyName>
