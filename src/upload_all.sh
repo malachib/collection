@@ -1,6 +1,8 @@
 #!/bin/bash
 
-. ./setenv.sh
+# specify this manually, otherwise it gets confused if setenv.sh has already been issued when we
+# reach here
+# . ./setenv.sh
 
 ./upload_project.sh Fact.Extensions.Caching
 ./upload_project.sh Fact.Extensions.Collection
