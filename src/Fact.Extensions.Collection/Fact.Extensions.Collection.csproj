@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Utility interfaces to consolidate different bag-like targets in .NET Core, such as caching</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFrameworks>netstandard1.1;netstandard1.6;netstandard1.6.2;net46</TargetFrameworks>
+    <TargetFrameworks>netstandard1.1;netstandard1.6;netstandard1.6.2;net40;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Fact.Extensions.Collection</AssemblyName>

@@ -54,7 +54,11 @@ namespace Fact.Extensions.Collection
         /// <returns></returns>
         public static bool IsNullable(this Type type)
         {
-            if(!type.GetTypeInfo().IsValueType) return true;
+#if NET40
+            if (!type.IsValueType) return true;
+#else
+            if (!type.GetTypeInfo().IsValueType) return true;
+#endif
 
             return Nullable.GetUnderlyingType(type) != null;
         }
