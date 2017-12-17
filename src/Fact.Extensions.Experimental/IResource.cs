@@ -43,35 +43,44 @@ namespace Fact.Extensions.Experimental
         bool IsShutdown { get; }
     }
 
-    public interface IResource : 
+    public interface IResourceProvider<TResource> : 
         ILifecycle, 
         ILockable,
         INamed
     {
+        TResource Resource { get; }
     }
 
 
-    public interface ISubsystem : 
-        IResource,
-        IChildProvider<IResource>
+    public interface IResource
     {
-        event Action<IResource> Starting;
-        event Action<IResource> Started;
+
     }
 
 
-    public abstract class Subsystem : ISubsystem
+    public interface ISubsystem<TResource> : 
+        IResourceProvider<TResource>,
+        IChildProvider<IResourceProvider<TResource>>
+    {
+        event Action<IResourceProvider<TResource>> Starting;
+        event Action<IResourceProvider<TResource>> Started;
+    }
+
+
+    public abstract class Subsystem<TResource> : ISubsystem<TResource>
     {
         readonly string name;
 
         public string Name => name;
 
-        public event Action<IResource> Starting;
-        public event Action<IResource> Started;
+        public event Action<IResourceProvider<TResource>> Starting;
+        public event Action<IResourceProvider<TResource>> Started;
 
         public Subsystem(string name) { this.name = name; }
 
-        public abstract IEnumerable<IResource> Children { get; }
+        public abstract IEnumerable<IResourceProvider<TResource>> Children { get; }
+
+        public TResource Resource => throw new NotImplementedException();
 
         public async Task Startup(IServiceProvider serviceProvider)
         {
@@ -108,13 +117,18 @@ namespace Fact.Extensions.Experimental
     }
 
 
-    public class LifecycleManager
+    public class LifecycleManager<TResource>
     {
         readonly IServiceProvider serviceProvider;
 
+        public LifecycleManager(IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
         // describes parent then child
-        public event Action<IResource, IResource> Starting;
-        public event Action<IResource, IResource> Started;
+        public event Action<IResourceProvider<TResource>, IResourceProvider<TResource>> Starting;
+        public event Action<IResourceProvider<TResource>, IResourceProvider<TResource>> Started;
 
         internal class Descriptor : ILifecycleDescriptor
         {
@@ -126,14 +140,14 @@ namespace Fact.Extensions.Experimental
             public bool IsShutdown { get; set; }
         }
 
-        public async void Start(ISubsystem subsystem)
+        public async void Start(ISubsystem<TResource> subsystem)
         {
             var d = new Descriptor();
-            Action<IResource> startingResponder = new Action<IResource>(r =>
+            var startingResponder = new Action<IResourceProvider<TResource>>(r =>
             {
                 Starting?.Invoke(subsystem, r);
             });
-            Action<IResource> startedResponder = new Action<IResource>(r =>
+            var startedResponder = new Action<IResourceProvider<TResource>>(r =>
             {
                 Started?.Invoke(subsystem, r);
             });
@@ -151,7 +165,6 @@ namespace Fact.Extensions.Experimental
         }
     }
 
-
     public struct LockScope : IDisposable
     {
         ILockable lockable;
@@ -166,6 +179,49 @@ namespace Fact.Extensions.Experimental
         public void Dispose()
         {
             lockable.Unlock();
+        }
+    }
+
+
+    public struct ResourceHelper<T> : IDisposable
+    {
+        IResourceProvider<T> provider;
+
+        public ResourceHelper(IResourceProvider<T> provider, object key = null)
+        {
+            this.provider = provider;
+
+            provider.Lock();
+        }
+
+        public T Resource => provider.Resource;
+
+        public void Dispose()
+        {
+            provider.Unlock();
+        }
+
+        public static implicit operator T(ResourceHelper<T> resourceHelper)
+        {
+            return resourceHelper.Resource;
+        }
+    }
+
+
+    public static class IResourceProviderExtensions
+    {
+        public static ResourceHelper<T> GetResourceHelper<T>(this IResourceProvider<T> resourceProvider)
+        {
+            // FIX: may do a lock/unlock/lock/unlock so beware
+            return new ResourceHelper<T>(resourceProvider);
+        }
+
+        public static async Task<TResource> GetResource<TResource>(this IResourceProvider<TResource> resourceProvider)
+        {
+            await resourceProvider.Lock();
+            TResource resource = resourceProvider.Resource;
+            resourceProvider.Unlock();
+            return resource;
         }
     }
 }
