@@ -96,12 +96,6 @@ namespace Fact.Extensions.Experimental
         LifecycleEnum LifecycleStatus { get; }
 
         event Action LifecycleStatusUpdated;
-
-        bool IsStarting { get; }
-        bool IsStarted { get; }
-
-        bool IsShuttingDown { get; }
-        bool IsShutdown { get; }
     }
 
 
@@ -109,6 +103,12 @@ namespace Fact.Extensions.Experimental
         ILifecycle,
         INamed
     { }
+
+
+    public interface IServiceDescriptor : ILifecycleDescriptor
+    {
+        IService Service { get; }
+    }
 
     public interface IResourceProvider<TResource> : 
         IService,
@@ -124,11 +124,31 @@ namespace Fact.Extensions.Experimental
     }
 
 
+    /// <summary>
+    /// FIX: Rename ISubsystem, right now the name represents a service with
+    /// children - but a subsytem , if you think about it, represents more the child
+    /// node, not the parent
+    /// </summary>
+    public interface ISubsystemExperimental : IService, 
+        IChild<IService>,
+        IChildProvider<IService>
+    {
+
+    }
+
+
+
     public interface ISubsystem<TResource> : 
         IService,
         IChildProvider<IResourceProvider<TResource>>
     {
+        /// <summary>
+        /// Fired per child resource provider which fires up
+        /// </summary>
         event Action<IResourceProvider<TResource>> Starting;
+        /// <summary>
+        /// Fired per child resource provider which halts up
+        /// </summary>
         event Action<IResourceProvider<TResource>> Started;
     }
 
@@ -181,27 +201,39 @@ namespace Fact.Extensions.Experimental
             this.serviceProvider = serviceProvider;
         }
 
-        // describes parent then child
+        // describes parent then child.  Operations are always
+        // on the child
         public event Action<IService, IService> Starting;
         public event Action<IService, IService> Started;
 
-        internal class Descriptor : ILifecycleDescriptor
+        internal class Descriptor : IServiceDescriptor
         {
-            public LifecycleEnum LifecycleStatus => throw new NotImplementedException();
+            LifecycleEnum status;
+            readonly IService service;
 
-            public bool IsStarting { get; set; }
-            public bool IsStarted { get; set; }
+            public IService Service => service;
 
-            public bool IsShuttingDown { get; set; }
+            internal Descriptor(IService service)
+            {
+                this.service = service;
+            }
 
-            public bool IsShutdown { get; set; }
+            public LifecycleEnum LifecycleStatus
+            {
+                get => status;
+                internal set
+                {
+                    status = value;
+                    LifecycleStatusUpdated?.Invoke();
+                }
+            }
 
             public event Action LifecycleStatusUpdated;
         }
 
         public async void Start<TResource>(ISubsystem<TResource> subsystem)
         {
-            var d = new Descriptor();
+            var d = new Descriptor(subsystem);
             var startingResponder = new Action<IResourceProvider<TResource>>(r =>
             {
                 Starting?.Invoke(subsystem, r);
@@ -211,16 +243,16 @@ namespace Fact.Extensions.Experimental
                 Started?.Invoke(subsystem, r);
             });
 
-            d.IsStarting = true;
-            Starting?.Invoke(subsystem, null);
+            d.LifecycleStatus = LifecycleEnum.Starting;
+            Starting?.Invoke(null, subsystem);
             subsystem.Starting += startingResponder;
             subsystem.Started += startedResponder;
             await subsystem.Startup(serviceProvider);
             subsystem.Starting -= startingResponder;
             subsystem.Started -= startedResponder;
-            Started?.Invoke(subsystem, null);
-            d.IsStarting = false;
-            d.IsStarted = true;
+            Started?.Invoke(null, subsystem);
+            d.LifecycleStatus = LifecycleEnum.Started;
+            d.LifecycleStatus = LifecycleEnum.Running;
         }
     }
 
