@@ -55,7 +55,8 @@ namespace Fact.Extensions.Experimental
         IResource,
         IChildProvider<IResource>
     {
-
+        event Action<IResource> Starting;
+        event Action<IResource> Started;
     }
 
 
@@ -65,6 +66,9 @@ namespace Fact.Extensions.Experimental
 
         public string Name => name;
 
+        public event Action<IResource> Starting;
+        public event Action<IResource> Started;
+
         public Subsystem(string name) { this.name = name; }
 
         public abstract IEnumerable<IResource> Children { get; }
@@ -72,7 +76,13 @@ namespace Fact.Extensions.Experimental
         public async Task Startup(IServiceProvider serviceProvider)
         {
             var startupTasks = 
-                Children.Select(x => Task.Run(() => x.Startup(serviceProvider))).ToArray();
+                Children.Select(x => 
+                Task.Run(() =>
+                {
+                    Starting?.Invoke(x);
+                    x.Startup(serviceProvider);
+                    Started?.Invoke(x);
+                })).ToArray();
 
             foreach(var child in startupTasks)
                 await child;
@@ -102,6 +112,10 @@ namespace Fact.Extensions.Experimental
     {
         readonly IServiceProvider serviceProvider;
 
+        // describes parent then child
+        public event Action<IResource, IResource> Starting;
+        public event Action<IResource, IResource> Started;
+
         internal class Descriptor : ILifecycleDescriptor
         {
             public bool IsStarting { get; set; }
@@ -115,11 +129,43 @@ namespace Fact.Extensions.Experimental
         public async void Start(ISubsystem subsystem)
         {
             var d = new Descriptor();
+            Action<IResource> startingResponder = new Action<IResource>(r =>
+            {
+                Starting?.Invoke(subsystem, r);
+            });
+            Action<IResource> startedResponder = new Action<IResource>(r =>
+            {
+                Started?.Invoke(subsystem, r);
+            });
 
             d.IsStarting = true;
+            Starting?.Invoke(subsystem, null);
+            subsystem.Starting += startingResponder;
+            subsystem.Started += startedResponder;
             await subsystem.Startup(serviceProvider);
+            subsystem.Starting -= startingResponder;
+            subsystem.Started -= startedResponder;
+            Started?.Invoke(subsystem, null);
             d.IsStarting = false;
             d.IsStarted = true;
+        }
+    }
+
+
+    public struct LockScope : IDisposable
+    {
+        ILockable lockable;
+
+        LockScope(ILockable lockable)
+        {
+            this.lockable = lockable;
+
+            lockable.Lock();
+        }
+
+        public void Dispose()
+        {
+            lockable.Unlock();
         }
     }
 }
