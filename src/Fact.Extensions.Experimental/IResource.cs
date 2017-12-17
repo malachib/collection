@@ -9,11 +9,68 @@ using System.Collections.Generic;
 
 namespace Fact.Extensions.Experimental
 {
+    public enum LifecycleEnum
+    {
+        Unstarted,
+        Starting,
+        // only blips, then moves to running
+        Started,
+        Stopping,
+        Stopped,
+        Sleeping,
+        Slept,
+        Waking,
+        // only blips, then moves to running
+        Awake,
+        Running,
+        Pausing,
+        Paused,
+        Resuming,
+        // only blips, then moves to running
+        Resumed
+    }
+
     public interface ILifecycle
     {
         Task Startup(IServiceProvider serviceProvider);
         Task Shutdown();
     }
+
+
+    /// <summary>
+    /// Pausible means the service can halt its processes immediately,
+    /// but does not take any action to clear memory.  Merely a way to
+    /// quickly halt and resume processing
+    /// </summary>
+    public interface IPausibleLifecycle
+    {
+        Task Pause();
+        Task Resume();
+    }
+
+    /// <summary>
+    /// Sleepable means the service is capable of performing tasks necessary
+    /// to prepare and recover from a system sleep mode.  Note that this
+    /// implies all processes and data are still memory resident
+    /// </summary>
+    public interface ISleepableLifecycle
+    {
+        Task Sleep();
+        Task Awaken();
+    }
+
+
+    /// <summary>
+    /// This is inbetween a sleep and a shutdown.  Freeze persists all relevant
+    /// data to a storage area (perhaps mate this to our ISerializable code)
+    /// and then frees up as much memory as it can and halts the procsess
+    /// </summary>
+    public interface IHibernatableLifecycle
+    {
+        Task Freeze();
+        Task Unfreeze();
+    }
+
 
     /// <summary>
     /// Describes any kind of lockable behavior such as virtual memory locking,
@@ -36,6 +93,10 @@ namespace Fact.Extensions.Experimental
 
     public interface ILifecycleDescriptor
     {
+        LifecycleEnum LifecycleStatus { get; }
+
+        event Action LifecycleStatusUpdated;
+
         bool IsStarting { get; }
         bool IsStarted { get; }
 
@@ -43,10 +104,15 @@ namespace Fact.Extensions.Experimental
         bool IsShutdown { get; }
     }
 
-    public interface IResourceProvider<TResource> : 
-        ILifecycle, 
-        ILockable,
+
+    public interface IService :
+        ILifecycle,
         INamed
+    { }
+
+    public interface IResourceProvider<TResource> : 
+        IService,
+        ILockable
     {
         TResource Resource { get; }
     }
@@ -59,7 +125,7 @@ namespace Fact.Extensions.Experimental
 
 
     public interface ISubsystem<TResource> : 
-        IResourceProvider<TResource>,
+        IService,
         IChildProvider<IResourceProvider<TResource>>
     {
         event Action<IResourceProvider<TResource>> Starting;
@@ -79,8 +145,6 @@ namespace Fact.Extensions.Experimental
         public Subsystem(string name) { this.name = name; }
 
         public abstract IEnumerable<IResourceProvider<TResource>> Children { get; }
-
-        public TResource Resource => throw new NotImplementedException();
 
         public async Task Startup(IServiceProvider serviceProvider)
         {
@@ -105,19 +169,10 @@ namespace Fact.Extensions.Experimental
             foreach (var child in shutdownTasks)
                 await child;
         }
-
-        public Task Lock(object key = null)
-        {
-            return null;
-        }
-
-        public void Unlock(object key = null)
-        {
-        }
     }
 
 
-    public class LifecycleManager<TResource>
+    public class LifecycleManager
     {
         readonly IServiceProvider serviceProvider;
 
@@ -127,20 +182,24 @@ namespace Fact.Extensions.Experimental
         }
 
         // describes parent then child
-        public event Action<IResourceProvider<TResource>, IResourceProvider<TResource>> Starting;
-        public event Action<IResourceProvider<TResource>, IResourceProvider<TResource>> Started;
+        public event Action<IService, IService> Starting;
+        public event Action<IService, IService> Started;
 
         internal class Descriptor : ILifecycleDescriptor
         {
+            public LifecycleEnum LifecycleStatus => throw new NotImplementedException();
+
             public bool IsStarting { get; set; }
             public bool IsStarted { get; set; }
 
             public bool IsShuttingDown { get; set; }
 
             public bool IsShutdown { get; set; }
+
+            public event Action LifecycleStatusUpdated;
         }
 
-        public async void Start(ISubsystem<TResource> subsystem)
+        public async void Start<TResource>(ISubsystem<TResource> subsystem)
         {
             var d = new Descriptor();
             var startingResponder = new Action<IResourceProvider<TResource>>(r =>
