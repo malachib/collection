@@ -8,6 +8,7 @@ namespace Fact.Extensions.Memory
     /// Follows the lazy-load paradigm, won't allocate until value is actually requested
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    /// <remarks>NOTE: Might duplicate System.Lazy functionality, look into this</remarks>
     public struct LazyLoader<T> where T : class, new()
     {
         T value;

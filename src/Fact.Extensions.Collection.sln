@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Factories",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.Matrix", "Fact.Extensions.Serialization.Matrix\Fact.Extensions.Serialization.Matrix.csproj", "{F00AC344-B5B5-42FC-A463-EE39F10D9633}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Experimental", "Fact.Extensions.Experimental\Fact.Extensions.Experimental.csproj", "{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +117,10 @@ Global
 		{F00AC344-B5B5-42FC-A463-EE39F10D9633}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F00AC344-B5B5-42FC-A463-EE39F10D9633}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F00AC344-B5B5-42FC-A463-EE39F10D9633}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
