@@ -24,7 +24,7 @@ namespace Fact.Extensions.Collection
     }
 
     /// <summary>
-    /// For any collection which can quer a key (and presumably owned value) existence
+    /// For any collection which can query a key (and presumably owned value) existence
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     public interface IContainsKey<TKey>
