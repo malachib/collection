@@ -20,13 +20,29 @@ namespace Fact.Extensions.Collection
         T Parent { get; }
     }
 
+    /// <summary>
+    /// Represents a class which can provide a simple enumeration of children
+    /// </summary>
+    /// <typeparam name="TChild"></typeparam>
     public interface IChildProvider<TChild>
     {
         IEnumerable<TChild> Children { get; }
     }
 
+
+    /// <summary>
+    /// Can provide both an enumeration of children as well as acquisition of children by
+    /// a key
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TChild"></typeparam>
     public interface IChildProvider<TKey, TChild> : IChildProvider<TChild>
     {
+        /// <summary>
+        /// Acquire a child by its key.  If non exists, default(TChild) is returned
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         TChild GetChild(TKey key);
     }
 
