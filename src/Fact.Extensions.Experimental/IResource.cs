@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Fact.Extensions.Collection;
-using Fact.Extensions.Collection.Taxonomy;
 using System.Collections.Generic;
 
 namespace Fact.Extensions.Experimental
 {
+    /// <summary>
+    /// Represents what stage of the life cycle has been reached
+    /// </summary>
     public enum LifecycleEnum
     {
         Unstarted,
