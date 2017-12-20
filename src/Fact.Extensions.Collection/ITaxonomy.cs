@@ -20,8 +20,45 @@ namespace Fact.Extensions.Collection
         T Parent { get; }
     }
 
-    public interface IChildProvider<TNode>
+    public interface IChildProvider<TChild>
     {
-        IEnumerable<TNode> Children { get; }
+        IEnumerable<TChild> Children { get; }
+    }
+
+    public interface IChildProvider<TKey, TChild> : IChildProvider<TChild>
+    {
+        TChild GetChild(TKey key);
+    }
+
+
+    public interface INamedChildProvider<TChild> : IChildProvider<string, TChild>
+        where TChild : INamed
+    { }
+
+
+    public interface IChildCollection<TChild> : IChildProvider<TChild>
+    {
+        /// <summary>
+        /// Param #1 is sender
+        /// Param #2 is added node
+        /// </summary>
+        event Action<object, TChild> ChildAdded;
+
+        void AddChild(TChild child);
+    }
+
+    public interface IChildCollection<TKey, TChild> : 
+        IChildCollection<TChild>,
+        IChildProvider<TKey, TChild>
+    {
+    }
+
+
+    public interface INamedChildCollection<TChild> :
+        IChildCollection<TChild>,
+        INamedChildProvider<TChild>
+        where TChild : INamed
+    {
+
     }
 }

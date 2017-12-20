@@ -11,29 +11,45 @@ namespace Fact.Extensions.Collection.Tests
     [TestClass]
     public class ExperimentalTests
     {
-        internal class TestNode : TaxonomyBase.NodeBase<TestNode>
+        internal class TestNode : TaxonomyBase.NodeBase<TestNode>, 
+            IChild<TestNode>
         {
-            internal TestNode(string name) : base(name) { }
+            readonly TestNode parent;
+
+            internal TestNode(TestNode parent, string name) : base(name)
+            {
+                this.parent = parent;
+            }
+
+            public TestNode Parent => parent;
         }
 
         internal class TestTaxonomy : TaxonomyBase<TestNode>
         {
-            readonly TestNode rootNode = new TestNode("root");
+            readonly TestNode rootNode = new TestNode(null, "root");
 
             public override TestNode RootNode => rootNode;
+        }
+
+        static string[] expectedNames = new[] { "root", "child1", "grandchild1", "child2" };
+
+        TestTaxonomy setup()
+        {
+            var taxonomy = new TestTaxonomy();
+            var rootNode = taxonomy.RootNode;
+            var child1 = new TestNode(rootNode, "child1");
+            rootNode.AddChild(child1);
+            child1.AddChild(new TestNode(child1, "grandchild1"));
+            rootNode.AddChild(new TestNode(rootNode, "child2"));
+
+            return taxonomy;
         }
 
         [TestMethod]
         public void VisitorTest()
         {
-            var taxonomy = new TestTaxonomy();
-            var expectedNames = new[] { "root", "child1", "grandchild1", "child2" };
+            TestTaxonomy taxonomy = setup();
             int counter = 0;
-
-            var child1 = new TestNode("child1");
-            taxonomy.RootNode.AddChild(child1);
-            child1.AddChild(new TestNode("grandchild1"));
-            taxonomy.RootNode.AddChild(new TestNode("child2"));
 
             taxonomy.Visit(n =>
             {
@@ -41,6 +57,24 @@ namespace Fact.Extensions.Collection.Tests
 
                 Assert.AreEqual(expectedNames[counter++], n.Name);
             });
+        }
+
+
+        [TestMethod]
+        public void FullNameTest()
+        {
+            TestTaxonomy taxonomy = setup();
+
+            var rootNode = taxonomy.RootNode;
+            var grandchild = rootNode.GetChild("child1").GetChild("grandchild1");
+
+            var grandChildName = grandchild.GetFullName();
+
+            Assert.AreEqual("root/child1/grandchild1", grandChildName);
+
+            grandchild = rootNode.GetChild("child1").GetChild("grandchild2");
+
+            Assert.IsNull(grandchild);
         }
     }
 }

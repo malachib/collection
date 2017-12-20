@@ -46,37 +46,13 @@ namespace Fact.Extensions.Experimental
     }
 
     /// <summary>
-    /// Represents a writable child provider
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface IChildCollection<T> : IChildProvider<T>
-    {
-        /// <summary>
-        /// Param #1 is sender
-        /// Param #2 is added node
-        /// </summary>
-        event Action<object, T> ChildAdded;
-
-        void AddChild(T child);
-
-        /// <summary>
-        /// FIX: This really should go in IChildProvider, but not 100% sure I like
-        /// exposing that much functionality there
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        T GetChild(string name);
-    }
-
-
-    /// <summary>
     /// Consider changing to a better name
     /// </summary>
     public class TaxonomyBase
     {
         public class NodeBase<TNode> :
             INamed,
-            IChildCollection<TNode>
+            INamedChildCollection<TNode>
             where TNode : INamed
         {
             SparseDictionary<string, TNode> children;
@@ -115,7 +91,7 @@ namespace Fact.Extensions.Experimental
 
     public abstract class TaxonomyBase<TNode> : TaxonomyBase, ITaxonomy<TNode>
         where TNode :
-            IChildCollection<TNode>,
+            INamedChildProvider<TNode>,
             INamed
     {
         public abstract TNode RootNode { get; }
@@ -175,8 +151,7 @@ namespace Fact.Extensions.Experimental
                 // We may encounter some nodes which are not child provider nodes
                 if (currentNode == null) continue;
 
-                // FIX: Eventually IChildProvider<T> will *probably* have GetChild in it
-                if(currentNode is IChildCollection<T> currentGetChildNode)
+                if(currentNode is IChildProvider<string, T> currentGetChildNode)
                 {
                     node = currentGetChildNode.GetChild(name);
                 }
@@ -206,6 +181,47 @@ namespace Fact.Extensions.Experimental
             }
 
             return node;
+        }
+    }
+
+
+    public static class IChildExtensions
+    {
+        static bool DetectNullNameParent<T>(T node)
+            where T : INamed, IChild<T>
+        {
+            return node.Parent.Name == null;
+        }
+
+        /// <summary>
+        /// String child nodes together to produce something similar to a FQDN
+        /// (fully qualified domain name)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="node"></param>
+        /// <param name="delimiter"></param>
+        /// <param name="experimentalAbortProcessor"></param>
+        /// <returns></returns>
+        public static string GetFullName<T>(this T node, char delimiter = '/',
+            Func<T, bool> experimentalAbortProcessor = null)
+            where T : INamed, IChild<T>
+        {
+            var fullName = node.Name;
+
+            while (node.Parent != null)
+            {
+                if (experimentalAbortProcessor != null && experimentalAbortProcessor(node)) return fullName;
+
+                node = node.Parent;
+
+                // TODO: Ideally this would be more configurable, but will do
+                // we skip path building/delimiter concatination if the node has no name
+                if (node.Name == null) continue;
+
+                fullName = node.Name + delimiter + fullName;
+            }
+
+            return fullName;
         }
     }
 }
