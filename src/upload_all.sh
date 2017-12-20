@@ -7,6 +7,7 @@
 ./upload_project.sh Fact.Extensions.Caching
 ./upload_project.sh Fact.Extensions.Collection
 ./upload_project.sh Fact.Extensions.Collection.Interceptor
+./upload_project.sh Fact.Extensions.Experimental
 ./upload_project.sh Fact.Extensions.Factories
 ./upload_project.sh Fact.Extensions.Configuration
 ./upload_project.sh Fact.Extensions.Serialization
