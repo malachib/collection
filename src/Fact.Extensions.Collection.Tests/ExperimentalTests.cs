@@ -76,5 +76,14 @@ namespace Fact.Extensions.Collection.Tests
 
             Assert.IsNull(grandchild);
         }
+
+
+        [TestMethod]
+        public void CreateTaxonomyNodeTest()
+        {
+            TestTaxonomy taxonomy = setup();
+
+            var node = taxonomy["root/child3"];
+        }
     }
 }
