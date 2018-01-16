@@ -4,9 +4,28 @@ using System.Text;
 
 namespace Fact.Extensions.Collection
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// TODO: Make a flag which includes or excludes root node as part of the INamedAccessor 
+    /// lookup.  Flag will allow the following, example being with RootNode.Name = 'rootn':
+    /// taxonomy["./child1"]        // root node -> child1 node
+    /// taxonomy["rootn/child1"]    // root node -> child1 node
+    /// taxonomy["/child1"]         // root node -> child1 node
+    /// - right now, we only support:
+    /// taxonomy["child1"]          // root node -> child1 node
+    /// we don't track any kind of PWD/CWD nor do we wish to, this should be an external party's
+    /// responsibility
+    /// </remarks>
+    /// <typeparam name="TNode"></typeparam>
     public interface ITaxonomy<TNode> : INamedAccessor<TNode>
         where TNode: INamed, IChildProvider<TNode>
     {
+        /// <summary>
+        /// Root node under which all other nodes will fall.
+        /// NOTE: Nodes are named, but usually the RootNode name is not seen
+        /// </summary>
         TNode RootNode { get; }
     }
 

@@ -88,9 +88,9 @@ namespace Fact.Extensions.Collection.Tests
         {
             TestTaxonomy taxonomy = setup();
 
-            var node = taxonomy["root/child3"];
+            var node = taxonomy["child3"];
 
-            //Assert.AreEqual("root/child3", node.GetFullName());
+            Assert.AreEqual("root/child3", node.GetFullName());
         }
     }
 }
