@@ -28,6 +28,11 @@ namespace Fact.Extensions.Collection.Tests
         {
             readonly TestNode rootNode = new TestNode(null, "root");
 
+            protected override TestNode CreateNode(TestNode parent, string name)
+            {
+                return new TestNode(parent, name);
+            }
+
             public override TestNode RootNode => rootNode;
         }
 
@@ -84,6 +89,8 @@ namespace Fact.Extensions.Collection.Tests
             TestTaxonomy taxonomy = setup();
 
             var node = taxonomy["root/child3"];
+
+            //Assert.AreEqual("root/child3", node.GetFullName());
         }
     }
 }

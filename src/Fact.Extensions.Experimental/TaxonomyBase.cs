@@ -55,7 +55,7 @@ namespace Fact.Extensions.Experimental
     {
         public abstract TNode RootNode { get; }
 
-        protected virtual TNode CreateNode(TNode parent, string name) { return default(TNode); }
+        protected abstract TNode CreateNode(TNode parent, string name);
 
         public event Action<object, TNode> NodeCreated;
 
