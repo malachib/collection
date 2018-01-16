@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersionGetter">
+
+  <PropertyGroup>
+    <Description>Utility interfaces to consolidate different bag-like targets in .NET Core, such as caching</Description>
+    <Authors>Malachi Burke</Authors>
+    <TargetFrameworks>netstandard1.1;netstandard1.6;netstandard1.6.2;net40;net46</TargetFrameworks>
+    <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Fact.Extensions.Collection</AssemblyName>
+    <PackageId>Fact.Extensions.Collection</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
+    <PackageReference Include="System.IO" Version="4.3.0" />
+    <PackageReference Include="System.Linq" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6.2' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD1_6_2</DefineConstants>
+  </PropertyGroup>
+
+  <Import Project="../VersionGetter.targets" />
+
+</Project>

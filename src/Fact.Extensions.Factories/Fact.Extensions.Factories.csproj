@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersionGetter">
+
+  <PropertyGroup>
+    <Description>Factory pattern helpers</Description>
+    <Authors>Malachi Burke</Authors>
+    <TargetFrameworks>netstandard1.1;net46</TargetFrameworks>
+    <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Fact.Extensions.Factories</AssemblyName>
+    <PackageId>Fact.Extensions.Factories</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
+    <PackageReference Include="System.IO" Version="4.3.0" />
+    <PackageReference Include="System.Linq" Version="4.3.0" />
+  </ItemGroup>
+
+  <Import Project="../VersionGetter.targets" />
+
+</Project>

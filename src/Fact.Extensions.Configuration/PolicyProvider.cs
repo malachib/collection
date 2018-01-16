@@ -130,7 +130,6 @@ namespace Fact.Extensions.Configuration
         /// <summary>
         /// Try to grab the policy from the provider and if it doesn't exist, make a new default one
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <param name="addToContainer">If true, adds this policy to container so that next retrieve will find it and
         /// not create a new policy.  Defaults to false</param>
@@ -186,7 +185,6 @@ namespace Fact.Extensions.Configuration
         /// <summary>
         /// Attempt to acquire policy from local container and then System container, in that order
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="policy"></param>
         /// <param name="key"></param>
         /// <returns></returns>

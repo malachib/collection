@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersionGetter">
+
+  <PropertyGroup>
+    <Description>ISerializationManager specific implementation for Newtonsoft JSON serialization</Description>
+    <Authors>Malachi Burke</Authors>
+    <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
+    <AssemblyName>Fact.Extensions.Serialization.Newtonsoft</AssemblyName>
+    <PackageId>Fact.Extensions.Serialization.Newtonsoft</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fact.Extensions.Serialization\Fact.Extensions.Serialization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  </ItemGroup>
+
+  <Import Project="../VersionGetter.targets" />
+
+</Project>

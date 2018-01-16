@@ -25,10 +25,12 @@ namespace Fact.Extensions.Collection
         }
 
 
+#if !NET40
         public static async Task<TValue> GetAsync<TValue>(this IGetterAsync<string, object> getter, string key)
         {
             return (TValue)await getter.GetAsync(key, typeof(TValue));
         }
+#endif
 
 
         /*

@@ -3,10 +3,13 @@
 # TODO: move this out into "useful-scripts" project
 
 . ../ext/myget/setenv_nuget.sh
+. ../ext/useful-scripts/setenv.sh
 
-branch_name=$(git symbolic-ref -q HEAD)
-branch_name=${branch_name##refs/heads/}
-branch_name=${branch_name:-HEAD}
+branch_name=$(${MB_USEFUL_SCRIPTS}/scm/get-branch-name.sh)
+
+# Utilize .NET Core nuget, which is v4 as of this writing
+# We must depend on setenv_windows or setenv_unix to set this
+#export NUGET='dotnet nuget'
 
 branch_version=$(<../.version.$branch_name)
 
@@ -14,8 +17,13 @@ project_version=$(<../.project-version)
 
 if [ -z "$branch_version" ]
 then
-	echo "No version available for this branch.  Do not upload NUGET packages"
-	branch_version="0"
+	branch_version=$(<../.version/$branch_name)
+
+	if [ -z "$branch_version" ]
+	then
+		echo "No version available for this branch.  Do not upload NUGET packages"
+		branch_version="0"
+	fi
 fi
 
 if [ -z $project_version ]

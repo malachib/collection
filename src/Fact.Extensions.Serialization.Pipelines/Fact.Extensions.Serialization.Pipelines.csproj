@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Experimental Pipeline implementations of ISerializationManager</Description>
+    <Authors>Malachi Burke</Authors>
+    <TargetFrameworks>netstandard1.6;netstandard2.0</TargetFrameworks>
+    <AssemblyName>Fact.Extensions.Serialization.Pipelines</AssemblyName>
+    <PackageId>Fact.Extensions.Serialization.Pipelines</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fact.Extensions.Serialization\Fact.Extensions.Serialization.csproj" />
+    <ProjectReference Include="..\Fact.Extensions.Serialization.Newtonsoft\Fact.Extensions.Serialization.Newtonsoft.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Pipelines" Version="0.1.0-e161214-2" />
+  </ItemGroup>
+
+</Project>

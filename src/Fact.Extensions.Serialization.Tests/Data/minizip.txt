@@ -1,0 +1,16 @@
+﻿zip   city         st latitude   longitude   tz  dst
+00210 Portsmouth   NH 43.005895  -71.013202  -5  1
+00211 Portsmouth   NH 43.005895  -71.013202  -5  1
+00212 Portsmouth   NH 43.005895  -71.013202  -5  1
+00213 Portsmouth   NH 43.005895  -71.013202  -5  1
+00214 Portsmouth   NH 43.005895  -71.013202  -5  1
+00215 Portsmouth   NH 43.005895  -71.013202  -5  1
+00501 Holtsville   NY 40.922326  -72.637078  -5  1
+00544 Holtsville   NY 40.922326  -72.637078  -5  1
+00601 Adjuntas     PR 18.180103  -66.74947   -4  0
+00602 Aguada       PR 18.363285  -67.18024   -4  0
+00603 Aguadilla    PR 18.448619  -67.13422   -4  0
+00604 Aguadilla    PR 18.498987  -67.13699   -4  0
+00605 Aguadilla    PR 18.465162  -67.141486  -4  0
+00606 Maricao      PR 18.182151  -66.9588    -4  0
+00607 Aguas Buenas PR 18.256995  -66.104657  -4  0

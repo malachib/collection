@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersionGetter">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.1</TargetFrameworks>
+    <AssemblyName>Fact.Extensions.Serialization.MessagePack</AssemblyName>
+    <PackageId>Fact.Extensions.Serialization.MessagePack</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fact.Extensions.Serialization\Fact.Extensions.Serialization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MsgPack.Cli" Version="0.9.2" />
+  </ItemGroup>
+
+  <Import Project="../VersionGetter.targets" />
+
+</Project>

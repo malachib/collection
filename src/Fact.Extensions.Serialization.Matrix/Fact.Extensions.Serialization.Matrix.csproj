@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Data-level 2D Matrix serialization (CSV, direct-DB, etc)</Description>
+    <Authors>Malachi Burke</Authors>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <PackageId>Fact.Extensions.Serialization.Matrix</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fact.Extensions.Collection\Fact.Extensions.Collection.csproj" />
+    <ProjectReference Include="..\Fact.Extensions.Configuration\Fact.Extensions.Configuration.csproj" />
+  </ItemGroup>
+
+</Project>

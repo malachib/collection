@@ -16,8 +16,7 @@ namespace Fact.Extensions.Collection
     /// TODO: Implement as a Factory 
     /// </remarks>
     public class LightweightContainer : //: Fact.Apprentice.Collection.IFactory<Type, object>
-        IServiceLocator,
-        IServiceRegistrar
+        IServiceContainer
     {
         internal struct Item
         {
