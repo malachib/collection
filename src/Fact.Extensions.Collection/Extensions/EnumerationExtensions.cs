@@ -1,4 +1,6 @@
-﻿#define FEATURE_ENUMEXTENSIONS_PREPEND
+﻿#if !NETSTANDARD2_0
+#define FEATURE_ENUMEXTENSIONS_PREPEND
+#endif
 
 using System;
 using System.Collections.Generic;
