@@ -70,7 +70,12 @@ namespace Fact.Extensions.Experimental.Tests
 
             dummyServiceDescriptor.LifecycleStatusUpdated += o =>
             {
-                Console.WriteLine($"status = {dummyServiceDescriptor.LifecycleStatus}");
+                Console.WriteLine($"dummy = {dummyServiceDescriptor.LifecycleStatus}");
+            };
+
+            sm.LifecycleStatusUpdated += o =>
+            {
+                Console.WriteLine($"parent: {sm.LifecycleStatus}");
             };
 
             child2Sm.Generic += () => sem.Release();
