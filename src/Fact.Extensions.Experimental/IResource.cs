@@ -91,6 +91,28 @@ namespace Fact.Extensions.Experimental
         Task Resume();
     }
 
+
+    /// <summary>
+    /// Optional online/offline events for services which can initiate these states
+    /// </summary>
+    public interface IOnlineEvents
+    {
+        event Action Offline;
+        event Action Online;
+    }
+
+    /// <summary>
+    /// Optional sleepable events for services which can initiate these states
+    /// These can be used with or without ISleepableLifecycle
+    /// </summary>
+    public interface ISleepableEvents
+    {
+        event Action Sleeping;
+        event Action Slept;
+        event Action Waking;
+        event Action Awake;
+    }
+
     /// <summary>
     /// Sleepable means the service is capable of performing tasks necessary
     /// to prepare and recover from a system sleep mode.  Note that this

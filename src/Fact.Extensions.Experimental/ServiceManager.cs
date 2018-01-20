@@ -39,22 +39,33 @@ namespace Fact.Extensions.Experimental
         IService,
         IServiceDescriptor2
     {
-        internal class ServiceDescriptor : IServiceDescriptor2
+        internal class ServiceDescriptor : LifecycleDescriptorBase, IServiceDescriptor2
         {
             readonly IService service;
 
             internal ServiceDescriptor(IService service)
             {
                 this.service = service;
+
+                // NOTE: perhaps not best location for this, but we can capture idea here at least
+                if (service is IOnlineEvents oe)
+                {
+                    oe.Online += () => LifecycleStatus = LifecycleEnum.Online;
+                    oe.Offline += () => LifecycleStatus = LifecycleEnum.Offline;
+                }
+
+                if (service is ISleepableEvents se)
+                {
+                    se.Sleeping += () => LifecycleStatus = LifecycleEnum.Sleeping;
+                    se.Slept += () => LifecycleStatus = LifecycleEnum.Slept;
+                    se.Awake += () => LifecycleStatus = LifecycleEnum.Awake;
+                    se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
+                }
             }
 
             public IService Service => service;
 
-            public LifecycleEnum LifecycleStatus => throw new NotImplementedException();
-
             public string Name => service.Name;
-
-            public event Action<object> LifecycleStatusUpdated;
         }
 
         public ServiceManager(string name = "unnamed") : base(name)
@@ -116,7 +127,21 @@ namespace Fact.Extensions.Experimental
         {
             // NOTE: Perhaps catch AddChild event instead of making virtual
             child.LifecycleStatusUpdated += Child_LifecycleStatusUpdated;
+
             AddChild(child);
+        }
+
+
+        /// <summary>
+        /// FIX: Clean up naming, collides with AddService when its both an IServiceDescriptor2 
+        /// *and* an IService
+        /// </summary>
+        /// <param name="service"></param>
+        public void AddService2(IService service)
+        {
+            var sd = new ServiceDescriptor(service);
+
+            AddService(sd);
         }
 
 

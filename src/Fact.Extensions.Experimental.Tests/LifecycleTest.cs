@@ -17,7 +17,7 @@ namespace Fact.Extensions.Experimental.Tests
         }
 
 
-        class DummyService : LifecycleDescriptorBase, IServiceDescriptor2, IService
+        class DummyService : LifecycleDescriptorBase, IService
         {
             public IService Service => this;
 
@@ -44,7 +44,7 @@ namespace Fact.Extensions.Experimental.Tests
             var child2Sm = new DummyService();
 
             sm.AddService(childSm);
-            sm.AddService(child2Sm);
+            sm.AddService2(child2Sm);
 
             Assert.AreEqual(LifecycleEnum.Unstarted, sm.LifecycleStatus);
 
