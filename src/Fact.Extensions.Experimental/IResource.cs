@@ -29,7 +29,22 @@ namespace Fact.Extensions.Experimental
         Paused,
         Resuming,
         // only blips, then moves to running
-        Resumed
+        Resumed,
+        /// <summary>
+        /// Service may go offline of its own accord - so announce that with this
+        /// </summary>
+        Offline,
+        /// <summary>
+        /// After service has been offline, it can announce it's back online with this
+        /// Note that this is a fleeting status, expect immediately for a Running
+        /// status to follow
+        /// </summary>
+        Online,
+        /// <summary>
+        /// For composite services where subservices have error states, we report it
+        /// this way
+        /// </summary>
+        Degraded
     }
 
     public interface ILifecycle
@@ -97,7 +112,10 @@ namespace Fact.Extensions.Experimental
     {
         LifecycleEnum LifecycleStatus { get; }
 
-        event Action LifecycleStatusUpdated;
+        /// <summary>
+        /// First parameter is sender
+        /// </summary>
+        event Action<object> LifecycleStatusUpdated;
     }
 
 
@@ -226,11 +244,11 @@ namespace Fact.Extensions.Experimental
                 internal set
                 {
                     status = value;
-                    LifecycleStatusUpdated?.Invoke();
+                    LifecycleStatusUpdated?.Invoke(this);
                 }
             }
 
-            public event Action LifecycleStatusUpdated;
+            public event Action<object> LifecycleStatusUpdated;
         }
 
         public async void Start<TResource>(ISubsystem<TResource> subsystem)
@@ -300,6 +318,141 @@ namespace Fact.Extensions.Experimental
         }
     }
 
+
+    public interface IServiceDescriptor2 : IServiceDescriptor, INamed { }
+    /// <summary>
+    /// We have many incarnations of this, here's another
+    /// A hierarchical manager which can manage many services inclusive of other servicemanagers
+    /// </summary>
+    public class ServiceManager : 
+        TaxonomyBase.NodeBase<IServiceDescriptor2>,
+        IServiceDescriptor2
+    {
+        internal class ServiceDescriptor : IServiceDescriptor2
+        {
+            public IService Service => throw new NotImplementedException();
+
+            public LifecycleEnum LifecycleStatus => throw new NotImplementedException();
+
+            public string Name => throw new NotImplementedException();
+
+            public event Action<object> LifecycleStatusUpdated;
+        }
+
+        public ServiceManager() : base("test") { }
+
+        public IService Service => throw new NotImplementedException();
+
+        public LifecycleEnum LifecycleStatus { get; set; }
+
+        public event Action<object> LifecycleStatusUpdated;
+
+        public Task Shutdown()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Startup(IServiceProvider serviceProvider)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <summary>
+        /// FIX: Will be confusing against base AddChild
+        /// </summary>
+        /// <param name="child"></param>
+        public void AddService(IServiceDescriptor2 child)
+        {
+            child.LifecycleStatusUpdated += Child_LifecycleStatusUpdated;
+            AddChild(child);
+        }
+
+        private void Child_LifecycleStatusUpdated(object sender)
+        {
+            var sd = (IServiceDescriptor2)sender;
+
+            switch(sd.LifecycleStatus)
+            {
+                case LifecycleEnum.Degraded:
+                case LifecycleEnum.Offline:
+                {
+                    LifecycleStatus = LifecycleEnum.Degraded;
+                    break;
+                }
+
+                case LifecycleEnum.Online:
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+
+    public static class ILifecycleDescriptorExtensions
+    {
+        /// <summary>
+        /// Is in an online kind of a state
+        /// </summary>
+        /// <param name="ld"></param>
+        /// <returns></returns>
+        public static bool IsNominal(this ILifecycleDescriptor ld)
+        {
+            var status = ld.LifecycleStatus;
+
+            return status == LifecycleEnum.Running;
+        }
+
+
+        /// <summary>
+        /// Is in a short term state between long-running states
+        /// </summary>
+        /// <param name="ld"></param>
+        /// <returns></returns>
+        public static bool IsTransitioning(this ILifecycleDescriptor ld)
+        {
+            var status = ld.LifecycleStatus;
+
+            switch(status)
+            {
+                case LifecycleEnum.Online:
+                case LifecycleEnum.Pausing:
+                case LifecycleEnum.Resuming:
+                case LifecycleEnum.Starting:
+                case LifecycleEnum.Waking:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Is definitely, positively in an offline kind of state.  Excludes transitioning from one state
+        /// Not necessarily an error state
+        /// to another
+        /// </summary>
+        /// <param name="ld"></param>
+        /// <returns></returns>
+        public static bool IsNotRunning(this ILifecycleDescriptor ld)
+        {
+            var status = ld.LifecycleStatus;
+
+            switch(status)
+            {
+                case LifecycleEnum.Offline:
+                case LifecycleEnum.Paused:
+                case LifecycleEnum.Slept:
+                case LifecycleEnum.Unstarted:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+    }
 
     public static class IResourceProviderExtensions
     {
