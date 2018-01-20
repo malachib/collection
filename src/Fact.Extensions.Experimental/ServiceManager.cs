@@ -39,7 +39,9 @@ namespace Fact.Extensions.Experimental
         IService,
         IServiceDescriptor2
     {
-        internal class ServiceDescriptor : LifecycleDescriptorBase, IServiceDescriptor2
+        internal class ServiceDescriptor : LifecycleDescriptorBase, 
+            IService,
+            IServiceDescriptor2
         {
             readonly IService service;
 
@@ -50,7 +52,11 @@ namespace Fact.Extensions.Experimental
                 // NOTE: perhaps not best location for this, but we can capture idea here at least
                 if (service is IOnlineEvents oe)
                 {
-                    oe.Online += () => LifecycleStatus = LifecycleEnum.Online;
+                    oe.Online += async () =>
+                    {
+                        LifecycleStatus = LifecycleEnum.Online;
+                        await Startup(null);
+                    };
                     oe.Offline += () => LifecycleStatus = LifecycleEnum.Offline;
                 }
 
@@ -58,7 +64,11 @@ namespace Fact.Extensions.Experimental
                 {
                     se.Sleeping += () => LifecycleStatus = LifecycleEnum.Sleeping;
                     se.Slept += () => LifecycleStatus = LifecycleEnum.Slept;
-                    se.Awake += () => LifecycleStatus = LifecycleEnum.Awake;
+                    se.Awake += async () =>
+                    {
+                        LifecycleStatus = LifecycleEnum.Awake;
+                        await Startup(null);
+                    };
                     se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
                 }
             }
@@ -66,6 +76,21 @@ namespace Fact.Extensions.Experimental
             public IService Service => service;
 
             public string Name => service.Name;
+
+            public async Task Shutdown()
+            {
+                LifecycleStatus = LifecycleEnum.Stopping;
+                await service.Shutdown();
+                LifecycleStatus = LifecycleEnum.Stopped;
+            }
+
+            public async Task Startup(IServiceProvider serviceProvider)
+            {
+                LifecycleStatus = LifecycleEnum.Starting;
+                await service.Startup(serviceProvider);
+                LifecycleStatus = LifecycleEnum.Started;
+                LifecycleStatus = LifecycleEnum.Running;
+            }
         }
 
         public ServiceManager(string name = "unnamed") : base(name)
@@ -90,7 +115,11 @@ namespace Fact.Extensions.Experimental
         {
             lifecycle.Value = LifecycleEnum.Stopping;
             // TODO: Add provision for sequential startup/shutdown also
-            var childrenShutdownTasks = Children.Select(x => x.Service.Shutdown());
+            // FIX: Casting to IService far, far from ideal here
+            // can't think of a better way to manage start/stop lifecycle event firing
+            var childrenShutdownTasks = Children.
+                Cast<IService>().
+                Select(x => x.Shutdown());
             try
             {
                 await Task.WhenAll(childrenShutdownTasks);
@@ -109,7 +138,11 @@ namespace Fact.Extensions.Experimental
         public async Task Startup(IServiceProvider serviceProvider)
         {
             lifecycle.Value = LifecycleEnum.Starting;
-            var childrenStartingTasks = Children.Select(x => x.Service.Startup(serviceProvider));
+            // FIX: Casting to IService far, far from ideal here
+            // can't think of a better way to manage start/stop lifecycle event firing
+            var childrenStartingTasks = Children.
+                Cast<IService>().
+                Select(x => x.Startup(serviceProvider));
             await Task.WhenAll(childrenStartingTasks);
             // FIX: child may set this in a degraded state or something, inconsistency in behavior
             // here
@@ -137,11 +170,13 @@ namespace Fact.Extensions.Experimental
         /// *and* an IService
         /// </summary>
         /// <param name="service"></param>
-        public void AddService2(IService service)
+        public IServiceDescriptor2 AddService2(IService service)
         {
             var sd = new ServiceDescriptor(service);
 
             AddService(sd);
+
+            return sd;
         }
 
 
@@ -178,6 +213,9 @@ namespace Fact.Extensions.Experimental
         {
             var sd = (IServiceDescriptor2)sender;
 
+            switch(sd.LifecycleStatus)
+            {
+            }
             // TODO: can optimize since we know which child state is changing
             lifecycle.Value = AscertainCompositeState();
         }

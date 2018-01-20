@@ -98,6 +98,10 @@ namespace Fact.Extensions.Experimental
     public interface IOnlineEvents
     {
         event Action Offline;
+        /// <summary>
+        /// Notify listeners we are back online
+        /// Expect a Startup(null) call from an external party
+        /// </summary>
         event Action Online;
     }
 
@@ -110,6 +114,10 @@ namespace Fact.Extensions.Experimental
         event Action Sleeping;
         event Action Slept;
         event Action Waking;
+        /// <summary>
+        /// Notify listeners that we are awake
+        /// Expect a Startup() call after firing this from external managing party
+        /// </summary>
         event Action Awake;
     }
 
