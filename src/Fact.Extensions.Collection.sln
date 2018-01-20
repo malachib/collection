@@ -49,7 +49,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Factories",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.Matrix", "Fact.Extensions.Serialization.Matrix\Fact.Extensions.Serialization.Matrix.csproj", "{F00AC344-B5B5-42FC-A463-EE39F10D9633}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Experimental", "Fact.Extensions.Experimental\Fact.Extensions.Experimental.csproj", "{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Experimental", "Fact.Extensions.Experimental\Fact.Extensions.Experimental.csproj", "{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Experimental.Tests", "Fact.Extensions.Experimental.Tests\Fact.Extensions.Experimental.Tests.csproj", "{FDA024A6-8C68-4DD3-BD76-5DF673AC1A7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,6 +123,10 @@ Global
 		{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F049054-DBD7-4B5E-8C56-E6B2DACFD291}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDA024A6-8C68-4DD3-BD76-5DF673AC1A7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDA024A6-8C68-4DD3-BD76-5DF673AC1A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDA024A6-8C68-4DD3-BD76-5DF673AC1A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDA024A6-8C68-4DD3-BD76-5DF673AC1A7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
