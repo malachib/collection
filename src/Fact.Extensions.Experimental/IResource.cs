@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 using Fact.Extensions.Collection;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Fact.Extensions.Experimental.Tests")]
 
 namespace Fact.Extensions.Experimental
 {
@@ -24,6 +27,10 @@ namespace Fact.Extensions.Experimental
         Waking,
         // only blips, then moves to running
         Awake,
+        /// <summary>
+        /// This is the state which all services seek to be.  The others are either offline 
+        /// or transitional states
+        /// </summary>
         Running,
         Pausing,
         Paused,
@@ -32,6 +39,8 @@ namespace Fact.Extensions.Experimental
         Resumed,
         /// <summary>
         /// Service may go offline of its own accord - so announce that with this
+        /// Does not necessarily indicate an error (i.e. a modem service could go offline
+        /// but not be in error)
         /// </summary>
         Offline,
         /// <summary>
@@ -41,10 +50,19 @@ namespace Fact.Extensions.Experimental
         /// </summary>
         Online,
         /// <summary>
+        /// For composite services where subservices are not running, but not in 
+        /// an error state.  Needs a better name
+        /// </summary>
+        PartialRunning,
+        /// <summary>
         /// For composite services where subservices have error states, we report it
         /// this way
         /// </summary>
-        Degraded
+        Degraded,
+        /// <summary>
+        /// Service is an error state.  Like Offline except explicitly due to a malfunction
+        /// </summary>
+        Error
     }
 
     public interface ILifecycle
@@ -319,77 +337,6 @@ namespace Fact.Extensions.Experimental
     }
 
 
-    public interface IServiceDescriptor2 : IServiceDescriptor, INamed { }
-    /// <summary>
-    /// We have many incarnations of this, here's another
-    /// A hierarchical manager which can manage many services inclusive of other servicemanagers
-    /// </summary>
-    public class ServiceManager : 
-        TaxonomyBase.NodeBase<IServiceDescriptor2>,
-        IServiceDescriptor2
-    {
-        internal class ServiceDescriptor : IServiceDescriptor2
-        {
-            public IService Service => throw new NotImplementedException();
-
-            public LifecycleEnum LifecycleStatus => throw new NotImplementedException();
-
-            public string Name => throw new NotImplementedException();
-
-            public event Action<object> LifecycleStatusUpdated;
-        }
-
-        public ServiceManager() : base("test") { }
-
-        public IService Service => throw new NotImplementedException();
-
-        public LifecycleEnum LifecycleStatus { get; set; }
-
-        public event Action<object> LifecycleStatusUpdated;
-
-        public Task Shutdown()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Startup(IServiceProvider serviceProvider)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        /// <summary>
-        /// FIX: Will be confusing against base AddChild
-        /// </summary>
-        /// <param name="child"></param>
-        public void AddService(IServiceDescriptor2 child)
-        {
-            child.LifecycleStatusUpdated += Child_LifecycleStatusUpdated;
-            AddChild(child);
-        }
-
-        private void Child_LifecycleStatusUpdated(object sender)
-        {
-            var sd = (IServiceDescriptor2)sender;
-
-            switch(sd.LifecycleStatus)
-            {
-                case LifecycleEnum.Degraded:
-                case LifecycleEnum.Offline:
-                {
-                    LifecycleStatus = LifecycleEnum.Degraded;
-                    break;
-                }
-
-                case LifecycleEnum.Online:
-                {
-                    break;
-                }
-            }
-        }
-    }
-
-
     public static class ILifecycleDescriptorExtensions
     {
         /// <summary>
@@ -431,8 +378,7 @@ namespace Fact.Extensions.Experimental
 
         /// <summary>
         /// Is definitely, positively in an offline kind of state.  Excludes transitioning from one state
-        /// Not necessarily an error state
-        /// to another
+        /// Not necessarily an error state, but could be
         /// </summary>
         /// <param name="ld"></param>
         /// <returns></returns>
@@ -446,6 +392,7 @@ namespace Fact.Extensions.Experimental
                 case LifecycleEnum.Paused:
                 case LifecycleEnum.Slept:
                 case LifecycleEnum.Unstarted:
+                case LifecycleEnum.Error:
                     return true;
 
                 default:
