@@ -18,9 +18,17 @@ namespace Fact.Extensions.Experimental
     {
         Unstarted,
         Starting,
-        // only blips, then moves to running
+        /// <summary>
+        /// only blips, then moves to running
+        /// </summary>
         Started,
+        /// <summary>
+        /// When shutdown begins, and while shutting down
+        /// </summary>
         Stopping,
+        /// <summary>
+        /// When shutdown completes.  May rest in this state
+        /// </summary>
         Stopped,
         Sleeping,
         Slept,
