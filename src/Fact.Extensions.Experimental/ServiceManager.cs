@@ -11,6 +11,25 @@ namespace Fact.Extensions.Experimental
     /// </summary>
     public interface IServiceDescriptor2 : IServiceDescriptor, INamed { }
 
+    public class LifecycleDescriptorBase : ILifecycleDescriptor
+    {
+        public LifecycleEnum LifecycleStatus
+        {
+            get => lifecycle.Value;
+            protected set => lifecycle.Value = value;
+        }
+
+        State<LifecycleEnum> lifecycle;
+
+        public event Action<object> LifecycleStatusUpdated;
+
+        protected LifecycleDescriptorBase()
+        {
+            lifecycle.Changed += v => LifecycleStatusUpdated?.Invoke(this);
+        }
+    }
+
+
     /// <summary>
     /// We have many incarnations of this, here's another
     /// A hierarchical manager which can manage many services inclusive of other servicemanagers
