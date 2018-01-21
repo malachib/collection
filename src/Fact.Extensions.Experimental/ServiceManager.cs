@@ -38,6 +38,7 @@ namespace Fact.Extensions.Experimental
         public string Name => name;
         readonly bool oneShot;
 
+
         /// <summary>
         /// 
         /// </summary>
@@ -48,7 +49,19 @@ namespace Fact.Extensions.Experimental
             this.ct = ct;
             this.name = name;
             this.oneShot = oneShot;
-            this.localCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            localCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="oneShot">FIX: Not active yet</param>
+        protected WorkerServiceBase(string name, bool oneShot = false)
+        {
+            this.name = name;
+            this.oneShot = oneShot;
+            localCts = new CancellationTokenSource();
         }
 
         // FIX: making protected to handle IOnlineEvents class services, but
