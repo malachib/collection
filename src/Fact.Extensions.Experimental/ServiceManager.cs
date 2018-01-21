@@ -9,7 +9,7 @@ namespace Fact.Extensions.Experimental
 {
     /// <summary>
     /// </summary>
-    public interface IServiceDescriptor2 : IServiceDescriptor, INamed { }
+    public interface IServiceDescriptor2 : IServiceDescriptor, ILifecycle, INamed { }
 
     public class LifecycleDescriptorBase : ILifecycleDescriptor
     {
@@ -93,8 +93,9 @@ namespace Fact.Extensions.Experimental
             }
         }
 
-        public ServiceManager(string name = "unnamed") : base(name)
+        public ServiceManager(string name) : base(name)
         {
+            lifecycle.Changing += (old, @new) => LifecycleStatusUpdating?.Invoke(this, @new);
             lifecycle.Changed += v => LifecycleStatusUpdated?.Invoke(this);
         }
 
@@ -109,16 +110,20 @@ namespace Fact.Extensions.Experimental
             internal set => lifecycle.Value = value;
         }
 
+        /// <summary>
+        /// Fired when we are updating lifecycle status, but before we've actually updated it
+        /// Use this to do any special state-change logic on the consumer side
+        /// provided LifecycleEnum is new state, old state will still exist in 'object'
+        /// </summary>
+        public event Action<ILifecycleDescriptor, LifecycleEnum> LifecycleStatusUpdating;
+
         public event Action<object> LifecycleStatusUpdated;
 
         public async Task Shutdown()
         {
             lifecycle.Value = LifecycleEnum.Stopping;
             // TODO: Add provision for sequential startup/shutdown also
-            // FIX: Casting to IService far, far from ideal here
-            // can't think of a better way to manage start/stop lifecycle event firing
             var childrenShutdownTasks = Children.
-                Cast<IService>().
                 Select(x => x.Shutdown());
             try
             {
@@ -138,10 +143,7 @@ namespace Fact.Extensions.Experimental
         public async Task Startup(IServiceProvider serviceProvider)
         {
             lifecycle.Value = LifecycleEnum.Starting;
-            // FIX: Casting to IService far, far from ideal here
-            // can't think of a better way to manage start/stop lifecycle event firing
             var childrenStartingTasks = Children.
-                Cast<IService>().
                 Select(x => x.Startup(serviceProvider));
             await Task.WhenAll(childrenStartingTasks);
             lifecycle.Value = LifecycleEnum.Started;
@@ -152,6 +154,7 @@ namespace Fact.Extensions.Experimental
         /// <summary>
         /// FIX: Will be confusing against base AddChild
         /// Probably making AddChild virtual would be better
+        /// Mainly use this for adding other service managers
         /// </summary>
         /// <param name="child"></param>
         public void AddService(IServiceDescriptor2 child)
@@ -193,6 +196,12 @@ namespace Fact.Extensions.Experimental
                 if (child.IsNominal())
                 {
 
+                }
+                else if (child.IsTransitioning())
+                {
+                    // child transitioning into or away from running state means
+                    // it's basically offline-ish, so report degraded state
+                    return LifecycleEnum.PartialRunning;
                 }
                 else if (child.IsNotRunning())
                 {

@@ -13,6 +13,12 @@ namespace Fact.Extensions.Experimental
         T value;
 
         /// <summary>
+        /// Fired when state is changing from one to the other, but before we assign it
+        /// </summary>
+        /// <remarks>parameters are old, new</remarks>
+        public event Action<T, T> Changing;
+
+        /// <summary>
         /// Fired after state has changed
         /// </summary>
         /// <remarks>
@@ -27,6 +33,7 @@ namespace Fact.Extensions.Experimental
             {
                 if (!Equals(this.value, value))
                 {
+                    Changing?.Invoke(this.value, value);
                     this.value = value;
                     Changed?.Invoke(value);
                 }
