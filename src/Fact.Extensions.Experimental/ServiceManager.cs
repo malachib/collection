@@ -35,22 +35,27 @@ namespace Fact.Extensions.Experimental
     {
         string name;
 
-        public string Name => throw new NotImplementedException();
+        public string Name => name;
+        readonly bool oneShot;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
         /// <param name="oneShot">FIX: Not active yet</param>
-        protected WorkerServiceBase(string name, bool oneShot = false)
+        protected WorkerServiceBase(string name, CancellationToken ct, bool oneShot = false)
         {
+            this.ct = ct;
             this.name = name;
+            this.oneShot = oneShot;
+            this.localCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         }
 
         // FIX: making protected to handle IOnlineEvents class services, but
         // I think we can do better
         protected Task worker;
-        protected readonly CancellationTokenSource localCts = new CancellationTokenSource();
+        protected readonly CancellationTokenSource localCts;
+        readonly CancellationToken ct;
 
         // TODO: Decide if we want to keep passing IServiceProvider in, thinking probably
         // yes but let's see how it goes
@@ -58,8 +63,14 @@ namespace Fact.Extensions.Experimental
 
         protected void RunWorker()
         {
-            worker = Worker(localCts.Token);
+            do
+            {
+                worker = Worker(localCts.Token);
+            }
+            while (!oneShot && !localCts.IsCancellationRequested);
         }
+
+        public bool IsWorkerRunning => worker != null;
 
         public async Task Shutdown()
         {

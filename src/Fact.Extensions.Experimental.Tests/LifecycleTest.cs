@@ -24,7 +24,7 @@ namespace Fact.Extensions.Experimental.Tests
             public event Action Online;
             public event Action Generic;
 
-            internal DummyService() : base("dummy service") { }
+            internal DummyService() : base("dummy service", new CancellationTokenSource().Token, true) { }
 
             protected override async Task Worker(CancellationToken ct)
             {
@@ -45,7 +45,7 @@ namespace Fact.Extensions.Experimental.Tests
             {
                 // because we have online-able, expect to get startup called again
                 // but don't reinitialize worker
-                if(worker == null)  RunWorker();
+                if(!IsWorkerRunning)  RunWorker();
 
                 return Task.CompletedTask;
             }
