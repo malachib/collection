@@ -61,11 +61,12 @@ namespace Fact.Extensions.Experimental
         // yes but let's see how it goes
         protected abstract Task Worker(CancellationToken cts);
 
-        protected void RunWorker()
+        protected async Task RunWorker()
         {
             do
             {
                 worker = Worker(localCts.Token);
+                await worker;
             }
             while (!oneShot && !localCts.IsCancellationRequested);
         }
@@ -74,12 +75,14 @@ namespace Fact.Extensions.Experimental
 
         public async Task Shutdown()
         {
+            localCts.Cancel();
             await worker;
         }
 
         // FIX: would use "completedTask" but it doesn't seem to be available for netstandard1.1?
         public virtual async Task Startup(IServiceProvider serviceProvider)
         {
+            // we specifically *do not* await here, we are starting up a worker thread
             RunWorker();
         }
     }
