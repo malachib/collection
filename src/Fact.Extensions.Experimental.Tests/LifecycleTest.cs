@@ -18,24 +18,15 @@ namespace Fact.Extensions.Experimental.Tests
         }
 
 
-        class DummyService : IService, IOnlineEvents
+        class DummyService : WorkerServiceBase, IOnlineEvents
         {
-            public IService Service => this;
-
-            public string Name => "dummy service";
-
             public event Action Offline;
             public event Action Online;
             public event Action Generic;
 
-            Task worker;
+            internal DummyService() : base("dummy service") { }
 
-            public async Task Shutdown()
-            {
-                await worker;
-            }
-
-            async Task _worker()
+            protected override async Task Worker(CancellationToken ct)
             {
                 await Task.Delay(500);
                 Offline();
@@ -50,12 +41,14 @@ namespace Fact.Extensions.Experimental.Tests
                 await Task.Delay(500);
             }
 
-            public async Task Startup(IServiceProvider serviceProvider)
+            public override Task Startup(IServiceProvider serviceProvider)
             {
                 // because we have online-able, expect to get startup called again
                 // but don't reinitialize worker
                 if(worker == null)
-                    worker = _worker();
+                    worker = Worker(localCts.Token);
+
+                return Task.CompletedTask;
             }
         }
 

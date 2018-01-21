@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Fact.Extensions.Experimental
 {
@@ -26,6 +27,44 @@ namespace Fact.Extensions.Experimental
         protected LifecycleDescriptorBase()
         {
             lifecycle.Changed += v => LifecycleStatusUpdated?.Invoke(this);
+        }
+    }
+
+
+    public abstract class WorkerServiceBase : IService
+    {
+        string name;
+
+        public string Name => throw new NotImplementedException();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="oneShot">FIX: Not active yet</param>
+        protected WorkerServiceBase(string name, bool oneShot = false)
+        {
+            this.name = name;
+        }
+
+        // FIX: making protected to handle IOnlineEvents class services, but
+        // I think we can do better
+        protected Task worker;
+        protected readonly CancellationTokenSource localCts = new CancellationTokenSource();
+
+        // TODO: Decide if we want to keep passing IServiceProvider in, thinking probably
+        // yes but let's see how it goes
+        protected abstract Task Worker(CancellationToken cts);
+
+        public async Task Shutdown()
+        {
+            await worker;
+        }
+
+        // FIX: would use "completedTask" but it doesn't seem to be available for netstandard1.1?
+        public virtual async Task Startup(IServiceProvider serviceProvider)
+        {
+            worker = Worker(localCts.Token);
         }
     }
 
