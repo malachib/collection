@@ -56,6 +56,11 @@ namespace Fact.Extensions.Experimental
         // yes but let's see how it goes
         protected abstract Task Worker(CancellationToken cts);
 
+        protected void RunWorker()
+        {
+            worker = Worker(localCts.Token);
+        }
+
         public async Task Shutdown()
         {
             await worker;
@@ -64,7 +69,7 @@ namespace Fact.Extensions.Experimental
         // FIX: would use "completedTask" but it doesn't seem to be available for netstandard1.1?
         public virtual async Task Startup(IServiceProvider serviceProvider)
         {
-            worker = Worker(localCts.Token);
+            RunWorker();
         }
     }
 

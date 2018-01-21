@@ -45,8 +45,7 @@ namespace Fact.Extensions.Experimental.Tests
             {
                 // because we have online-able, expect to get startup called again
                 // but don't reinitialize worker
-                if(worker == null)
-                    worker = Worker(localCts.Token);
+                if(worker == null)  RunWorker();
 
                 return Task.CompletedTask;
             }
