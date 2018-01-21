@@ -144,10 +144,8 @@ namespace Fact.Extensions.Experimental
                 Cast<IService>().
                 Select(x => x.Startup(serviceProvider));
             await Task.WhenAll(childrenStartingTasks);
-            // FIX: child may set this in a degraded state or something, inconsistency in behavior
-            // here
             lifecycle.Value = LifecycleEnum.Started;
-            lifecycle.Value = LifecycleEnum.Running;
+            lifecycle.Value = AscertainCompositeState();
         }
 
 
@@ -216,8 +214,21 @@ namespace Fact.Extensions.Experimental
             switch(sd.LifecycleStatus)
             {
             }
-            // TODO: can optimize since we know which child state is changing
-            lifecycle.Value = AscertainCompositeState();
+
+            var status = LifecycleStatus;
+
+            // wait until starting state is over before computing state value for composite
+            // so that we don't get a bunch of confusing states if the children are goofed up
+
+            // FIX: Because we exclude stopped here, shutdown failures won't be reported as 
+            // an overall error, which they should be
+            if (status != LifecycleEnum.Starting &&
+                status != LifecycleEnum.Stopping &&
+                status != LifecycleEnum.Stopped)
+            {
+                // TODO: can optimize since we know which child state is changing
+                lifecycle.Value = AscertainCompositeState();
+            }
         }
     }
 }
