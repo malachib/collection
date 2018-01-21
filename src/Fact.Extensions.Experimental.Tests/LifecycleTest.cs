@@ -42,7 +42,11 @@ namespace Fact.Extensions.Experimental.Tests
                 await Task.Delay(500);
                 Online();
                 Console.WriteLine("Got here");
+                // Give parent time to leave degraded state
+                await Task.Delay(500);
+                // Generic signals test to shut down
                 Generic?.Invoke();
+                // wait a little longer to see rest of events fire
                 await Task.Delay(500);
             }
 
@@ -91,6 +95,8 @@ namespace Fact.Extensions.Experimental.Tests
                 childSm.LifecycleStatus = LifecycleEnum.Error;
 
                 Assert.AreEqual(LifecycleEnum.Degraded, sm.LifecycleStatus);
+
+                childSm.LifecycleStatus = LifecycleEnum.Running;
 
                 await sem.WaitAsync(10000);
 
