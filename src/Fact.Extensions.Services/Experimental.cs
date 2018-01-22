@@ -129,6 +129,8 @@ namespace Fact.Extensions.Experimental
         // UNTIL an activity occurs
         readonly SemaphoreSlim reverseMutexSem = new SemaphoreSlim(0, 1);
         readonly SemaphoreSlim mutexSem = new SemaphoreSlim(1, 1);
+        // for brief times whether the above two mutexes need to interact
+        readonly SemaphoreSlim blackZoneSem = new SemaphoreSlim(1, 1);
 
         public AwaitableCollection2(ICollection<T> wrapped)
         {
@@ -141,20 +143,32 @@ namespace Fact.Extensions.Experimental
 
         public void Add(T item)
         {
-            mutexSem.Wait();
+            Enter();
             wrapped.Add(item);
+            Exit();
+        }
+
+        void Enter()
+        {
+            mutexSem.Wait();
+            //blackZoneSem.Wait();
+        }
+
+        void Exit()
+        {
+            // Counting on this Release() to be immediately picked up by
+            // any awaiting WaitFor
             reverseMutexSem.Release();
+            //blackZoneSem.Release();
             mutexSem.Release();
             reverseMutexSem.Wait();
         }
 
         public void Clear()
         {
-            mutexSem.Wait();
+            Enter();
             wrapped.Clear();
-            reverseMutexSem.Release();
-            mutexSem.Release();
-            reverseMutexSem.Wait();
+            Exit();
         }
 
         /// <summary>
@@ -171,11 +185,19 @@ namespace Fact.Extensions.Experimental
 
             while (!condition())
             {
+                // we've not yet released our mutex, so condition() results
+                // should not have changed yet when we get here.  In that
+                // protection, now activate blackZoneSem interstice protection
+                // for the case where we zip out of the activity and blast back
+                // into a new activity, past the mutexSem.wait().  In that case
+                // the blackZoneSem.Wait() will stop us from modifying condition()
+                // related things
+                await blackZoneSem.WaitAsync(ct);
                 // we've checked the condition under safe mutexed scenario,
                 mutexSem.Release();
 
-                // FIX: there's a black zone here where condition() can change
-                // since we've released our mutex.  Maybe some kind of clever brief spinwait should go here?
+                // operations are now protected by black zone semaphore during
+                // this brief interstice where mutex is not protecting condition()
 
                 // wait until SOMETHING to happen.  When it does, we will
                 // be safe within our mutex
@@ -184,6 +206,8 @@ namespace Fact.Extensions.Experimental
                 // end of that activity can continue
                 reverseMutexSem.Release();
 
+                // and interstice protection now can be relieved as well
+                blackZoneSem.Release();
                 // block again just before we check our condition
                 await mutexSem.WaitAsync(ct);
             }
@@ -199,18 +223,18 @@ namespace Fact.Extensions.Experimental
 
         public void CopyTo(T[] array, int arrayIndex)
         {
+            Enter();
             wrapped.CopyTo(array, arrayIndex);
+            Exit();
         }
 
         public IEnumerator<T> GetEnumerator() => wrapped.GetEnumerator();
 
         public bool Remove(T item)
         {
-            mutexSem.Wait();
+            Enter();
             bool result = wrapped.Remove(item);
-            reverseMutexSem.Release();
-            mutexSem.Release();
-            reverseMutexSem.Wait();
+            Exit();
             return result;
         }
 
