@@ -33,6 +33,14 @@ namespace Fact.Extensions.Services
     /// </summary>
     public interface IServiceDescriptor : IServiceDescriptorBase, IService
     {
+        /// <summary>
+        /// List of services which depend on this one - specifically,
+        /// when it's time for this service to shut down, it has to wait
+        /// until dependers list is completely free.  This way, dependers
+        /// can do what they need to do with this service before allowing
+        /// it to shutdown
+        /// </summary>
+        //ICollection<IServiceDescriptor> Dependers { get; }
     }
 
 }

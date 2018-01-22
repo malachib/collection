@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections;
 
 namespace Fact.Extensions.Services
 {
@@ -206,19 +207,24 @@ namespace Fact.Extensions.Services
 
         public event Action<object> LifecycleStatusUpdated;
 
+        async Task Noop() { }
+
         public async Task Shutdown()
         {
             lifecycle.Value = LifecycleEnum.Stopping;
+
+            // start self awaiter first, but it can finish anytime
+            // FIX: Will need provision to "unlock" dependent-on resources,
+            // or otherwise (hope we can void this) have a two-phase shutdown
+            Task selfAwaiter = self != null ? self.Shutdown() : Noop();
+
             // TODO: Add provision for sequential startup/shutdown also
-            var childrenShutdownTasks = Children.Select(x => x.Shutdown());
+            var childrenShutdownTasks = Children.Select(x => x.Shutdown()).Append(selfAwaiter);
 
             try
             {
                 await Task.WhenAll(childrenShutdownTasks);
                 lifecycle.Value = LifecycleEnum.Stopped;
-
-                // stop self after children
-                if (self != null) await self.Shutdown();
             }
             catch (Exception e)
             {
@@ -234,12 +240,10 @@ namespace Fact.Extensions.Services
         {
             lifecycle.Value = LifecycleEnum.Starting;
 
-            // start self before children
-            if (self != null) await self.Startup(serviceProvider);
+            Task selfAwaiter = self != null ? self.Startup(serviceProvider) : Noop();
 
             var childrenStartingTasks = Children.
-                Select(x => x.Startup(serviceProvider));
-
+                Select(x => x.Startup(serviceProvider)).Append(selfAwaiter);
 
             await Task.WhenAll(childrenStartingTasks);
             lifecycle.Value = LifecycleEnum.Started;
