@@ -41,6 +41,21 @@ namespace Fact.Extensions.Collection
 
             foreach (T item in enumeration) yield return item;
         }
+
+
+        /// <summary>
+        /// Appends a particular value to the end of a (returned) enumeration
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumeration"></param>
+        /// <param name="appendedValue"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> Append<T>(this IEnumerable<T> enumeration, T appendedValue)
+        {
+            foreach (T item in enumeration) yield return item;
+
+            yield return appendedValue;
+        }
 #endif
     }
 
