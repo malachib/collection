@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Fact.Extensions.Collection
 {
@@ -42,5 +43,62 @@ namespace Fact.Extensions.Collection
         }
 
         public static implicit operator T(State<T> state) => state.value;
+
+        // this one wont work cause state.Changed -= d can't run due to it being a ref
+#if UNUSED
+#if !NET40
+        public static SemaphoreSlim GetSemaphoreWaitFor(ref State<T> state, Func<T, bool> condition)
+        {
+            SemaphoreSlim conditionMet = new SemaphoreSlim(condition(state.value) ? 1 : 0);
+
+            Action<T> d = v =>
+            {
+                if (condition(v))
+                {
+                    conditionMet.Release();
+                    state.Changed -= d;
+                }
+            };
+
+            state.Changed += d;
+
+            // FIX: Unsure if it helps us to do this default check
+            if (ct == default(CancellationToken))
+                await conditionMet.WaitAsync(millisecondsTimeout);
+            else
+                await conditionMet.WaitAsync(millisecondsTimeout, ct);
+
+            Changed -= d;
+        }
+#endif
+#endif
+
+        // This code doesn't work because even 'this pointer' is actually a value copy,
+        // so events never fire
+#if UNUSED
+#if !NET40
+        public async System.Threading.Tasks.Task WaitFor(Func<T, bool> condition, 
+            int millisecondsTimeout = Timeout.Infinite, 
+            CancellationToken ct = default(CancellationToken))
+        {
+            SemaphoreSlim conditionMet = new SemaphoreSlim(condition(value) ? 1 : 0);
+
+            Action<T> d = v =>
+            {
+                if (condition(v)) conditionMet.Release();
+            };
+
+            Changed += d;
+
+            // FIX: Unsure if it helps us to do this default check
+            if (ct == default(CancellationToken))
+                await conditionMet.WaitAsync(millisecondsTimeout);
+            else
+                await conditionMet.WaitAsync(millisecondsTimeout, ct);
+
+            Changed -= d;
+        }
+#endif
+#endif
     }
 }
