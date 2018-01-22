@@ -9,8 +9,10 @@ using System.Threading;
 namespace Fact.Extensions.Experimental
 {
     /// <summary>
+    /// FIX: Needs a better name, described wrapper interface for
+    /// ServiceDescriptoBase below
     /// </summary>
-    public interface IServiceDescriptor2 : IServiceDescriptor, ILifecycle, INamed { }
+    public interface IServiceDescriptor2 : IServiceDescriptor, IService { }
 
     public class LifecycleDescriptorBase : ILifecycleDescriptor
     {
@@ -27,6 +29,63 @@ namespace Fact.Extensions.Experimental
         protected LifecycleDescriptorBase()
         {
             lifecycle.Changed += v => LifecycleStatusUpdated?.Invoke(this);
+        }
+    }
+
+
+    /// <summary>
+    /// Wrapper class which wraps up a provided service and combines it with a ILifecycleDescriptor
+    /// helper - so that the underlying service itself is alleviated from managing that plubming
+    /// </summary>
+    internal class ServiceDescriptorBase : LifecycleDescriptorBase, IServiceDescriptor2
+    {
+        readonly IService service;
+
+        internal ServiceDescriptorBase(IService service)
+        {
+            this.service = service;
+
+            // NOTE: perhaps not best location for this, but we can capture idea here at least
+            if (service is IOnlineEvents oe)
+            {
+                oe.Online += async () =>
+                {
+                    LifecycleStatus = LifecycleEnum.Online;
+                    await Startup(null);
+                };
+                oe.Offline += () => LifecycleStatus = LifecycleEnum.Offline;
+            }
+
+            if (service is ISleepableEvents se)
+            {
+                se.Sleeping += () => LifecycleStatus = LifecycleEnum.Sleeping;
+                se.Slept += () => LifecycleStatus = LifecycleEnum.Slept;
+                se.Awake += async () =>
+                {
+                    LifecycleStatus = LifecycleEnum.Awake;
+                    await Startup(null);
+                };
+                se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
+            }
+        }
+
+        public IService Service => service;
+
+        public string Name => service.Name;
+
+        public virtual async Task Shutdown()
+        {
+            LifecycleStatus = LifecycleEnum.Stopping;
+            await service.Shutdown();
+            LifecycleStatus = LifecycleEnum.Stopped;
+        }
+
+        public virtual async Task Startup(IServiceProvider serviceProvider)
+        {
+            LifecycleStatus = LifecycleEnum.Starting;
+            await service.Startup(serviceProvider);
+            LifecycleStatus = LifecycleEnum.Started;
+            LifecycleStatus = LifecycleEnum.Running;
         }
     }
 
@@ -106,66 +165,14 @@ namespace Fact.Extensions.Experimental
     /// A hierarchical manager which can manage many services inclusive of other servicemanagers
     /// </summary>
     public class ServiceManager :
-        TaxonomyBase.NodeBase<IServiceDescriptor2>,
+        NamedChildCollection<IServiceDescriptor2>,
         IService,
         IServiceDescriptor2
     {
-        internal class ServiceDescriptor : LifecycleDescriptorBase, 
-            IService,
-            IServiceDescriptor2
-        {
-            readonly IService service;
-
-            internal ServiceDescriptor(IService service)
-            {
-                this.service = service;
-
-                // NOTE: perhaps not best location for this, but we can capture idea here at least
-                if (service is IOnlineEvents oe)
-                {
-                    oe.Online += async () =>
-                    {
-                        LifecycleStatus = LifecycleEnum.Online;
-                        await Startup(null);
-                    };
-                    oe.Offline += () => LifecycleStatus = LifecycleEnum.Offline;
-                }
-
-                if (service is ISleepableEvents se)
-                {
-                    se.Sleeping += () => LifecycleStatus = LifecycleEnum.Sleeping;
-                    se.Slept += () => LifecycleStatus = LifecycleEnum.Slept;
-                    se.Awake += async () =>
-                    {
-                        LifecycleStatus = LifecycleEnum.Awake;
-                        await Startup(null);
-                    };
-                    se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
-                }
-            }
-
-            public IService Service => service;
-
-            public string Name => service.Name;
-
-            public async Task Shutdown()
-            {
-                LifecycleStatus = LifecycleEnum.Stopping;
-                await service.Shutdown();
-                LifecycleStatus = LifecycleEnum.Stopped;
-            }
-
-            public async Task Startup(IServiceProvider serviceProvider)
-            {
-                LifecycleStatus = LifecycleEnum.Starting;
-                await service.Startup(serviceProvider);
-                LifecycleStatus = LifecycleEnum.Started;
-                LifecycleStatus = LifecycleEnum.Running;
-            }
-        }
-
         public ServiceManager(string name) : base(name)
         {
+            ChildAdded += (o, c) => c.LifecycleStatusUpdated += Child_LifecycleStatusUpdated;
+            ChildRemoved += (o, c) => c.LifecycleStatusUpdated -= Child_LifecycleStatusUpdated;
             lifecycle.Changing += (old, @new) => LifecycleStatusUpdating?.Invoke(this, @new);
             lifecycle.Changed += v => LifecycleStatusUpdated?.Invoke(this);
         }
@@ -222,36 +229,6 @@ namespace Fact.Extensions.Experimental
         }
 
 
-        /// <summary>
-        /// FIX: Will be confusing against base AddChild
-        /// Probably making AddChild virtual would be better
-        /// Mainly use this for adding other service managers
-        /// </summary>
-        /// <param name="child"></param>
-        public void AddService(IServiceDescriptor2 child)
-        {
-            // NOTE: Perhaps catch AddChild event instead of making virtual
-            child.LifecycleStatusUpdated += Child_LifecycleStatusUpdated;
-
-            AddChild(child);
-        }
-
-
-        /// <summary>
-        /// FIX: Clean up naming, collides with AddService when its both an IServiceDescriptor2 
-        /// *and* an IService
-        /// </summary>
-        /// <param name="service"></param>
-        public IServiceDescriptor2 AddService2(IService service)
-        {
-            var sd = new ServiceDescriptor(service);
-
-            AddService(sd);
-
-            return sd;
-        }
-
-
         public void RemoveService(IServiceDescriptor2 child)
         {
             // TBD, no base remover
@@ -291,10 +268,6 @@ namespace Fact.Extensions.Experimental
         {
             var sd = (IServiceDescriptor2)sender;
 
-            switch(sd.LifecycleStatus)
-            {
-            }
-
             var status = LifecycleStatus;
 
             // wait until starting state is over before computing state value for composite
@@ -309,6 +282,19 @@ namespace Fact.Extensions.Experimental
                 // TODO: can optimize since we know which child state is changing
                 lifecycle.Value = AscertainCompositeState();
             }
+        }
+    }
+
+
+    public static class ServiceManagerExtensions
+    {
+        public static IServiceDescriptor2 AddService(this ServiceManager serviceManager, IService service)
+        {
+            var sd = new ServiceDescriptorBase(service);
+
+            serviceManager.AddChild(sd);
+
+            return sd;
         }
     }
 }

@@ -58,7 +58,7 @@ namespace Fact.Extensions.Collection
     public interface IChildProvider<TKey, TChild> : IChildProvider<TChild>
     {
         /// <summary>
-        /// Acquire a child by its key.  If non exists, default(TChild) is returned
+        /// Acquire a child by its key.  If none exists, default(TChild) is returned
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>

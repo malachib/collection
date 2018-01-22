@@ -61,8 +61,8 @@ namespace Fact.Extensions.Experimental.Tests
             var child2Sm = new DummyService();
             var sem = new SemaphoreSlim(0, 1);
 
-            sm.AddService(childSm);
-            var dummyServiceDescriptor = sm.AddService2(child2Sm);
+            sm.AddChild(childSm);
+            var dummyServiceDescriptor = sm.AddService(child2Sm);
 
             dummyServiceDescriptor.LifecycleStatusUpdated += o =>
             {
