@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Fact.Extensions.Experimental.Tests
+namespace Fact.Extensions.Services.Tests
 {
     [TestClass]
     public class LifecycleTest

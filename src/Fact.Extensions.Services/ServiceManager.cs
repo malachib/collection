@@ -6,14 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace Fact.Extensions.Experimental
+namespace Fact.Extensions.Services
 {
-    /// <summary>
-    /// FIX: Needs a better name, described wrapper interface for
-    /// ServiceDescriptoBase below
-    /// </summary>
-    public interface IServiceDescriptor2 : IServiceDescriptor, IService { }
-
     public class LifecycleDescriptorBase : ILifecycleDescriptor
     {
         public LifecycleEnum LifecycleStatus
@@ -37,7 +31,7 @@ namespace Fact.Extensions.Experimental
     /// Wrapper class which wraps up a provided service and combines it with a ILifecycleDescriptor
     /// helper - so that the underlying service itself is alleviated from managing that plubming
     /// </summary>
-    internal class ServiceDescriptorBase : LifecycleDescriptorBase, IServiceDescriptor2
+    internal class ServiceDescriptorBase : LifecycleDescriptorBase, IServiceDescriptor
     {
         readonly IService service;
 
@@ -165,9 +159,9 @@ namespace Fact.Extensions.Experimental
     /// A hierarchical manager which can manage many services inclusive of other servicemanagers
     /// </summary>
     public class ServiceManager :
-        NamedChildCollection<IServiceDescriptor2>,
+        NamedChildCollection<IServiceDescriptor>,
         IService,
-        IServiceDescriptor2
+        IServiceDescriptor
     {
         public ServiceManager(string name) : base(name)
         {
@@ -229,12 +223,6 @@ namespace Fact.Extensions.Experimental
         }
 
 
-        public void RemoveService(IServiceDescriptor2 child)
-        {
-            // TBD, no base remover
-        }
-
-
         LifecycleEnum AscertainCompositeState()
         {
             LifecycleEnum state = LifecycleEnum.Running;
@@ -266,7 +254,7 @@ namespace Fact.Extensions.Experimental
 
         private void Child_LifecycleStatusUpdated(object sender)
         {
-            var sd = (IServiceDescriptor2)sender;
+            var sd = (IServiceDescriptor)sender;
 
             var status = LifecycleStatus;
 
@@ -288,7 +276,7 @@ namespace Fact.Extensions.Experimental
 
     public static class ServiceManagerExtensions
     {
-        public static IServiceDescriptor2 AddService(this ServiceManager serviceManager, IService service)
+        public static IServiceDescriptor AddService(this ServiceManager serviceManager, IService service)
         {
             var sd = new ServiceDescriptorBase(service);
 

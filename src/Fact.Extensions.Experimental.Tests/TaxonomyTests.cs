@@ -12,7 +12,7 @@ namespace Fact.Extensions.Experimental.Tests
     [TestClass]
     public class TaxonomyTests
     {
-        internal class TestNode : TaxonomyBase.NodeBase<TestNode>, 
+        internal class TestNode : NamedChildCollection<TestNode>, 
             IChild<TestNode>
         {
             readonly TestNode parent;
