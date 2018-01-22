@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Fact.Extensions.Experimental
+namespace Fact.Extensions.Collection
 {
     /// <summary>
-    /// ONly in experimental because I am not sure what other namespace to put it in
-    /// Otherwise not considered experimental
+    /// Specialized and dedicated value holder class whose main purpose is to notify
+    /// listeners when an *actual* state change occurs, not just merely an assignment
+    /// (which may end up being the same value assigned)
     /// </summary>
     public struct State<T>
     {
@@ -39,5 +40,7 @@ namespace Fact.Extensions.Experimental
                 }
             }
         }
+
+        public static implicit operator T(State<T> state) => state.value;
     }
 }

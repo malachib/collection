@@ -8,7 +8,8 @@ using System.Text;
 namespace Fact.Extensions.Collection
 {
     /// <summary>
-    /// Not fully tested, but should work
+    /// Flavor of IDictionary which is very lazy-loaded
+    /// Has undergone light testing
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>

@@ -16,7 +16,7 @@ namespace Fact.Extensions.Experimental
     {
         public LifecycleEnum LifecycleStatus
         {
-            get => lifecycle.Value;
+            get => lifecycle;
             protected set => lifecycle.Value = value;
         }
 
@@ -176,7 +176,7 @@ namespace Fact.Extensions.Experimental
 
         public LifecycleEnum LifecycleStatus
         {
-            get => lifecycle.Value;
+            get => lifecycle;
             // mainly used for unit test access
             internal set => lifecycle.Value = value;
         }
