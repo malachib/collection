@@ -67,20 +67,24 @@ namespace Fact.Extensions.Experimental
         {
             try
             {
+                // make sure nobody fiddles with Count
                 await mutexSem.WaitAsync();
                 if (Count == 0) return; // No awaiting needs to happen if no elements
                                         // wait until flag indicating has no elements is set
-                await hasNoElementsSem.WaitAsync();
-                // it's briefly not set here (but since it's a distcint semaphore
-                // from has elements, should cause no confusion) - so we re-set
-                // it.  Only side effect is external consumer will briefly wait
-                // on AwaitEmpty as we reset the flag
-                hasNoElementsSem.Release();
             }
             finally
             {
                 mutexSem.Release();
             }
+            // can safely wait for no elements anytime, once we
+            // think we should wait - and if we DON'T have to wait anymore,
+            // that's OK too
+            await hasNoElementsSem.WaitAsync();
+            // it's briefly not set here (but since it's a distcint semaphore
+            // from has elements, should cause no confusion) - so we re-set
+            // it.  Only side effect is external consumer will briefly wait
+            // on AwaitEmpty as we reset the flag
+            hasNoElementsSem.Release();
         }
 
         public bool Contains(T item) => wrapped.Contains(item);
@@ -94,11 +98,11 @@ namespace Fact.Extensions.Experimental
 
         public bool Remove(T item)
         {
+            mutexSem.Wait();
             bool result = wrapped.Remove(item);
             // don't really want to block here, but necessary to decrement
             // hasElemensSem counter.  NOTE: it's VERY likely we'll hit an
             // exception first before reaching a wait state here
-            mutexSem.Wait();
             hasElementsSem.Wait();
             if (Count == 0)
             {
@@ -108,6 +112,105 @@ namespace Fact.Extensions.Experimental
                 hasNoElementsSem.Release();
             }
             mutexSem.Release();
+            return result;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => wrapped.GetEnumerator();
+    }
+
+
+    // Does not work, and semaphore seems a bad fit for it
+    // In fact starting to look like kind of a disaster... damn
+    public class AwaitableCollection2<T> : ICollection<T>
+    {
+        ICollection<T> wrapped;
+
+        // reverse mutex means we ARE doing something.  Used to block
+        // UNTIL an activity occurs
+        readonly SemaphoreSlim reverseMutexSem = new SemaphoreSlim(0, 1);
+        readonly SemaphoreSlim mutexSem = new SemaphoreSlim(1, 1);
+
+        public AwaitableCollection2(ICollection<T> wrapped)
+        {
+            this.wrapped = wrapped;
+        }
+
+        public int Count => wrapped.Count;
+
+        public bool IsReadOnly => wrapped.IsReadOnly;
+
+        public void Add(T item)
+        {
+            mutexSem.Wait();
+            wrapped.Add(item);
+            reverseMutexSem.Release();
+            mutexSem.Release();
+            reverseMutexSem.Wait();
+        }
+
+        public void Clear()
+        {
+            mutexSem.Wait();
+            wrapped.Clear();
+            reverseMutexSem.Release();
+            mutexSem.Release();
+            reverseMutexSem.Wait();
+        }
+
+        /// <summary>
+        /// Waits for a condition.  While condition resolves to false,
+        /// we wait for *any* write activity to this collection, then
+        /// check condition again
+        /// </summary>
+        /// <returns></returns>
+        public async Task WaitFor(Func<bool> condition, CancellationToken ct)
+        {
+            // in our activities, mutexSem is always released before initiating
+            // a reverseMutex so this is fully safe
+            await mutexSem.WaitAsync(ct);
+
+            while (!condition())
+            {
+                // we've checked the condition under safe mutexed scenario,
+                mutexSem.Release();
+
+                // FIX: there's a black zone here where condition() can change
+                // since we've released our mutex.  Maybe some kind of clever brief spinwait should go here?
+
+                // wait until SOMETHING to happen.  When it does, we will
+                // be safe within our mutex
+                await reverseMutexSem.WaitAsync(ct);
+                // once an activity happens, be sure to release so that the
+                // end of that activity can continue
+                reverseMutexSem.Release();
+
+                // block again just before we check our condition
+                await mutexSem.WaitAsync(ct);
+            }
+        }
+
+
+        public async Task AwaitEmpty(CancellationToken ct)
+        {
+            await WaitFor(() => Count == 0, ct);
+        }
+
+        public bool Contains(T item) => wrapped.Contains(item);
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            wrapped.CopyTo(array, arrayIndex);
+        }
+
+        public IEnumerator<T> GetEnumerator() => wrapped.GetEnumerator();
+
+        public bool Remove(T item)
+        {
+            mutexSem.Wait();
+            bool result = wrapped.Remove(item);
+            reverseMutexSem.Release();
+            mutexSem.Release();
+            reverseMutexSem.Wait();
             return result;
         }
 
