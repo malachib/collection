@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections;
+using Microsoft.Extensions.Logging;
 
 namespace Fact.Extensions.Services
 {
