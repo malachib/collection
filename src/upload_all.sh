@@ -11,8 +11,8 @@
 ./upload_project.sh Fact.Extensions.Factories
 ./upload_project.sh Fact.Extensions.Configuration
 ./upload_project.sh Fact.Extensions.Serialization
-./upload_project.sh Fact.Extensions.Services
 ./upload_project.sh Fact.Extensions.Serialization.Newtonsoft
 ./upload_project.sh Fact.Extensions.Serialization.MessagePack
 ./upload_project.sh Fact.Extensions.Serialization.Pipelines
+./upload_project.sh Fact.Extensions.Services
 ./upload_project.sh Fact.Extensions.StateAccessor
