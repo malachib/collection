@@ -54,6 +54,8 @@ namespace Fact.Extensions.Services
         /// <summary>
         /// For composite services where subservices are not running, but not in 
         /// an error state.  Needs a better name
+        /// Note that since the composite service itself quasi-counts as a service,
+        /// even if ALL children are not running, a PartialRunning is still reported
         /// </summary>
         PartialRunning,
         /// <summary>

@@ -163,13 +163,28 @@ namespace Fact.Extensions.Services
         IService,
         IServiceDescriptor
     {
-        public ServiceManager(string name) : base(name)
+        public ServiceManager(string name, IService self = null) : base(name)
         {
             ChildAdded += (o, c) => c.LifecycleStatusUpdated += Child_LifecycleStatusUpdated;
             ChildRemoved += (o, c) => c.LifecycleStatusUpdated -= Child_LifecycleStatusUpdated;
             lifecycle.Changing += (old, @new) => LifecycleStatusUpdating?.Invoke(this, @new);
             lifecycle.Changed += v => LifecycleStatusUpdated?.Invoke(this);
+            if(self != null)
+            {
+                this.self = new ServiceDescriptorBase(self);
+            }
         }
+
+
+        /// <summary>
+        /// Normally a service manager serves mainly to look after child services or other child
+        /// service managers.  Additionaly though, the service manager can have a 1:1 relationship
+        /// itself with a service.  This 'self' service manages its own lifecycle state just like
+        /// a child service, and composite takes 'self' lifecycle state into account as if it 
+        /// where a child.  So except for startup/shutdown order and general accessibility, 'self'
+        /// operates like any other child service
+        /// </summary>
+        IServiceDescriptor self;
 
         public IService Service => this;
 
@@ -195,12 +210,15 @@ namespace Fact.Extensions.Services
         {
             lifecycle.Value = LifecycleEnum.Stopping;
             // TODO: Add provision for sequential startup/shutdown also
-            var childrenShutdownTasks = Children.
-                Select(x => x.Shutdown());
+            var childrenShutdownTasks = Children.Select(x => x.Shutdown());
+
             try
             {
                 await Task.WhenAll(childrenShutdownTasks);
                 lifecycle.Value = LifecycleEnum.Stopped;
+
+                // stop self after children
+                if (self != null) await self.Shutdown();
             }
             catch (Exception e)
             {
@@ -215,8 +233,14 @@ namespace Fact.Extensions.Services
         public async Task Startup(IServiceProvider serviceProvider)
         {
             lifecycle.Value = LifecycleEnum.Starting;
+
+            // start self before children
+            if (self != null) await self.Startup(serviceProvider);
+
             var childrenStartingTasks = Children.
                 Select(x => x.Startup(serviceProvider));
+
+
             await Task.WhenAll(childrenStartingTasks);
             lifecycle.Value = LifecycleEnum.Started;
             lifecycle.Value = AscertainCompositeState();
@@ -226,18 +250,32 @@ namespace Fact.Extensions.Services
         LifecycleEnum AscertainCompositeState()
         {
             LifecycleEnum state = LifecycleEnum.Running;
+            IEnumerable<IServiceDescriptor> children;
 
-            foreach (var child in Children)
+            if (self != null)
+                children = Children.Prepend(self);
+            else
+                children = Children;
+
+            foreach (var child in children)
             {
-                if (child.IsNominal())
-                {
+                var status = child.LifecycleStatus;
 
+                if(status == LifecycleEnum.PartialRunning)
+                {
+                    // we keep looking, because degraded state supercedes this one, if we find it
+                    state = LifecycleEnum.PartialRunning;
+                }
+                else if(status == LifecycleEnum.Degraded)
+                {
+                    // degraded child bubbles up and makes for a degraded parent
+                    return LifecycleEnum.Degraded;
                 }
                 else if (child.IsTransitioning())
                 {
                     // child transitioning into or away from running state means
-                    // it's basically offline-ish, so report degraded state
-                    return LifecycleEnum.PartialRunning;
+                    // it's basically offline-ish, so report partial running state
+                    state = LifecycleEnum.PartialRunning;
                 }
                 else if (child.IsNotRunning())
                 {

@@ -251,6 +251,8 @@ namespace Fact.Extensions.Services
                 case LifecycleEnum.Pausing:
                 case LifecycleEnum.Resuming:
                 case LifecycleEnum.Starting:
+                case LifecycleEnum.Started:
+                case LifecycleEnum.Stopping:
                 case LifecycleEnum.Waking:
                     return true;
 
@@ -275,6 +277,7 @@ namespace Fact.Extensions.Services
                 case LifecycleEnum.Offline:
                 case LifecycleEnum.Paused:
                 case LifecycleEnum.Slept:
+                case LifecycleEnum.Stopped:
                 case LifecycleEnum.Unstarted:
                 case LifecycleEnum.Error:
                     return true;
