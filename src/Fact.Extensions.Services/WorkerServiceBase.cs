@@ -25,6 +25,14 @@ namespace Fact.Extensions.Services
         // a constructor
         protected Task configure;
 
+        /// <summary>
+        /// Override this if pre-startup/semi-long-running config needs to happen
+        /// Will be kicked off by constructor
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected virtual async Task Configure(ServiceContext context) { }
+
 
         WorkerServiceBase(IServiceProvider sp, string name)
         {
@@ -37,10 +45,10 @@ namespace Fact.Extensions.Services
         /// </summary>
         /// <param name="name"></param>
         /// <param name="oneShot">FIX: Not active yet</param>
-        protected WorkerServiceBase(IServiceProvider sp, string name, CancellationToken ct, bool oneShot = false)
-            : this(sp, name)
+        protected WorkerServiceBase(ServiceContext context, string name, bool oneShot = false)
+            : this(context.ServiceProvider, name)
         {
-            this.ct = ct;
+            this.ct = context.CancellationToken;
             this.oneShot = oneShot;
             localCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         }
@@ -63,7 +71,7 @@ namespace Fact.Extensions.Services
 
         // TODO: Decide if we want to keep passing IServiceProvider in, thinking probably
         // yes but let's see how it goes
-        protected abstract Task Worker(CancellationToken cts);
+        protected abstract Task Worker(ServiceContext context);
 
 
         /// <summary>
@@ -86,13 +94,25 @@ namespace Fact.Extensions.Services
             localCts.Cancel();
         }
 
-        protected async Task RunWorker()
+        /// <summary>
+        /// Runs the custom worker process
+        /// Note that inbound context will have its cancellation token augmented with this
+        /// worker service local CTS
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected async Task RunWorker(ServiceContext context)
         {
             logger.LogTrace($"Worker starting ({Name})");
 
+            context = new ServiceContext(context, context.Descriptor);
+            context.CancellationToken = localCts.Token;
+
             do
             {
-                worker = Worker(localCts.Token);
+                // TODO: Work out how progress.report is gonna work with repeating/non one
+                // shot services, if any
+                worker = Worker(context);
                 await worker;
             }
             while (!oneShot && !localCts.IsCancellationRequested);
@@ -124,21 +144,30 @@ namespace Fact.Extensions.Services
                 logger.LogWarning($"Shutdown: No worker was created before shutdown was called ({Name})");
         }
 
-        // FIX: would use "completedTask" but it doesn't seem to be available for netstandard1.1?
-        public virtual async Task Startup(IServiceProvider serviceProvider)
+        public virtual Task Startup(IServiceProvider serviceProvider)
         {
-            if(configure != null)
+            var context = new ServiceContext(serviceProvider);
+
+            return Startup(context);
+        }
+
+        // FIX: would use "completedTask" but it doesn't seem to be available for netstandard1.1?
+        public virtual async Task Startup(ServiceContext context)
+        {
+            context.Progress?.Report(0);
+
+            if (configure != null)
             {
                 await configure;
             }
 
-            // we specifically *do not* await here, we are starting up a worker thread
-            RunWorker().ContinueWithErrorLogger(serviceProvider, Name);
-        }
+            context.Progress?.Report(50);
 
-        public virtual Task Startup(ServiceContext context)
-        {
-            return Startup(context.ServiceProvider);
+            // we specifically *do not* await here, we are starting up a worker thread
+            RunWorker(context).ContinueWithErrorLogger(context.ServiceProvider, Name);
+
+            // TODO: have mini-awaiter which only waits for runworker to start
+            context.Progress?.Report(100);
         }
 
         public virtual Task Shutdown(ServiceContext context)

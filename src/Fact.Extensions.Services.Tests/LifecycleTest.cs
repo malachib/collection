@@ -1,3 +1,4 @@
+using Fact.Extensions.Experimental;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,28 +26,31 @@ namespace Fact.Extensions.Services.Tests
             public event Action Online;
             public event Action Generic;
 
-            internal DummyService(IServiceProvider sp) : base(sp, "dummy service", new CancellationTokenSource().Token, true) { }
+            internal DummyService(IServiceProvider sp) : base(sp, "dummy service", true) { }
 
-            protected override async Task Worker(CancellationToken ct)
+            protected override async Task Worker(ServiceContext context)
             {
                 await Task.Delay(500);
+                context.Progress?.Report(25);
                 Offline();
                 await Task.Delay(500);
+                context.Progress?.Report(50);
                 Online();
                 Console.WriteLine("Got here");
                 // Give parent time to leave degraded state
                 await Task.Delay(500);
+                context.Progress?.Report(75);
                 // Generic signals test to shut down
                 Generic?.Invoke();
                 // wait a little longer to see rest of events fire
                 await Task.Delay(500);
             }
 
-            public override Task Startup(IServiceProvider serviceProvider)
+            public override Task Startup(ServiceContext context)
             {
                 // because we have online-able, expect to get startup called again
                 // but don't reinitialize worker
-                if(!IsWorkerCreated)  RunWorker();
+                if(!IsWorkerCreated)  RunWorker(context);
 
                 return Task.CompletedTask;
             }

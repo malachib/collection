@@ -317,30 +317,33 @@ namespace Fact.Extensions.Experimental
         }
 
 
-        public ServiceContext(IServiceProvider serviceProvider, Services.IServiceDescriptor parent)
+        public ServiceContext(IServiceProvider serviceProvider, Services.IServiceDescriptor descriptor)
             : this(serviceProvider)
         {
-            ParentDescriptor = parent;
+            Descriptor = descriptor;
 
-            if(parent is IProgress<float> parentWithProgress)
+            if(descriptor is IProgress<float> descriptorWithProgress)
             {
-                Progress = parentWithProgress;
+                Progress = descriptorWithProgress;
             }
         }
 
-        public ServiceContext(ServiceContext copyFrom, Services.IServiceDescriptor parent) : base(copyFrom)
+        public ServiceContext(ServiceContext copyFrom, Services.IServiceDescriptor descriptor) : base(copyFrom)
         {
-            ParentDescriptor = parent;
+            Descriptor = descriptor;
 
-            if (copyFrom.Progress == null && parent is IProgress<float> parentWithProgress)
+            if (copyFrom.Progress == null && descriptor is IProgress<float> descriptorWithProgress)
             {
-                Progress = parentWithProgress;
+                Progress = descriptorWithProgress;
             }
         }
 
 
         public IServiceProvider ServiceProvider { get; private set; }
 
-        public Services.IServiceDescriptor ParentDescriptor { get; set; }
+        /// <summary>
+        /// Descriptor which is 1:1 associated with the running service
+        /// </summary>
+        public Services.IServiceDescriptor Descriptor { get; set; }
     }
 }

@@ -327,17 +327,18 @@ namespace Fact.Extensions.Services
                     child.LifecycleStatusUpdated += lifecycleObserver;
             }
 
-            var childContext = new ServiceContext(context, this);
-
             // TODO: get the cancellation token going either per child
             // or tacked onto WhenAll.  Where's that extension...
             var childrenStartingTasks = children.
                 Select(x =>
                 {
                     if (x is IServiceExperimental se)
+                    {
+                        var childContext = new ServiceContext(context, x);
                         return se.Startup(childContext);
+                    }
                     else
-                        return x.Startup(childContext.ServiceProvider);
+                        return x.Startup(context.ServiceProvider);
                 });
 
             await Task.WhenAll(childrenStartingTasks);
