@@ -47,7 +47,7 @@ namespace Fact.Extensions.Services
 
         internal ServiceDescriptorBase(IServiceProvider sp, IService service)
         {
-            this.logger = sp.GetService<ILogger>();
+            this.logger = sp.GetService<ILogger<ServiceDescriptorBase>>();
             this.service = service;
 
             // NOTE: perhaps not best location for this, but we can capture idea here at least
