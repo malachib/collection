@@ -287,6 +287,10 @@ namespace Fact.Extensions.Experimental
     public class AsyncContext
     {
         public IServiceProvider ServiceProvider { get; set; }
+
+        /// <summary>
+        /// from 0-100, not 0-1
+        /// </summary>
         public IProgress<float> Progress { get; set; }
         public CancellationToken CancellationToken { get; set; }
     }

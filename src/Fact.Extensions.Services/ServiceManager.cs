@@ -85,6 +85,12 @@ namespace Fact.Extensions.Services
             LifecycleStatus = LifecycleEnum.Stopped;
         }
 
+        public async Task Shutdown(AsyncContext context)
+        {
+            // TODO: Implement this
+            await Shutdown();
+        }
+
         public virtual async Task Startup(IServiceProvider serviceProvider)
         {
             LifecycleStatus = LifecycleEnum.Starting;
@@ -283,12 +289,14 @@ namespace Fact.Extensions.Services
             var children = Children;
             if (self != null) children = children.Prepend(self);
 
-            if(progress != null)
+            Action<object> lifecycleObserver = null;
+
+            if (progress != null)
             {
                 int progressCount = 0;
                 int totalChildren = children.Count();
 
-                Action<object> lifecycleObserver = null;
+                progress.Report(0);
 
                 lifecycleObserver = new Action<object>(o =>
                 {
@@ -297,11 +305,7 @@ namespace Fact.Extensions.Services
                     // we can divide it up here and make the overall 
                     // more smooth (cool!)
                     if (child.LifecycleStatus == LifecycleEnum.Running)
-                        progress.Report(100f * progressCount++ / totalChildren);
-
-                    // FIX: Watch this closely, I used to use this trick
-                    // but not sure if it still works
-                    child.LifecycleStatusUpdated -= lifecycleObserver;
+                        progress.Report(100f * ++progressCount / totalChildren);
                 });
 
                 foreach (var child in children)
@@ -314,8 +318,21 @@ namespace Fact.Extensions.Services
                 Select(x => x.Startup(serviceProvider));
 
             await Task.WhenAll(childrenStartingTasks);
+
+            if (lifecycleObserver != null)
+            {
+                foreach (var child in children)
+                    child.LifecycleStatusUpdated -= lifecycleObserver;
+            }
+
             lifecycle.Value = LifecycleEnum.Started;
             lifecycle.Value = AscertainCompositeState();
+        }
+
+        public async Task Shutdown(AsyncContext context)
+        {
+            // TODO: Implement this
+            await Shutdown();
         }
     }
 

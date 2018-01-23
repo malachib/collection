@@ -52,14 +52,20 @@ namespace Fact.Extensions.Services.Tests
             }
         }
 
-        [TestMethod]
-        public void BasicServiceManagerTest()
+        IServiceProvider Setup()
         {
             var sc = new ServiceCollection();
             sc.AddLogging();
             var sp = sc.BuildServiceProvider();
             var lf = sp.GetService<ILoggerFactory>();
             lf.AddConsole(LogLevel.Trace);
+            return sp;
+        }
+
+        [TestMethod]
+        public void BasicServiceManagerTest()
+        {
+            var sp = Setup();
             var sm = new ServiceManager(sp, "parent");
             var childSm = new ServiceManager(sp, "child");
             var dummyService = new DummyService(sp);
@@ -102,6 +108,43 @@ namespace Fact.Extensions.Services.Tests
 
             }).Wait();
 
+        }
+
+        internal class Progress : IProgress<float>
+        {
+            public void Report(float value)
+            {
+                Console.WriteLine($"Progress %: {value}");
+            }
+        }
+
+        [TestMethod]
+        public void AsyncContextTest()
+        {
+            Experimental.AsyncContext context = new Experimental.AsyncContext();
+
+            context.Progress = new Progress();
+            context.ServiceProvider = Setup();
+            var sp = context.ServiceProvider;
+
+            var sm = new ServiceManager(sp, "parent");
+            var childSm = new ServiceManager(sp, "child");
+            var dummyService = new DummyService(sp);
+            var dummySem = new SemaphoreSlim(0, 1);
+
+            sm.AddChild(childSm);
+            sm.AddService(dummyService, sp);
+
+            dummyService.Generic += () => dummySem.Release();
+
+            Task.Run(async () =>
+            {
+                await sm.Startup(context);
+
+                await dummySem.WaitAsync();
+
+                await sm.Shutdown(context);
+            }).Wait(3000);
         }
     }
 }
