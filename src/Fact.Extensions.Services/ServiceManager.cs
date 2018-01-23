@@ -35,10 +35,12 @@ namespace Fact.Extensions.Services
     /// Wrapper class which wraps up a provided service and combines it with a ILifecycleDescriptor
     /// helper - so that the underlying service itself is alleviated from managing that plubming
     /// </summary>
+    /// <remarks>
+    /// TODO: Once I settle on a name, move this to its own class file
+    /// </remarks>
     internal class ServiceDescriptorBase : 
         LifecycleDescriptorBase, 
-        IServiceDescriptor,
-        IServiceExtended
+        IServiceDescriptor
     {
         readonly IService service;
         readonly ILogger logger;
@@ -80,6 +82,8 @@ namespace Fact.Extensions.Services
 
         public virtual async Task Shutdown()
         {
+            logger.LogTrace($"Shutdown: {Name}");
+
             LifecycleStatus = LifecycleEnum.Stopping;
             await service.Shutdown();
             LifecycleStatus = LifecycleEnum.Stopped;
@@ -93,15 +97,15 @@ namespace Fact.Extensions.Services
 
         public virtual async Task Startup(IServiceProvider serviceProvider)
         {
-            LifecycleStatus = LifecycleEnum.Starting;
-            await service.Startup(serviceProvider);
-            LifecycleStatus = LifecycleEnum.Started;
-            LifecycleStatus = LifecycleEnum.Running;
+            var context = new ServiceContext(serviceProvider, this);
+            await Startup(context);
         }
 
 
         public virtual async Task Startup(ServiceContext context)
         {
+            logger.LogTrace($"Startup: {Name}");
+
             if (service is IServiceExtended se)
             {
                 LifecycleStatus = LifecycleEnum.Starting;
@@ -137,7 +141,6 @@ namespace Fact.Extensions.Services
     /// </summary>
     public class ServiceManager :
         NamedChildCollection<IServiceDescriptor>,
-        IServiceExtended,
         IServiceDescriptor
     {
         readonly ILogger logger;

@@ -45,7 +45,7 @@ namespace Fact.Extensions.Services
     /// Furthermore, we implement IService interface itself as a light facade around our service
     /// mainly to assist in the aforementioned, tracking service state
     /// </summary>
-    public interface IServiceDescriptor : IServiceDescriptorBase, IService
+    public interface IServiceDescriptor : IServiceDescriptorBase, IServiceExtended
     {
         /// <summary>
         /// List of services which depend on this one - specifically,
