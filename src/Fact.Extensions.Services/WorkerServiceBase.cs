@@ -115,7 +115,23 @@ namespace Fact.Extensions.Services
             }
             while (!oneShot && !localCts.IsCancellationRequested);
 
-            logger.LogTrace($"Worker has finished: ({Name}) - {worker.Status}");
+            // If not oneshot, then it was a cancellation request
+            // NOTE: Untested, might just blast right by it with an exception
+            if(!oneShot)
+            {
+                // if our outsider cancellation token was NOT the instigator,
+                // then we expect localCts itself generated it
+                if(!ct.IsCancellationRequested)
+                {
+                    logger.LogTrace($"Worker has finished: ({Name}) Shutdown normally");
+                }
+                else
+                {
+                    logger.LogWarning($"Worker has finished: ({Name}) Shutdown forcefully from system");
+                }
+            }
+            else
+                logger.LogTrace($"Worker has finished: ({Name}) - {worker.Status}");
         }
 
         /// <summary>
@@ -123,7 +139,7 @@ namespace Fact.Extensions.Services
         /// </summary>
         public bool IsWorkerCreated => worker != null;
 
-        public async Task Shutdown()
+        public async virtual Task Shutdown()
         {
             // TODO: Do threadsafe stuff
             if (IsWorkerCreated)
