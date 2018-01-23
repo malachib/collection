@@ -16,9 +16,8 @@ namespace Fact.Extensions.Services
         IServiceExtended
     {
         readonly ILogger logger;
-        string name;
 
-        public string Name => name;
+        public abstract string Name { get; }
         readonly bool oneShot;
 
         // this is for asynchronous pre-startup initialization, manually assigned from
@@ -34,10 +33,9 @@ namespace Fact.Extensions.Services
         protected virtual async Task Configure(ServiceContext context) { }
 
 
-        WorkerServiceBase(IServiceProvider sp, string name)
+        WorkerServiceBase(IServiceProvider sp)
         {
             logger = sp.GetService<ILogger<WorkerServiceBase>>();
-            this.name = name;
         }
 
         /// <summary>
@@ -45,8 +43,8 @@ namespace Fact.Extensions.Services
         /// </summary>
         /// <param name="name"></param>
         /// <param name="oneShot">FIX: Not active yet</param>
-        protected WorkerServiceBase(ServiceContext context, string name, bool oneShot = false)
-            : this(context.ServiceProvider, name)
+        protected WorkerServiceBase(ServiceContext context, bool oneShot = false)
+            : this(context.ServiceProvider)
         {
             this.ct = context.CancellationToken;
             this.oneShot = oneShot;
@@ -58,7 +56,7 @@ namespace Fact.Extensions.Services
         /// </summary>
         /// <param name="name"></param>
         /// <param name="oneShot">FIX: Not active yet</param>
-        protected WorkerServiceBase(IServiceProvider sp, string name, bool oneShot = false) : this(sp, name)
+        protected WorkerServiceBase(IServiceProvider sp, bool oneShot = false) : this(sp)
         {
             this.oneShot = oneShot;
             localCts = new CancellationTokenSource();
@@ -164,7 +162,7 @@ namespace Fact.Extensions.Services
             context.Progress?.Report(50);
 
             // we specifically *do not* await here, we are starting up a worker thread
-            RunWorker(context).ContinueWithErrorLogger(context.ServiceProvider, Name);
+            RunWorker(context).ContinueWithErrorLogger(logger, Name);
 
             // TODO: have mini-awaiter which only waits for runworker to start
             context.Progress?.Report(100);

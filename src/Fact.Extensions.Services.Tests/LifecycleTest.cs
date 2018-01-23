@@ -26,7 +26,9 @@ namespace Fact.Extensions.Services.Tests
             public event Action Online;
             public event Action Generic;
 
-            internal DummyService(IServiceProvider sp) : base(sp, "dummy service", true) { }
+            public override string Name => "Dummy service";
+
+            internal DummyService(IServiceProvider sp) : base(sp, true) { }
 
             protected override async Task Worker(ServiceContext context)
             {

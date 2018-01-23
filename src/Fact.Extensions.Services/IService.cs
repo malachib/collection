@@ -120,6 +120,15 @@ namespace Fact.Extensions.Services
             }
         }
 
+
+        public ServiceContext(IServiceProvider serviceProvider, 
+            CancellationToken cancellationToken, 
+            IServiceDescriptor descriptor = null) :
+            this(serviceProvider, descriptor)
+        {
+            CancellationToken = cancellationToken;
+        }
+
         public ServiceContext(ServiceContext copyFrom, IServiceDescriptor descriptor) : base(copyFrom)
         {
             Descriptor = descriptor;
