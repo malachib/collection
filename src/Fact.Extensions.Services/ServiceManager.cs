@@ -100,7 +100,7 @@ namespace Fact.Extensions.Services
         }
 
 
-        public virtual async Task Startup(Experimental.ServiceContext context)
+        public virtual async Task Startup(ServiceContext context)
         {
             if (service is IServiceExperimental se)
             {
@@ -112,6 +112,22 @@ namespace Fact.Extensions.Services
             else
                 await Startup(context.ServiceProvider);
         }
+    }
+
+
+    internal class ServiceDescriptorBase<TService> : ServiceDescriptorBase,
+        IServiceDescriptor<TService>
+        where TService : IService
+    {
+        public ServiceDescriptorBase(ServiceContext context, IService service) :
+            base(context.ServiceProvider, service)
+        { }
+
+        public ServiceDescriptorBase(IServiceProvider sp, IService service) :
+            base(sp, service)
+        { }
+
+        TService IServiceDescriptor<TService>.Service => (TService)Service;
     }
 
 
@@ -311,7 +327,7 @@ namespace Fact.Extensions.Services
                     child.LifecycleStatusUpdated += lifecycleObserver;
             }
 
-            var childContext = new Experimental.ServiceContext(context, this);
+            var childContext = new ServiceContext(context, this);
 
             // TODO: get the cancellation token going either per child
             // or tacked onto WhenAll.  Where's that extension...
@@ -349,6 +365,27 @@ namespace Fact.Extensions.Services
         public static IServiceDescriptor AddService(this ServiceManager serviceManager, IService service, IServiceProvider sp)
         {
             var sd = new ServiceDescriptorBase(sp, service);
+
+            serviceManager.AddChild(sd);
+
+            return sd;
+        }
+
+
+        public static IServiceDescriptor<TService> AddService<TService>(this ServiceManager serviceManager, TService service, IServiceProvider sp)
+            where TService : IService
+        {
+            var sd = new ServiceDescriptorBase<TService>(sp, service);
+
+            serviceManager.AddChild(sd);
+
+            return sd;
+        }
+
+        public static IServiceDescriptor<TService> AddService<TService>(this ServiceManager serviceManager, TService service, ServiceContext context)
+            where TService: IService
+        {
+            var sd = new ServiceDescriptorBase<TService>(context, service);
 
             serviceManager.AddChild(sd);
 
