@@ -38,7 +38,7 @@ namespace Fact.Extensions.Services
     internal class ServiceDescriptorBase : 
         LifecycleDescriptorBase, 
         IServiceDescriptor,
-        IServiceExperimental
+        IServiceExtended
     {
         readonly IService service;
         readonly ILogger logger;
@@ -102,7 +102,7 @@ namespace Fact.Extensions.Services
 
         public virtual async Task Startup(ServiceContext context)
         {
-            if (service is IServiceExperimental se)
+            if (service is IServiceExtended se)
             {
                 LifecycleStatus = LifecycleEnum.Starting;
                 await se.Startup(context);
@@ -137,7 +137,7 @@ namespace Fact.Extensions.Services
     /// </summary>
     public class ServiceManager :
         NamedChildCollection<IServiceDescriptor>,
-        IServiceExperimental,
+        IServiceExtended,
         IServiceDescriptor
     {
         readonly ILogger logger;
@@ -332,7 +332,7 @@ namespace Fact.Extensions.Services
             var childrenStartingTasks = children.
                 Select(x =>
                 {
-                    if (x is IServiceExperimental se)
+                    if (x is IServiceExtended se)
                     {
                         var childContext = new ServiceContext(context, x);
                         return se.Startup(childContext);

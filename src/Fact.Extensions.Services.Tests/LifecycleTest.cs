@@ -120,7 +120,7 @@ namespace Fact.Extensions.Services.Tests
             var progress = new Progress<float>();
 
             progress.ProgressChanged += (o, value) => Console.WriteLine($"Progress %: {value}");
-            Experimental.ServiceContext context = new Experimental.ServiceContext(Setup(), progress);
+            ServiceContext context = new ServiceContext(Setup(), progress);
 
             var sp = context.ServiceProvider;
 
