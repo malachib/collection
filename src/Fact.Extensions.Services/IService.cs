@@ -47,6 +47,8 @@ namespace Fact.Extensions.Services
     /// </summary>
     public interface IServiceDescriptor : IServiceDescriptorBase, IServiceExtended
     {
+        Exception Exception { get; }
+
         /// <summary>
         /// List of services which depend on this one - specifically,
         /// when it's time for this service to shut down, it has to wait

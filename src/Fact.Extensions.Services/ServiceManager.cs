@@ -45,6 +45,8 @@ namespace Fact.Extensions.Services
         readonly IService service;
         readonly ILogger logger;
 
+        public Exception Exception { get; private set; }
+
         internal ServiceDescriptorBase(IServiceProvider sp, IService service)
         {
             this.logger = sp.GetService<ILogger<ServiceDescriptorBase>>();
@@ -84,9 +86,18 @@ namespace Fact.Extensions.Services
         {
             logger.LogTrace($"Shutdown: {Name}");
 
-            LifecycleStatus = LifecycleEnum.Stopping;
-            await service.Shutdown();
-            LifecycleStatus = LifecycleEnum.Stopped;
+            try
+            {
+                LifecycleStatus = LifecycleEnum.Stopping;
+                await service.Shutdown();
+                LifecycleStatus = LifecycleEnum.Stopped;
+            }
+            catch(Exception e)
+            {
+                LifecycleStatus = LifecycleEnum.Error;
+                Exception = e;
+                logger.LogError($"Shutdown failed: {Name}");
+            }
         }
 
         public async Task Shutdown(ServiceContext context)
@@ -106,15 +117,24 @@ namespace Fact.Extensions.Services
         {
             logger.LogTrace($"Startup: {Name}");
 
-            if (service is IServiceExtended se)
+            try
             {
-                LifecycleStatus = LifecycleEnum.Starting;
-                await se.Startup(context);
-                LifecycleStatus = LifecycleEnum.Started;
-                LifecycleStatus = LifecycleEnum.Running;
+                if (service is IServiceExtended se)
+                {
+                    LifecycleStatus = LifecycleEnum.Starting;
+                    await se.Startup(context);
+                    LifecycleStatus = LifecycleEnum.Started;
+                    LifecycleStatus = LifecycleEnum.Running;
+                }
+                else
+                    await Startup(context.ServiceProvider);
             }
-            else
-                await Startup(context.ServiceProvider);
+            catch(Exception e)
+            {
+                Exception = e;
+                logger.LogError(0, e, $"Startup failed: {Name}");
+                LifecycleStatus = LifecycleEnum.Error;
+            }
         }
     }
 
@@ -144,6 +164,12 @@ namespace Fact.Extensions.Services
         IServiceDescriptor
     {
         readonly ILogger logger;
+
+        /// <summary>
+        /// ServiceManager doesn't use this just yet, merely because haven't decided what
+        /// best way to utilize it for this class is
+        /// </summary>
+        public Exception Exception { get; private set; }
 
         public ServiceManager(IServiceProvider sp, string name, IService self = null) : base(name)
         {
@@ -226,7 +252,7 @@ namespace Fact.Extensions.Services
             Task selfAwaiter = self != null ? self.Startup(serviceProvider) : Noop();
 
             var childrenStartingTasks = Children.
-                Select(x => x.Startup(serviceProvider)).Append(selfAwaiter);
+                Select(x => x.Startup(serviceProvider)).Prepend(selfAwaiter);
 
             await Task.WhenAll(childrenStartingTasks);
             lifecycle.Value = LifecycleEnum.Started;
@@ -234,6 +260,11 @@ namespace Fact.Extensions.Services
         }
 
 
+        /// <summary>
+        /// Evaluate all children and return a state which attempts to summarize
+        /// their statuses
+        /// </summary>
+        /// <returns></returns>
         LifecycleEnum AscertainCompositeState()
         {
             LifecycleEnum state = LifecycleEnum.Running;
@@ -307,7 +338,7 @@ namespace Fact.Extensions.Services
             var children = Children;
             if (self != null) children = children.Prepend(self);
 
-            Action<object> lifecycleObserver = null;
+            Action<object> progressObserver = null;
 
             if (progress != null)
             {
@@ -316,7 +347,7 @@ namespace Fact.Extensions.Services
 
                 progress.Report(0);
 
-                lifecycleObserver = new Action<object>(o =>
+                progressObserver = new Action<object>(o =>
                 {
                     var child = (ILifecycleDescriptor)o;
                     // TODO: If children themselves also report progress,
@@ -327,7 +358,7 @@ namespace Fact.Extensions.Services
                 });
 
                 foreach (var child in children)
-                    child.LifecycleStatusUpdated += lifecycleObserver;
+                    child.LifecycleStatusUpdated += progressObserver;
             }
 
             // TODO: get the cancellation token going either per child
@@ -346,10 +377,10 @@ namespace Fact.Extensions.Services
 
             await Task.WhenAll(childrenStartingTasks);
 
-            if (lifecycleObserver != null)
+            if (progressObserver != null)
             {
                 foreach (var child in children)
-                    child.LifecycleStatusUpdated -= lifecycleObserver;
+                    child.LifecycleStatusUpdated -= progressObserver;
             }
 
             lifecycle.Value = LifecycleEnum.Started;
