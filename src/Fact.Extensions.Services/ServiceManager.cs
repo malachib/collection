@@ -96,7 +96,7 @@ namespace Fact.Extensions.Services
             {
                 LifecycleStatus = LifecycleEnum.Error;
                 Exception = e;
-                logger.LogError($"Shutdown failed: {Name}");
+                logger.LogError(0, e, $"Shutdown failed: {Name}");
             }
         }
 
