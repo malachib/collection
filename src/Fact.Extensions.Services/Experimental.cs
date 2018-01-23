@@ -244,42 +244,19 @@ namespace Fact.Extensions.Experimental
         IEnumerator IEnumerable.GetEnumerator() => wrapped.GetEnumerator();
     }
 
-    public static class TaskExtensions
+
+
+    internal class LocalCancellationTokenBase
     {
-        public static Task ContinueWithErrorLogger(this Task task, IServiceProvider sp, string name)
+        protected readonly CancellationTokenSource localCts;
+
+        protected void Cancel() => localCts.Cancel();
+
+        protected CancellationToken Combine(CancellationToken cancellationToken)
         {
-            return ContinueWithErrorLogger(task, sp.GetService<ILoggerFactory>().CreateLogger(name), name);
-        }
-
-        /// <summary>
-        /// Wire in a generic post-task error logger
-        /// </summary>
-        /// <param name="task"></param>
-        /// <param name="logger"></param>
-        /// <param name="name"></param>
-        public static Task ContinueWithErrorLogger(this Task task, ILogger logger, string name = null)
-        {
-            return task.ContinueWith(t =>
-            {
-                if(t.IsFaulted)
-                {
-                    if (name == null) name = t.Id.ToString();
-
-                    if(t.Exception.InnerException is OperationCanceledException)
-                    {
-                        logger.LogWarning($"Task {name} shut down via operation canceled exception");
-
-                    }
-                    else
-                        logger.LogError(0, t.Exception.InnerException, 
-                            $"Task {name} did not complete as expected");
-                }
-
-                if(t.IsCanceled)
-                {
-                    logger.LogDebug($"Task {name} completed unexceptionally");
-                }
-            });
+            return CancellationTokenSource.CreateLinkedTokenSource(
+                localCts.Token,
+                cancellationToken).Token;
         }
     }
 }
