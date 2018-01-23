@@ -131,6 +131,8 @@ namespace Fact.Extensions.Services
 
         public ServiceContext(ServiceContext copyFrom, IServiceDescriptor descriptor) : base(copyFrom)
         {
+            ServiceProvider = copyFrom.ServiceProvider;
+
             Descriptor = descriptor;
 
             if (copyFrom.Progress == null && descriptor is IProgress<float> descriptorWithProgress)
