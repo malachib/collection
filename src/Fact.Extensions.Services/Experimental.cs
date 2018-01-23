@@ -282,4 +282,12 @@ namespace Fact.Extensions.Experimental
             });
         }
     }
+
+
+    public class AsyncContext
+    {
+        public IServiceProvider ServiceProvider { get; set; }
+        public IProgress<float> Progress { get; set; }
+        public CancellationToken CancellationToken { get; set; }
+    }
 }

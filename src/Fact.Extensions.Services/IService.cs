@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("Fact.Extensions.Services.Tests")]
 
@@ -13,6 +14,12 @@ namespace Fact.Extensions.Services
         ILifecycle,
         INamed
     { }
+
+
+    public interface IServiceExperimental : IService
+    {
+        Task Startup(Experimental.AsyncContext context);
+    }
 
 
     /// <summary>

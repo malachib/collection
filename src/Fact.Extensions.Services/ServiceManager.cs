@@ -8,6 +8,7 @@ using System.Threading;
 using System.Collections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Fact.Extensions.Experimental;
 
 namespace Fact.Extensions.Services
 {
@@ -34,7 +35,10 @@ namespace Fact.Extensions.Services
     /// Wrapper class which wraps up a provided service and combines it with a ILifecycleDescriptor
     /// helper - so that the underlying service itself is alleviated from managing that plubming
     /// </summary>
-    internal class ServiceDescriptorBase : LifecycleDescriptorBase, IServiceDescriptor
+    internal class ServiceDescriptorBase : 
+        LifecycleDescriptorBase, 
+        IServiceDescriptor,
+        IServiceExperimental
     {
         readonly IService service;
         readonly ILogger logger;
@@ -50,7 +54,8 @@ namespace Fact.Extensions.Services
                 oe.Online += async () =>
                 {
                     LifecycleStatus = LifecycleEnum.Online;
-                    await Startup(null);
+                    // Beware, this might not be the SP you are after!
+                    await Startup(sp);
                 };
                 oe.Offline += () => LifecycleStatus = LifecycleEnum.Offline;
             }
@@ -62,7 +67,8 @@ namespace Fact.Extensions.Services
                 se.Awake += async () =>
                 {
                     LifecycleStatus = LifecycleEnum.Awake;
-                    await Startup(null);
+                    // Beware, this might not be the SP you are after!
+                    await Startup(sp);
                 };
                 se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
             }
@@ -86,6 +92,20 @@ namespace Fact.Extensions.Services
             LifecycleStatus = LifecycleEnum.Started;
             LifecycleStatus = LifecycleEnum.Running;
         }
+
+
+        public virtual async Task Startup(Experimental.AsyncContext context)
+        {
+            if (service is IServiceExperimental se)
+            {
+                LifecycleStatus = LifecycleEnum.Starting;
+                await se.Startup(context);
+                LifecycleStatus = LifecycleEnum.Started;
+                LifecycleStatus = LifecycleEnum.Running;
+            }
+            else
+                await Startup(context.ServiceProvider);
+        }
     }
 
 
@@ -95,7 +115,7 @@ namespace Fact.Extensions.Services
     /// </summary>
     public class ServiceManager :
         NamedChildCollection<IServiceDescriptor>,
-        IService,
+        IServiceExperimental,
         IServiceDescriptor
     {
         readonly ILogger logger;
@@ -250,6 +270,52 @@ namespace Fact.Extensions.Services
                 // TODO: can optimize since we know which child state is changing
                 lifecycle.Value = AscertainCompositeState();
             }
+        }
+
+        // Copy/paste of regular startup but with extra goodies
+        // If we like it, replace primary one with this one
+        public async Task Startup(AsyncContext context)
+        {
+            var serviceProvider = context.ServiceProvider;
+            var progress = context.Progress;
+            lifecycle.Value = LifecycleEnum.Starting;
+
+            var children = Children;
+            if (self != null) children = children.Prepend(self);
+
+            if(progress != null)
+            {
+                int progressCount = 0;
+                int totalChildren = children.Count();
+
+                Action<object> lifecycleObserver = null;
+
+                lifecycleObserver = new Action<object>(o =>
+                {
+                    var child = (ILifecycleDescriptor)o;
+                    // TODO: If children themselves also report progress,
+                    // we can divide it up here and make the overall 
+                    // more smooth (cool!)
+                    if (child.LifecycleStatus == LifecycleEnum.Running)
+                        progress.Report(100f * progressCount++ / totalChildren);
+
+                    // FIX: Watch this closely, I used to use this trick
+                    // but not sure if it still works
+                    child.LifecycleStatusUpdated -= lifecycleObserver;
+                });
+
+                foreach (var child in children)
+                    child.LifecycleStatusUpdated += lifecycleObserver;
+            }
+
+            // TODO: get the cancellation token going either per child
+            // or tacked onto WhenAll.  Where's that extension...
+            var childrenStartingTasks = children.
+                Select(x => x.Startup(serviceProvider));
+
+            await Task.WhenAll(childrenStartingTasks);
+            lifecycle.Value = LifecycleEnum.Started;
+            lifecycle.Value = AscertainCompositeState();
         }
     }
 
