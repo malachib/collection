@@ -110,21 +110,14 @@ namespace Fact.Extensions.Services.Tests
 
         }
 
-        internal class Progress : IProgress<float>
-        {
-            public void Report(float value)
-            {
-                Console.WriteLine($"Progress %: {value}");
-            }
-        }
-
         [TestMethod]
         public void AsyncContextTest()
         {
-            Experimental.AsyncContext context = new Experimental.AsyncContext();
+            var progress = new Progress<float>();
 
-            context.Progress = new Progress();
-            context.ServiceProvider = Setup();
+            progress.ProgressChanged += (o, value) => Console.WriteLine($"Progress %: {value}");
+            Experimental.ServiceContext context = new Experimental.ServiceContext(Setup(), progress);
+
             var sp = context.ServiceProvider;
 
             var sm = new ServiceManager(sp, "parent");

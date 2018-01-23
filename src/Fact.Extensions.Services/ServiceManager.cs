@@ -85,7 +85,7 @@ namespace Fact.Extensions.Services
             LifecycleStatus = LifecycleEnum.Stopped;
         }
 
-        public async Task Shutdown(AsyncContext context)
+        public async Task Shutdown(ServiceContext context)
         {
             // TODO: Implement this
             await Shutdown();
@@ -100,7 +100,7 @@ namespace Fact.Extensions.Services
         }
 
 
-        public virtual async Task Startup(Experimental.AsyncContext context)
+        public virtual async Task Startup(Experimental.ServiceContext context)
         {
             if (service is IServiceExperimental se)
             {
@@ -280,9 +280,8 @@ namespace Fact.Extensions.Services
 
         // Copy/paste of regular startup but with extra goodies
         // If we like it, replace primary one with this one
-        public async Task Startup(AsyncContext context)
+        public async Task Startup(ServiceContext context)
         {
-            var serviceProvider = context.ServiceProvider;
             var progress = context.Progress;
             lifecycle.Value = LifecycleEnum.Starting;
 
@@ -312,10 +311,18 @@ namespace Fact.Extensions.Services
                     child.LifecycleStatusUpdated += lifecycleObserver;
             }
 
+            var childContext = new Experimental.ServiceContext(context, this);
+
             // TODO: get the cancellation token going either per child
             // or tacked onto WhenAll.  Where's that extension...
             var childrenStartingTasks = children.
-                Select(x => x.Startup(serviceProvider));
+                Select(x =>
+                {
+                    if (x is IServiceExperimental se)
+                        return se.Startup(childContext);
+                    else
+                        return x.Startup(childContext.ServiceProvider);
+                });
 
             await Task.WhenAll(childrenStartingTasks);
 
@@ -329,7 +336,7 @@ namespace Fact.Extensions.Services
             lifecycle.Value = AscertainCompositeState();
         }
 
-        public async Task Shutdown(AsyncContext context)
+        public async Task Shutdown(ServiceContext context)
         {
             // TODO: Implement this
             await Shutdown();

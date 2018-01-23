@@ -286,12 +286,61 @@ namespace Fact.Extensions.Experimental
 
     public class AsyncContext
     {
-        public IServiceProvider ServiceProvider { get; set; }
+        public AsyncContext(IProgress<float> progress)
+        {
+            Progress = progress;
+        }
+
+        public AsyncContext(AsyncContext copyFrom)
+        {
+            Progress = copyFrom.Progress;
+            CancellationToken = copyFrom.CancellationToken;
+        }
+
+
+        public AsyncContext() { }
 
         /// <summary>
         /// from 0-100, not 0-1
         /// </summary>
-        public IProgress<float> Progress { get; set; }
+        public IProgress<float> Progress { get; protected set; }
         public CancellationToken CancellationToken { get; set; }
+    }
+
+
+    public class ServiceContext : AsyncContext
+    {
+        public ServiceContext(IServiceProvider serviceProvider, IProgress<float> progress = null) 
+            : base(progress)
+        {
+            ServiceProvider = serviceProvider;
+        }
+
+
+        public ServiceContext(IServiceProvider serviceProvider, Services.IServiceDescriptor parent)
+            : this(serviceProvider)
+        {
+            ParentDescriptor = parent;
+
+            if(parent is IProgress<float> parentWithProgress)
+            {
+                Progress = parentWithProgress;
+            }
+        }
+
+        public ServiceContext(ServiceContext copyFrom, Services.IServiceDescriptor parent) : base(copyFrom)
+        {
+            ParentDescriptor = parent;
+
+            if (copyFrom.Progress == null && parent is IProgress<float> parentWithProgress)
+            {
+                Progress = parentWithProgress;
+            }
+        }
+
+
+        public IServiceProvider ServiceProvider { get; private set; }
+
+        public Services.IServiceDescriptor ParentDescriptor { get; set; }
     }
 }

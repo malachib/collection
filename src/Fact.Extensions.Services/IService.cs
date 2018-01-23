@@ -18,9 +18,9 @@ namespace Fact.Extensions.Services
 
     public interface IServiceExperimental : IService
     {
-        Task Startup(Experimental.AsyncContext context);
+        Task Startup(Experimental.ServiceContext context);
 
-        Task Shutdown(Experimental.AsyncContext context);
+        Task Shutdown(Experimental.ServiceContext context);
     }
 
 
@@ -50,6 +50,13 @@ namespace Fact.Extensions.Services
         /// it to shutdown
         /// </summary>
         //ICollection<IServiceDescriptor> Dependers { get; }
+    }
+
+
+    public interface IServiceDescriptor<TService> : IServiceDescriptor
+        where TService : IService
+    {
+        new TService Service { get; }
     }
 
 }
