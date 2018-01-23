@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Collections;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Fact.Extensions.Services
 {
@@ -36,9 +37,11 @@ namespace Fact.Extensions.Services
     internal class ServiceDescriptorBase : LifecycleDescriptorBase, IServiceDescriptor
     {
         readonly IService service;
+        readonly ILogger logger;
 
-        internal ServiceDescriptorBase(IService service)
+        internal ServiceDescriptorBase(IServiceProvider sp, IService service)
         {
+            this.logger = sp.GetService<ILogger>();
             this.service = service;
 
             // NOTE: perhaps not best location for this, but we can capture idea here at least
@@ -95,15 +98,18 @@ namespace Fact.Extensions.Services
         IService,
         IServiceDescriptor
     {
-        public ServiceManager(string name, IService self = null) : base(name)
+        readonly ILogger logger;
+
+        public ServiceManager(IServiceProvider sp, string name, IService self = null) : base(name)
         {
+            logger = sp.GetService<ILogger<ServiceManager>>();
             ChildAdded += (o, c) => c.LifecycleStatusUpdated += Child_LifecycleStatusUpdated;
             ChildRemoved += (o, c) => c.LifecycleStatusUpdated -= Child_LifecycleStatusUpdated;
             lifecycle.Changing += (old, @new) => LifecycleStatusUpdating?.Invoke(this, @new);
             lifecycle.Changed += v => LifecycleStatusUpdated?.Invoke(this);
             if(self != null)
             {
-                this.self = new ServiceDescriptorBase(self);
+                this.self = new ServiceDescriptorBase(sp, self);
             }
         }
 
@@ -159,6 +165,7 @@ namespace Fact.Extensions.Services
             }
             catch (Exception e)
             {
+                logger.LogError(0, e, $"Shutdown: Unable to proceed");
                 // If an exception is thrown while shutting down children, an improper shutdown
                 // has occurred and this is an error state
                 // FIX: Don't want to abort shutdown of other children though, so rework code to
@@ -249,9 +256,9 @@ namespace Fact.Extensions.Services
 
     public static class ServiceManagerExtensions
     {
-        public static IServiceDescriptor AddService(this ServiceManager serviceManager, IService service)
+        public static IServiceDescriptor AddService(this ServiceManager serviceManager, IService service, IServiceProvider sp)
         {
-            var sd = new ServiceDescriptorBase(service);
+            var sd = new ServiceDescriptorBase(sp, service);
 
             serviceManager.AddChild(sd);
 

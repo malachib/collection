@@ -5,10 +5,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.DependencyInjection;
+
+using Fact.Extensions.Experimental;
+
 namespace Fact.Extensions.Services
 {
     public abstract class WorkerServiceBase : IService
     {
+        readonly ILogger logger;
         string name;
 
         public string Name => name;
@@ -19,15 +24,21 @@ namespace Fact.Extensions.Services
         protected Task configure;
 
 
+        WorkerServiceBase(IServiceProvider sp, string name)
+        {
+            logger = sp.GetService<ILogger<WorkerServiceBase>>();
+            this.name = name;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
         /// <param name="oneShot">FIX: Not active yet</param>
-        protected WorkerServiceBase(ILogger logger, string name, CancellationToken ct, bool oneShot = false)
+        protected WorkerServiceBase(IServiceProvider sp, string name, CancellationToken ct, bool oneShot = false)
+            : this(sp, name)
         {
             this.ct = ct;
-            this.name = name;
             this.oneShot = oneShot;
             localCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         }
@@ -37,9 +48,8 @@ namespace Fact.Extensions.Services
         /// </summary>
         /// <param name="name"></param>
         /// <param name="oneShot">FIX: Not active yet</param>
-        protected WorkerServiceBase(ILogger logger, string name, bool oneShot = false)
+        protected WorkerServiceBase(IServiceProvider sp, string name, bool oneShot = false) : this(sp, name)
         {
-            this.name = name;
             this.oneShot = oneShot;
             localCts = new CancellationTokenSource();
         }
@@ -95,13 +105,14 @@ namespace Fact.Extensions.Services
             // TODO: Do threadsafe stuff
             if (IsWorkerCreated)
             {
-                if (worker.Status == TaskStatus.Created || worker.Status == TaskStatus.Running)
-                {
-                    localCts.Cancel();
-                    await worker;
-                }
-                // TODO: log why we couldn't do a regular shutdown
+                if (worker.Status != TaskStatus.Created || worker.Status != TaskStatus.Running)
+                    logger.LogWarning($"Shutdown: No worker was running ({Name}).  Cancel initiated anyway.  Status = {worker.Status}");
+
+                localCts.Cancel();
+                await worker;
             }
+            else
+                logger.LogWarning($"Shutdown: No worker was created before shutdown was called ({Name})");
         }
 
         // FIX: would use "completedTask" but it doesn't seem to be available for netstandard1.1?
@@ -113,7 +124,7 @@ namespace Fact.Extensions.Services
             }
 
             // we specifically *do not* await here, we are starting up a worker thread
-            RunWorker();
+            RunWorker().ContinueWithErrorLogger(serviceProvider, Name);
         }
     }
 }

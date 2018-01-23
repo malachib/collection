@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading;
@@ -24,7 +25,7 @@ namespace Fact.Extensions.Services.Tests
             public event Action Online;
             public event Action Generic;
 
-            internal DummyService() : base(null, "dummy service", new CancellationTokenSource().Token, true) { }
+            internal DummyService(IServiceProvider sp) : base(sp, "dummy service", new CancellationTokenSource().Token, true) { }
 
             protected override async Task Worker(CancellationToken ct)
             {
@@ -55,14 +56,17 @@ namespace Fact.Extensions.Services.Tests
         public void BasicServiceManagerTest()
         {
             var sc = new ServiceCollection();
+            sc.AddLogging();
             var sp = sc.BuildServiceProvider();
-            var sm = new ServiceManager("parent");
-            var childSm = new ServiceManager("child");
-            var child2Sm = new DummyService();
+            var lf = sp.GetService<ILoggerFactory>();
+            lf.AddConsole(LogLevel.Trace);
+            var sm = new ServiceManager(sp, "parent");
+            var childSm = new ServiceManager(sp, "child");
+            var child2Sm = new DummyService(sp);
             var sem = new SemaphoreSlim(0, 1);
 
             sm.AddChild(childSm);
-            var dummyServiceDescriptor = sm.AddService(child2Sm);
+            var dummyServiceDescriptor = sm.AddService(child2Sm, sp);
 
             dummyServiceDescriptor.LifecycleStatusUpdated += o =>
             {
