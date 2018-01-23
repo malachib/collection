@@ -11,7 +11,9 @@ using Fact.Extensions.Experimental;
 
 namespace Fact.Extensions.Services
 {
-    public abstract class WorkerServiceBase : IService
+    public abstract class WorkerServiceBase : 
+        IService,
+        IServiceExperimental
     {
         readonly ILogger logger;
         string name;
@@ -54,9 +56,8 @@ namespace Fact.Extensions.Services
             localCts = new CancellationTokenSource();
         }
 
-        // FIX: making protected to handle IOnlineEvents class services, but
-        // I think we can do better
-        protected Task worker;
+        Task worker;
+
         protected readonly CancellationTokenSource localCts;
         readonly CancellationToken ct;
 
@@ -133,6 +134,16 @@ namespace Fact.Extensions.Services
 
             // we specifically *do not* await here, we are starting up a worker thread
             RunWorker().ContinueWithErrorLogger(serviceProvider, Name);
+        }
+
+        public virtual Task Startup(ServiceContext context)
+        {
+            return Startup(context.ServiceProvider);
+        }
+
+        public virtual Task Shutdown(ServiceContext context)
+        {
+            return Shutdown();
         }
     }
 }
