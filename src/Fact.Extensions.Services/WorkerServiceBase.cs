@@ -87,12 +87,16 @@ namespace Fact.Extensions.Services
 
         protected async Task RunWorker()
         {
+            logger.LogTrace($"Worker starting ({Name})");
+
             do
             {
                 worker = Worker(localCts.Token);
                 await worker;
             }
             while (!oneShot && !localCts.IsCancellationRequested);
+
+            logger.LogTrace($"Worker has finished: ({Name}) - {worker.Status}");
         }
 
         /// <summary>
@@ -105,7 +109,11 @@ namespace Fact.Extensions.Services
             // TODO: Do threadsafe stuff
             if (IsWorkerCreated)
             {
-                if (worker.Status != TaskStatus.Created || worker.Status != TaskStatus.Running)
+                // because of https://stackoverflow.com/questions/20830998/async-always-waitingforactivation
+                // these async/await tasks don't get normal statuses
+                if (worker.Status != TaskStatus.Created && 
+                    worker.Status != TaskStatus.Running &&
+                    worker.Status != TaskStatus.WaitingForActivation)
                     logger.LogWarning($"Shutdown: No worker was running ({Name}).  Cancel initiated anyway.  Status = {worker.Status}");
 
                 localCts.Cancel();

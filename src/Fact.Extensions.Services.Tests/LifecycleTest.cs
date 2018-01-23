@@ -62,11 +62,11 @@ namespace Fact.Extensions.Services.Tests
             lf.AddConsole(LogLevel.Trace);
             var sm = new ServiceManager(sp, "parent");
             var childSm = new ServiceManager(sp, "child");
-            var child2Sm = new DummyService(sp);
-            var sem = new SemaphoreSlim(0, 1);
+            var dummyService = new DummyService(sp);
+            var dummySem = new SemaphoreSlim(0, 1);
 
             sm.AddChild(childSm);
-            var dummyServiceDescriptor = sm.AddService(child2Sm, sp);
+            var dummyServiceDescriptor = sm.AddService(dummyService, sp);
 
             dummyServiceDescriptor.LifecycleStatusUpdated += o =>
             {
@@ -78,7 +78,7 @@ namespace Fact.Extensions.Services.Tests
                 Console.WriteLine($"{DateTime.Now.Millisecond}: parent: {sm.LifecycleStatus}");
             };
 
-            child2Sm.Generic += () => sem.Release();
+            dummyService.Generic += () => dummySem.Release();
 
             Assert.AreEqual(LifecycleEnum.Unstarted, sm.LifecycleStatus);
 
@@ -94,8 +94,10 @@ namespace Fact.Extensions.Services.Tests
 
                 childSm.LifecycleStatus = LifecycleEnum.Running;
 
-                await sem.WaitAsync(10000);
+                await dummySem.WaitAsync(10000);
 
+                // FIX: Something is wrong, dummy service is claiming worker
+                // is awaiting activation when we reach here
                 await sm.Shutdown();
 
             }).Wait();
