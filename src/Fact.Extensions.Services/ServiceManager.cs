@@ -127,7 +127,7 @@ namespace Fact.Extensions.Services
                     LifecycleStatus = LifecycleEnum.Running;
                 }
                 else
-                    await Startup(context.ServiceProvider);
+                    await service.Startup(context.ServiceProvider);
             }
             catch(Exception e)
             {
