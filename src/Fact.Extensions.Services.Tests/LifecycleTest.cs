@@ -111,7 +111,7 @@ namespace Fact.Extensions.Services.Tests
 
                 // FIX: Something is wrong, dummy service is claiming worker
                 // is awaiting activation when we reach here
-                await sm.Shutdown();
+                await sm.Shutdown(context);
 
             }).Wait();
 

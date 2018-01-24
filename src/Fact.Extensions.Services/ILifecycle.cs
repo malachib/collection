@@ -71,8 +71,8 @@ namespace Fact.Extensions.Services
 
     public interface ILifecycle<TContext>
     {
-        Task Startup(TContext serviceProvider);
-        Task Shutdown();
+        Task Startup(TContext context);
+        Task Shutdown(TContext context);
     }
 
 

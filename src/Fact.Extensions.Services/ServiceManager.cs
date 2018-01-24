@@ -91,14 +91,14 @@ namespace Fact.Extensions.Services
 
         public string Name => service.Name;
 
-        public virtual async Task Shutdown()
+        public virtual async Task Shutdown(ServiceContext context)
         {
             logger.LogTrace($"Shutdown: {Name}");
 
             try
             {
                 LifecycleStatus = LifecycleEnum.Stopping;
-                await service.Shutdown();
+                await service.Shutdown(context);
                 LifecycleStatus = LifecycleEnum.Stopped;
             }
             catch(Exception e)
@@ -107,12 +107,6 @@ namespace Fact.Extensions.Services
                 Exception = e;
                 logger.LogError(0, e, $"Shutdown failed: {Name}");
             }
-        }
-
-        public async Task Shutdown(ServiceContext context)
-        {
-            // TODO: Implement this
-            await Shutdown();
         }
 
         public virtual async Task Startup(IServiceProvider serviceProvider)
@@ -221,17 +215,17 @@ namespace Fact.Extensions.Services
 
         async Task Noop() { }
 
-        public async Task Shutdown()
+        public async Task Shutdown(ServiceContext context)
         {
             lifecycle.Value = LifecycleEnum.Stopping;
 
             // start self awaiter first, but it can finish anytime
             // FIX: Will need provision to "unlock" dependent-on resources,
             // or otherwise (hope we can void this) have a two-phase shutdown
-            Task selfAwaiter = self != null ? self.Shutdown() : Noop();
+            Task selfAwaiter = self != null ? self.Shutdown(context) : Noop();
 
             // TODO: Add provision for sequential startup/shutdown also
-            var childrenShutdownTasks = Children.Select(x => x.Shutdown()).Append(selfAwaiter);
+            var childrenShutdownTasks = Children.Select(x => x.Shutdown(context)).Append(selfAwaiter);
 
             try
             {
@@ -369,12 +363,6 @@ namespace Fact.Extensions.Services
 
             lifecycle.Value = LifecycleEnum.Started;
             lifecycle.Value = AscertainCompositeState();
-        }
-
-        public async Task Shutdown(ServiceContext context)
-        {
-            // TODO: Implement this
-            await Shutdown();
         }
     }
 
