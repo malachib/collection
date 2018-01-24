@@ -4,7 +4,7 @@
 # We must depend on setenv_windows or setenv_unix to set this
 #export NUGET='dotnet nuget'
 
-version_path=..
+version_path=$FACT_EXTENSIONS_COLLECTION_VERSIONPATH
 branch_name=$(${MB_USEFUL_SCRIPTS}/scm/get-branch-name.sh)
 
 branch_version=$(<$version_path/.version.$branch_name)
