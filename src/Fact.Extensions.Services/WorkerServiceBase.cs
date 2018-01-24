@@ -13,7 +13,8 @@ namespace Fact.Extensions.Services
 {
     public abstract class WorkerServiceBase : 
         IService,
-        IServiceExtended
+        IServiceExtended,
+        IExceptionProvider
     {
         readonly ILogger logger;
 
@@ -66,6 +67,8 @@ namespace Fact.Extensions.Services
 
         protected readonly CancellationTokenSource localCts;
         readonly CancellationToken ct;
+
+        public event Action<Exception> ExceptionOccurred;
 
         // TODO: Decide if we want to keep passing IServiceProvider in, thinking probably
         // yes but let's see how it goes
@@ -134,6 +137,24 @@ namespace Fact.Extensions.Services
                 logger.LogTrace($"Worker has finished: ({Name}) - {worker.Status}");
         }
 
+
+        void RunWorkerHelper(ServiceContext context)
+        {
+            // we specifically *do not* await here, we are starting up a worker thread
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await RunWorker(context);
+                }
+                catch (Exception ex)
+                {
+                    ExceptionOccurred?.Invoke(ex);
+                    logger.LogWarning(0, ex, $"Worker: ({Name}) has error");
+                }
+            });
+        }
+
         /// <summary>
         /// Ascertain whether a worker has even been created
         /// </summary>
@@ -144,6 +165,12 @@ namespace Fact.Extensions.Services
             // TODO: Do threadsafe stuff
             if (IsWorkerCreated)
             {
+                if (worker.Status == TaskStatus.Faulted)
+                {
+                    logger.LogWarning($"Shutdown: Worker was faulted.  Error should appear earlier in logs.  Message = {worker.Exception.InnerException.Message}");
+                    return;
+                }
+
                 // because of https://stackoverflow.com/questions/20830998/async-always-waitingforactivation
                 // these async/await tasks don't get normal statuses
                 if (worker.Status != TaskStatus.Created && 
@@ -177,8 +204,7 @@ namespace Fact.Extensions.Services
 
             context.Progress?.Report(50);
 
-            // we specifically *do not* await here, we are starting up a worker thread
-            RunWorker(context).ContinueWithErrorLogger(logger, Name);
+            RunWorkerHelper(context);
 
             // TODO: have mini-awaiter which only waits for runworker to start
             context.Progress?.Report(100);

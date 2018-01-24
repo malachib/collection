@@ -76,6 +76,15 @@ namespace Fact.Extensions.Services
                 };
                 se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
             }
+
+            if (service is IExceptionProvider ep)
+            {
+                ep.ExceptionOccurred += e =>
+                {
+                    LifecycleStatus = LifecycleEnum.Error;
+                    Exception = e;
+                };
+            }
         }
 
         public IService Service => service;

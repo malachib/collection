@@ -145,5 +145,40 @@ namespace Fact.Extensions.Services.Tests
                 await sm.Shutdown(context);
             }).Wait(3000);
         }
+
+
+        public class DummyService2 : WorkerServiceBase
+        {
+            public override string Name => "Dummy Service 2";
+
+            public DummyService2(ServiceContext context) : base(context) { }
+
+            protected override async Task Worker(ServiceContext context)
+            {
+                await Task.Delay(250);
+                throw new NotImplementedException();
+            }
+        }
+
+        [TestMethod]
+        public void CancelledServiceTest()
+        {
+            var cts = new CancellationTokenSource();
+
+            Task.Run(async () =>
+            {
+                var p = Setup();
+                ServiceContext context = new ServiceContext(p);
+                DummyService2 service = new DummyService2(context);
+                var descriptor = new ServiceDescriptorBase(p, service);
+                context = new ServiceContext(context, descriptor);
+                context.CancellationToken = cts.Token;
+                await descriptor.Startup(context);
+                //await descriptor.WaitFor(x => x == LifecycleEnum.Running, cts.Token);
+                await Task.Delay(500);
+                Assert.AreEqual(LifecycleEnum.Error, descriptor.LifecycleStatus);
+                await descriptor.Shutdown(context);
+            }).Wait(2000);
+        }
     }
 }

@@ -30,6 +30,15 @@ namespace Fact.Extensions.Services
 
 
     /// <summary>
+    /// TODO: Integrate this into IServiceExtended
+    /// </summary>
+    public interface IExceptionProvider
+    {
+        event Action<Exception> ExceptionOccurred;
+    }
+
+
+    /// <summary>
     /// More or less a lifecycle descriptor with a service providing interface
     /// </summary>
     public interface IServiceDescriptorBase : ILifecycleDescriptor
@@ -45,7 +54,9 @@ namespace Fact.Extensions.Services
     /// Furthermore, we implement IService interface itself as a light facade around our service
     /// mainly to assist in the aforementioned, tracking service state
     /// </summary>
-    public interface IServiceDescriptor : IServiceDescriptorBase, IServiceExtended
+    public interface IServiceDescriptor : 
+        IServiceDescriptorBase, 
+        IServiceExtended
     {
         Exception Exception { get; }
 
