@@ -5,8 +5,6 @@
 . ../ext/myget/setenv_nuget.sh
 . ../ext/useful-scripts/setenv.sh
 
-branch_name=$(${MB_USEFUL_SCRIPTS}/scm/get-branch-name.sh)
-
 # Utilize .NET Core nuget, which is v4 as of this writing
 # We must depend on setenv_windows or setenv_unix to set this
 #export NUGET='dotnet nuget'

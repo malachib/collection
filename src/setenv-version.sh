@@ -1,20 +1,30 @@
+#!/bin/bash
+
 # Utilize .NET Core nuget, which is v4 as of this writing
 # We must depend on setenv_windows or setenv_unix to set this
 #export NUGET='dotnet nuget'
 
-branch_version=$(<../.version.$branch_name)
+version_path=..
+branch_name=$(${MB_USEFUL_SCRIPTS}/scm/get-branch-name.sh)
 
-project_version=$(<../.project-version)
+branch_version=$(<$version_path/.version.$branch_name)
+
+project_version=$(<$version_path/.version/prefix.$branch_name)
 
 if [ -z "$branch_version" ]
 then
-	branch_version=$(<../.version/$branch_name)
+	branch_version=$(<$version_path/.version/$branch_name)
 
 	if [ -z "$branch_version" ]
 	then
 		echo "No version available for this branch.  Do not upload NUGET packages"
 		branch_version="0"
 	fi
+fi
+
+if [ -z $project_version ]
+then
+	project_version=$(<$version_path/.project-version)
 fi
 
 if [ -z $project_version ]
