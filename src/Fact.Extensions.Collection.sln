@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection", "Fact.Extensions.Collection\Fact.Extensions.Collection.csproj", "{8EBB3E70-9F01-46A6-AC53-285CAF1F1BE1}"
 EndProject
@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{00900FD9-475E-47E0-B728-AC3F3A474456}"
 	ProjectSection(SolutionItems) = preProject
 		bump.sh = bump.sh
+		setenv-version.sh = setenv-version.sh
 		setenv.sh = setenv.sh
 		setenv_windows.sh = setenv_windows.sh
 		upload_all.sh = upload_all.sh
@@ -53,9 +54,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Experimenta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Experimental.Tests", "Fact.Extensions.Experimental.Tests\Fact.Extensions.Experimental.Tests.csproj", "{FDA024A6-8C68-4DD3-BD76-5DF673AC1A7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Services", "Fact.Extensions.Services\Fact.Extensions.Services.csproj", "{16F4A79E-5E8B-44AD-8492-FADE60C11671}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Services", "Fact.Extensions.Services\Fact.Extensions.Services.csproj", "{16F4A79E-5E8B-44AD-8492-FADE60C11671}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Services.Tests", "Fact.Extensions.Services.Tests\Fact.Extensions.Services.Tests.csproj", "{7C1F207E-CA68-4D12-BB0C-1AF6AF146669}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Services.Tests", "Fact.Extensions.Services.Tests\Fact.Extensions.Services.Tests.csproj", "{7C1F207E-CA68-4D12-BB0C-1AF6AF146669}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
