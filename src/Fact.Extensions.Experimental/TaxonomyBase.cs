@@ -10,44 +10,18 @@ namespace Fact.Extensions.Experimental
     /// </summary>
     public class TaxonomyBase
     {
-        public class NodeBase<TNode> :
-            INamed,
-            INamedChildCollection<TNode>
+        [Obsolete("Use NamedChildCollection now")]
+        public class NodeBase<TNode> : NamedChildCollection<TNode>
             where TNode : INamed
         {
-            SparseDictionary<string, TNode> children;
-            readonly string name;
-
-            public string Name => name;
-
-            public IEnumerable<TNode> Children => children.Values;
-
-            public event Action<object, TNode> ChildAdded;
-
-            public NodeBase(string name)
-            {
-                this.name = name;
-            }
-
-            /// <summary>
-            /// TODO: Very likely would prefer a null back if no child, not an exception
-            /// </summary>
-            /// <param name="name"></param>
-            /// <returns></returns>
-            public TNode GetChild(string name)
-            {
-                children.TryGetValue(name, out TNode value);
-                return value;
-            }
-
-            public void AddChild(TNode node)
-            {
-                children.Add(node.Name, node);
-                ChildAdded?.Invoke(this, node);
-            }
+            public NodeBase(string name) : base(name) { }
         }
     }
 
+    /// <summary>
+    /// Base wrapper/accessor for nodes, which are expected to be INamedChildProvider
+    /// </summary>
+    /// <typeparam name="TNode"></typeparam>
     public abstract class TaxonomyBase<TNode> : TaxonomyBase, ITaxonomy<TNode>
         where TNode :
             INamedChildProvider<TNode>,

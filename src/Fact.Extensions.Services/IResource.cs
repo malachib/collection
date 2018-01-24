@@ -6,74 +6,8 @@ using System.Threading.Tasks;
 using Fact.Extensions.Collection;
 using System.Collections.Generic;
 
-namespace Fact.Extensions.Experimental
+namespace Fact.Extensions.Services
 {
-    /// <summary>
-    /// Represents what stage of the life cycle has been reached
-    /// </summary>
-    public enum LifecycleEnum
-    {
-        Unstarted,
-        Starting,
-        // only blips, then moves to running
-        Started,
-        Stopping,
-        Stopped,
-        Sleeping,
-        Slept,
-        Waking,
-        // only blips, then moves to running
-        Awake,
-        Running,
-        Pausing,
-        Paused,
-        Resuming,
-        // only blips, then moves to running
-        Resumed
-    }
-
-    public interface ILifecycle
-    {
-        Task Startup(IServiceProvider serviceProvider);
-        Task Shutdown();
-    }
-
-
-    /// <summary>
-    /// Pausible means the service can halt its processes immediately,
-    /// but does not take any action to clear memory.  Merely a way to
-    /// quickly halt and resume processing
-    /// </summary>
-    public interface IPausibleLifecycle
-    {
-        Task Pause();
-        Task Resume();
-    }
-
-    /// <summary>
-    /// Sleepable means the service is capable of performing tasks necessary
-    /// to prepare and recover from a system sleep mode.  Note that this
-    /// implies all processes and data are still memory resident
-    /// </summary>
-    public interface ISleepableLifecycle
-    {
-        Task Sleep();
-        Task Awaken();
-    }
-
-
-    /// <summary>
-    /// This is inbetween a sleep and a shutdown.  Freeze persists all relevant
-    /// data to a storage area (perhaps mate this to our ISerializable code)
-    /// and then frees up as much memory as it can and halts the procsess
-    /// </summary>
-    public interface IHibernatableLifecycle
-    {
-        Task Freeze();
-        Task Unfreeze();
-    }
-
-
     /// <summary>
     /// Describes any kind of lockable behavior such as virtual memory locking,
     /// DB table locking, etc
@@ -92,25 +26,6 @@ namespace Fact.Extensions.Experimental
         void Unlock(object key = null);
     }
 
-
-    public interface ILifecycleDescriptor
-    {
-        LifecycleEnum LifecycleStatus { get; }
-
-        event Action LifecycleStatusUpdated;
-    }
-
-
-    public interface IService :
-        ILifecycle,
-        INamed
-    { }
-
-
-    public interface IServiceDescriptor : ILifecycleDescriptor
-    {
-        IService Service { get; }
-    }
 
     public interface IResourceProvider<TResource> : 
         IService,
@@ -155,6 +70,7 @@ namespace Fact.Extensions.Experimental
     }
 
 
+#if UNUSED
     public abstract class Subsystem<TResource> : ISubsystem<TResource>
     {
         readonly string name;
@@ -192,7 +108,7 @@ namespace Fact.Extensions.Experimental
                 await child;
         }
     }
-
+#endif
 
     public class LifecycleManager
     {
@@ -208,7 +124,7 @@ namespace Fact.Extensions.Experimental
         public event Action<IService, IService> Starting;
         public event Action<IService, IService> Started;
 
-        internal class Descriptor : IServiceDescriptor
+        internal class Descriptor : IServiceDescriptorBase
         {
             LifecycleEnum status;
             readonly IService service;
@@ -226,11 +142,11 @@ namespace Fact.Extensions.Experimental
                 internal set
                 {
                     status = value;
-                    LifecycleStatusUpdated?.Invoke();
+                    LifecycleStatusUpdated?.Invoke(this);
                 }
             }
 
-            public event Action LifecycleStatusUpdated;
+            public event Action<object> LifecycleStatusUpdated;
         }
 
         public async void Start<TResource>(ISubsystem<TResource> subsystem)
@@ -249,7 +165,8 @@ namespace Fact.Extensions.Experimental
             Starting?.Invoke(null, subsystem);
             subsystem.Starting += startingResponder;
             subsystem.Started += startedResponder;
-            await subsystem.Startup(serviceProvider);
+            var context = new ServiceContext(serviceProvider);
+            await subsystem.Startup(context);
             subsystem.Starting -= startingResponder;
             subsystem.Started -= startedResponder;
             Started?.Invoke(null, subsystem);

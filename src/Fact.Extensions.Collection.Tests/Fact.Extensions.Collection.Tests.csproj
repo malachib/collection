@@ -15,7 +15,6 @@
     <ProjectReference Include="..\Fact.Extensions.Caching\Fact.Extensions.Caching.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Collection.Interceptor\Fact.Extensions.Collection.Interceptor.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Collection\Fact.Extensions.Collection.csproj" />
-    <ProjectReference Include="..\Fact.Extensions.Experimental\Fact.Extensions.Experimental.csproj" />
   </ItemGroup>
 
   <ItemGroup>

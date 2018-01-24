@@ -24,6 +24,7 @@ namespace Fact.Extensions.Caching
     /// Use this to further attempt to hide the fact that one is caching a value
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    /// <remarks>Bears a spiritual similarity to State [of T] class</remarks>
     public struct CachedReference<T> : ICachedReference<T>
     {
         readonly Func<T> factory;
@@ -53,7 +54,6 @@ namespace Fact.Extensions.Caching
                 if (!cache.TryGet<T>(key, out cachedValue))
                 {
                     cachedValue = factory();
-                    // TODO: Make an AsArray and use it
                     cache.Set(key, cachedValue, typeof(T), Options);
                 }
                 return cachedValue;
@@ -62,7 +62,6 @@ namespace Fact.Extensions.Caching
             {
                 // One can explicitly set the cache value if one desires, bypassing the factory method.
                 // this can be useful for seed values
-                // TODO: Make an AsArray and use it
                 cache.Set(key, value, typeof(T), getOptions().AsArray());
             }
         }
