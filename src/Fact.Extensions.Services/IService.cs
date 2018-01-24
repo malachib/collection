@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Fact.Extensions.Services
 {
     public interface IService :
-        ILifecycle,
+        ILifecycle<ServiceContext>,
         INamed
     {
     }
@@ -23,9 +23,6 @@ namespace Fact.Extensions.Services
     /// </summary>
     public interface IServiceExtended : IService
     {
-        Task Startup(ServiceContext context);
-
-        Task Shutdown(ServiceContext context);
     }
 
 
@@ -34,6 +31,10 @@ namespace Fact.Extensions.Services
     /// </summary>
     public interface IExceptionProvider
     {
+        /// <summary>
+        /// Fire this when exceptions occur *outside* of the lifecycle event calls
+        /// (i.e. durring running, sleeping, etc)
+        /// </summary>
         event Action<Exception> ExceptionOccurred;
     }
 
@@ -56,7 +57,7 @@ namespace Fact.Extensions.Services
     /// </summary>
     public interface IServiceDescriptor : 
         IServiceDescriptorBase, 
-        IServiceExtended
+        IService
     {
         Exception Exception { get; }
 

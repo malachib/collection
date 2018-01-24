@@ -70,6 +70,7 @@ namespace Fact.Extensions.Services
     }
 
 
+#if UNUSED
     public abstract class Subsystem<TResource> : ISubsystem<TResource>
     {
         readonly string name;
@@ -107,7 +108,7 @@ namespace Fact.Extensions.Services
                 await child;
         }
     }
-
+#endif
 
     public class LifecycleManager
     {
@@ -164,7 +165,8 @@ namespace Fact.Extensions.Services
             Starting?.Invoke(null, subsystem);
             subsystem.Starting += startingResponder;
             subsystem.Started += startedResponder;
-            await subsystem.Startup(serviceProvider);
+            var context = new ServiceContext(serviceProvider);
+            await subsystem.Startup(context);
             subsystem.Starting -= startingResponder;
             subsystem.Started -= startedResponder;
             Started?.Invoke(null, subsystem);

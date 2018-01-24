@@ -96,7 +96,8 @@ namespace Fact.Extensions.Services.Tests
 
             Task.Run(async () =>
             {
-                await sm.Startup(sp);
+                var context = new ServiceContext(sp);
+                await sm.Startup(context);
 
                 Assert.AreEqual(LifecycleEnum.Running, sm.LifecycleStatus);
 

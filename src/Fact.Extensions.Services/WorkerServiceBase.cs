@@ -13,7 +13,6 @@ namespace Fact.Extensions.Services
 {
     public abstract class WorkerServiceBase : 
         IService,
-        IServiceExtended,
         IExceptionProvider
     {
         readonly ILogger logger;
@@ -23,7 +22,7 @@ namespace Fact.Extensions.Services
 
         // this is for asynchronous pre-startup initialization, manually assigned from
         // a constructor
-        protected Task configure;
+        Task configure;
 
         /// <summary>
         /// Override this if pre-startup/semi-long-running config needs to happen
@@ -50,6 +49,9 @@ namespace Fact.Extensions.Services
             this.ct = context.CancellationToken;
             this.oneShot = oneShot;
             localCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            // TODO: Wrap up configure with proper error event firing mechanism instead
+            // (using IExceptionProvider)
+            configure = Configure(context).ContinueWithErrorLogger(logger);
         }
 
         /// <summary>

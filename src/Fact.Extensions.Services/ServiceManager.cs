@@ -128,15 +128,10 @@ namespace Fact.Extensions.Services
 
             try
             {
-                if (service is IServiceExtended se)
-                {
-                    LifecycleStatus = LifecycleEnum.Starting;
-                    await se.Startup(context);
-                    LifecycleStatus = LifecycleEnum.Started;
-                    LifecycleStatus = LifecycleEnum.Running;
-                }
-                else
-                    await service.Startup(context.ServiceProvider);
+                LifecycleStatus = LifecycleEnum.Starting;
+                await service.Startup(context);
+                LifecycleStatus = LifecycleEnum.Started;
+                LifecycleStatus = LifecycleEnum.Running;
             }
             catch(Exception e)
             {
@@ -254,21 +249,6 @@ namespace Fact.Extensions.Services
             }
         }
 
-        public async Task Startup(IServiceProvider serviceProvider)
-        {
-            lifecycle.Value = LifecycleEnum.Starting;
-
-            Task selfAwaiter = self != null ? self.Startup(serviceProvider) : Noop();
-
-            var childrenStartingTasks = Children.
-                Select(x => x.Startup(serviceProvider)).Prepend(selfAwaiter);
-
-            await Task.WhenAll(childrenStartingTasks);
-            lifecycle.Value = LifecycleEnum.Started;
-            lifecycle.Value = AscertainCompositeState();
-        }
-
-
         /// <summary>
         /// Evaluate all children and return a state which attempts to summarize
         /// their statuses
@@ -375,13 +355,8 @@ namespace Fact.Extensions.Services
             var childrenStartingTasks = children.
                 Select(x =>
                 {
-                    if (x is IServiceExtended se)
-                    {
-                        var childContext = new ServiceContext(context, x);
-                        return se.Startup(childContext);
-                    }
-                    else
-                        return x.Startup(context.ServiceProvider);
+                    var childContext = new ServiceContext(context, x);
+                    return x.Startup(childContext);
                 });
 
             await Task.WhenAll(childrenStartingTasks);

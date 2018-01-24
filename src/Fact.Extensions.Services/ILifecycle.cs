@@ -69,9 +69,9 @@ namespace Fact.Extensions.Services
         Error
     }
 
-    public interface ILifecycle
+    public interface ILifecycle<TContext>
     {
-        Task Startup(IServiceProvider serviceProvider);
+        Task Startup(TContext serviceProvider);
         Task Shutdown();
     }
 
