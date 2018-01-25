@@ -58,6 +58,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Services", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Services.Tests", "Fact.Extensions.Services.Tests\Fact.Extensions.Services.Tests.csproj", "{7C1F207E-CA68-4D12-BB0C-1AF6AF146669}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "useful-scripts", "useful-scripts", "{76284774-D227-44D5-97AA-7D81DC228900}"
+	ProjectSection(SolutionItems) = preProject
+		..\ext\useful-scripts\scm\setenv-version.sh = ..\ext\useful-scripts\scm\setenv-version.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +148,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{76284774-D227-44D5-97AA-7D81DC228900} = {00900FD9-475E-47E0-B728-AC3F3A474456}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {40017D9B-CA0E-45B2-BB72-867DC60A2417}
