@@ -2,7 +2,7 @@
 
 # TODO: move this out into "useful-scripts" project
 
-. ../ext/myget/setenv_nuget.sh
+. ../ext/myget/setenv-nuget-beta.sh
 . ../ext/useful-scripts/setenv.sh
 
 # Utilize .NET Core nuget, which is v4 as of this writing
