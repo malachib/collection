@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersionGetter">
+﻿<Project Sdk="Microsoft.NET.Sdk" InitialTargets="GitInfo;VersionGetter">
 
   <PropertyGroup>
     <Description>Factory pattern helpers</Description>

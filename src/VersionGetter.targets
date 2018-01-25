@@ -1,10 +1,7 @@
 <!-- Flawed but useful autoversioner.  Going to be x.x.x.y where y is branched build #.  branch itself must be derived
      discretely, potentially throwing off redirect-style version greater-than-version comparisons -->
 <Project InitialTargets="VersionGetter">
-  <ItemGroup>
-    <PackageReference Include="GitInfo" Version="2.0.8" />
-  </ItemGroup>
-  <Target Name="VersionGetter" DependsOnTargets="GitInfo">
+  <Target Name="VersionGetter">
     <PropertyGroup>
       <FEBranch>$(GitBranch)</FEBranch>
     </PropertyGroup>
@@ -21,6 +18,7 @@
       <ProductName>$(AssemblyName) - $(FEBranch)</ProductName>
       <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-$(FEBranch)+$(BuildVersion)</AssemblyTitle>
     </PropertyGroup>
+    <Message Text="TEST: $(GitBaseVersion)/$(GitSemVerPatch)" Importance="high" />
     <Message Text="Got version: $(ProjectVersion)-$(FEBranch)$(BuildVersion) / FileVersion = $(FETestVersion)" Importance="low">
     </Message>
   </Target>
