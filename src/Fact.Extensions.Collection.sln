@@ -61,6 +61,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "useful-scripts", "useful-scripts", "{76284774-D227-44D5-97AA-7D81DC228900}"
 	ProjectSection(SolutionItems) = preProject
 		..\ext\useful-scripts\scm\setenv-version.sh = ..\ext\useful-scripts\scm\setenv-version.sh
+		..\ext\useful-scripts\nuget\upload_project_v4_4 = ..\ext\useful-scripts\nuget\upload_project_v4_4
 	EndProjectSection
 EndProject
 Global

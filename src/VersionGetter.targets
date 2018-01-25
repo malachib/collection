@@ -8,7 +8,7 @@
     <ReadLinesFromFile File="..\..\.version\$(FEBranch)">
       <Output TaskParameter="Lines" PropertyName="BuildVersion" />
     </ReadLinesFromFile>
-    <ReadLinesFromFile File="..\..\.project-version">
+    <ReadLinesFromFile File="..\..\.version\prefix.$(FEBranch)">
       <Output TaskParameter="Lines" PropertyName="ProjectVersion" />
     </ReadLinesFromFile>
     <PropertyGroup>
@@ -16,7 +16,7 @@
 	  <FileVersion>$(FETestVersion)</FileVersion>
 	  <ProductVersion>$(FETestVersion)</ProductVersion>
       <ProductName>$(AssemblyName) - $(FEBranch)</ProductName>
-      <AssemblyTitle>$(AssemblyName) - $(FEBranch)</AssemblyTitle>
+      <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-$(FEBranch)+$(BuildVersion)</AssemblyTitle>
     </PropertyGroup>
     <Message Text="Got version: $(ProjectVersion)-$(FEBranch)$(BuildVersion) / FileVersion = $(FETestVersion)" Importance="low">
     </Message>
