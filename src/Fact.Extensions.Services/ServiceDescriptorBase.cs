@@ -12,6 +12,9 @@ namespace Fact.Extensions.Services
     /// Wrapper class which wraps up a provided service and combines it with a ILifecycleDescriptor
     /// helper - so that the underlying service itself is alleviated from managing that plubming
     /// </summary>
+    /// <remarks>
+    /// I see a day where ServiceManager and ServiceDescriptorBase are more alike
+    /// </remarks>
     internal class ServiceDescriptorBase :
         LifecycleDescriptorBase,
         IServiceDescriptor
@@ -52,12 +55,12 @@ namespace Fact.Extensions.Services
                 se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
             }
 
-            if (service is IExceptionProvider ep)
+            if (service is IExceptionEventProvider ep)
             {
                 ep.ExceptionOccurred += e =>
                 {
-                    LifecycleStatus = LifecycleEnum.Error;
                     Exception = e;
+                    LifecycleStatus = LifecycleEnum.Error;
                 };
             }
         }
@@ -68,7 +71,7 @@ namespace Fact.Extensions.Services
 
         public virtual async Task Shutdown(ServiceContext context)
         {
-            logger.LogTrace($"Shutdown: {Name}");
+            logger.LogTrace($"Shutdown: Initiated on {Name}");
 
             try
             {
@@ -78,8 +81,8 @@ namespace Fact.Extensions.Services
             }
             catch (Exception e)
             {
-                LifecycleStatus = LifecycleEnum.Error;
                 Exception = e;
+                LifecycleStatus = LifecycleEnum.Error;
                 logger.LogError(0, e, $"Shutdown failed: {Name}");
             }
         }

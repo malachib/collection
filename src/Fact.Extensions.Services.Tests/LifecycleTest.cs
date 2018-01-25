@@ -68,6 +68,15 @@ namespace Fact.Extensions.Services.Tests
             return sp;
         }
 
+
+        (ServiceContext context, CancellationTokenSource cts) Setup2()
+        {
+            var cts = new CancellationTokenSource();
+            var context = new ServiceContext(Setup(), cts.Token);
+
+            return (context, cts);
+        }
+
         [TestMethod]
         public void BasicServiceManagerTest()
         {
@@ -180,6 +189,46 @@ namespace Fact.Extensions.Services.Tests
                 Assert.AreEqual(LifecycleEnum.Error, descriptor.LifecycleStatus);
                 await descriptor.Shutdown(context);
             }).Wait(2000);
+        }
+
+
+        class DummyWorkerItemAcquirerService : WorkerItemAcquirerService<int>
+        {
+            int counter = 0;
+
+            public override string Name => "Dummy worker item acquirer";
+
+            protected override int GetItem(CancellationToken ct)
+            {
+                Thread.Sleep(250);
+                return counter++;
+            }
+
+            internal DummyWorkerItemAcquirerService(ServiceContext context) :
+                base(context) {}
+        }
+
+        [TestMethod]
+        public void WorkerItemAcquirerServiceTest()
+        {
+            var result = Setup2();
+            var context = result.context;
+            var service = new DummyWorkerItemAcquirerService(context);
+            var descriptor = new ServiceDescriptorBase(context.ServiceProvider, service);
+
+            bool completedOnTime = Task.Run(async () =>
+            {
+                service.ItemAcquired += v => Console.WriteLine($"Got item: {v}");
+                await descriptor.Startup(context);
+
+                await Task.Delay(1500);
+
+                await descriptor.Shutdown(context);
+
+            }).Wait(3000);
+
+            Assert.AreEqual(LifecycleEnum.Stopped, descriptor.LifecycleStatus);
+            Assert.IsTrue(completedOnTime, "Did not complete on time");
         }
     }
 }

@@ -29,13 +29,19 @@ namespace Fact.Extensions.Services
     /// <summary>
     /// TODO: Integrate this into IServiceExtended
     /// </summary>
-    public interface IExceptionProvider
+    public interface IExceptionEventProvider
     {
         /// <summary>
         /// Fire this when exceptions occur *outside* of the lifecycle event calls
         /// (i.e. durring running, sleeping, etc)
         /// </summary>
         event Action<Exception> ExceptionOccurred;
+    }
+
+
+    public interface IExceptionProvider
+    {
+        Exception Exception { get; }
     }
 
 
@@ -57,10 +63,9 @@ namespace Fact.Extensions.Services
     /// </summary>
     public interface IServiceDescriptor : 
         IServiceDescriptorBase, 
-        IService
+        IService,
+        IExceptionProvider
     {
-        Exception Exception { get; }
-
         /// <summary>
         /// List of services which depend on this one - specifically,
         /// when it's time for this service to shut down, it has to wait

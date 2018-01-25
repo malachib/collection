@@ -13,7 +13,7 @@ namespace Fact.Extensions.Services
 {
     public abstract class WorkerServiceBase : 
         IService,
-        IExceptionProvider
+        IExceptionEventProvider
     {
         readonly ILogger logger;
 
