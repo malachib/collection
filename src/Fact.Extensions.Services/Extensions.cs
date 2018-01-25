@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -198,6 +199,24 @@ namespace Fact.Extensions.Services
             serviceManager.AddChild(sd);
 
             return sd;
+        }
+
+
+        /// <summary>
+        /// Acquire the service descriptor associated with a particular service type who is
+        /// added to the specified serviceManager.  Also typecasts it to strong
+        /// IServiceDescriptor of TService for convenience
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="serviceManager"></param>
+        /// <returns></returns>
+        public static IServiceDescriptor<TService> GetChild<TService>(
+            this IChildProvider<IServiceDescriptor> serviceManager)
+            where TService: IService
+        {
+            IServiceDescriptor sd = serviceManager.Children.Single(x => x.Service is TService);
+
+            return (IServiceDescriptor<TService>)sd;
         }
     }
 }
