@@ -1,9 +1,12 @@
 <!-- Flawed but useful autoversioner.  Going to be x.x.x.y where y is branched build #.  branch itself must be derived
      discretely, potentially throwing off redirect-style version greater-than-version comparisons -->
 <Project InitialTargets="VersionGetter">
-  <Target Name="VersionGetter">
+  <ItemGroup>
+    <PackageReference Include="GitInfo" Version="2.0.8" />
+  </ItemGroup>
+  <Target Name="VersionGetter" DependsOnTargets="GitInfo">
     <PropertyGroup>
-      <FEBranch>alpha</FEBranch>
+      <FEBranch>$(GitBranch)</FEBranch>
     </PropertyGroup>
     <ReadLinesFromFile File="..\..\.version\$(FEBranch)">
       <Output TaskParameter="Lines" PropertyName="BuildVersion" />
