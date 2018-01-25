@@ -51,6 +51,7 @@ namespace Fact.Extensions.Services
         {
             this.logger = sp.GetService<ILogger<ServiceDescriptorBase>>();
             this.service = service;
+            var context = new ServiceContext(sp, this);
 
             // NOTE: perhaps not best location for this, but we can capture idea here at least
             if (service is IOnlineEvents oe)
@@ -59,7 +60,7 @@ namespace Fact.Extensions.Services
                 {
                     LifecycleStatus = LifecycleEnum.Online;
                     // Beware, this might not be the SP you are after!
-                    await Startup(sp);
+                    await Startup(context);
                 };
                 oe.Offline += () => LifecycleStatus = LifecycleEnum.Offline;
             }
@@ -72,7 +73,7 @@ namespace Fact.Extensions.Services
                 {
                     LifecycleStatus = LifecycleEnum.Awake;
                     // Beware, this might not be the SP you are after!
-                    await Startup(sp);
+                    await Startup(context);
                 };
                 se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
             }
@@ -108,13 +109,6 @@ namespace Fact.Extensions.Services
                 logger.LogError(0, e, $"Shutdown failed: {Name}");
             }
         }
-
-        public virtual async Task Startup(IServiceProvider serviceProvider)
-        {
-            var context = new ServiceContext(serviceProvider, this);
-            await Startup(context);
-        }
-
 
         public virtual async Task Startup(ServiceContext context)
         {
