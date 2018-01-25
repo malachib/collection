@@ -224,38 +224,4 @@ namespace Fact.Extensions.Services
             lifecycle.Value = AscertainCompositeState();
         }
     }
-
-
-    public static class ServiceManagerExtensions
-    {
-        public static IServiceDescriptor AddService(this ServiceManager serviceManager, IService service, IServiceProvider sp)
-        {
-            var sd = new ServiceDescriptorBase(sp, service);
-
-            serviceManager.AddChild(sd);
-
-            return sd;
-        }
-
-
-        public static IServiceDescriptor<TService> AddService<TService>(this ServiceManager serviceManager, TService service, IServiceProvider sp)
-            where TService : IService
-        {
-            var sd = new ServiceDescriptorBase<TService>(sp, service);
-
-            serviceManager.AddChild(sd);
-
-            return sd;
-        }
-
-        public static IServiceDescriptor<TService> AddService<TService>(this ServiceManager serviceManager, TService service, ServiceContext context)
-            where TService: IService
-        {
-            var sd = new ServiceDescriptorBase<TService>(context, service);
-
-            serviceManager.AddChild(sd);
-
-            return sd;
-        }
-    }
 }

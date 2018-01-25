@@ -24,45 +24,59 @@ namespace Fact.Extensions.Services
 
         public Exception Exception { get; private set; }
 
-        internal ServiceDescriptorBase(IServiceProvider sp, IService service)
+        /// <summary>
+        /// Wire up specified service to fire pertinent events back to this service descriptor
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="service"></param>
+        protected virtual void SetupServiceEvents(ServiceContext context, IService service)
         {
-            this.logger = sp.GetService<ILogger<ServiceDescriptorBase>>();
-            this.service = service;
-            var context = new ServiceContext(sp, this);
+            SetupEvents(service);
 
-            // NOTE: perhaps not best location for this, but we can capture idea here at least
+            // These await Startup calls specifically trail the stock-standard LifecycleStatus
+            // update call, so that first the event state is fired off (Online, Awake) then
+            // sequentially afterwards an async startup happens to actually start the service
+            // back up again from its semi-shutdown state
+
             if (service is IOnlineEvents oe)
             {
-                oe.Online += async () =>
-                {
-                    LifecycleStatus = LifecycleEnum.Online;
-                    // Beware, this might not be the SP you are after!
-                    await Startup(context);
-                };
-                oe.Offline += () => LifecycleStatus = LifecycleEnum.Offline;
+                // Beware, this might not be the SP you are after!
+                oe.Online += async () => await Startup(context);
             }
 
             if (service is ISleepableEvents se)
             {
-                se.Sleeping += () => LifecycleStatus = LifecycleEnum.Sleeping;
-                se.Slept += () => LifecycleStatus = LifecycleEnum.Slept;
-                se.Awake += async () =>
-                {
-                    LifecycleStatus = LifecycleEnum.Awake;
-                    // Beware, this might not be the SP you are after!
-                    await Startup(context);
-                };
-                se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
+                // Beware, this might not be the SP you are after!
+                se.Awake += async () => await Startup(context);
             }
 
             if (service is IExceptionEventProvider ep)
             {
                 ep.ExceptionOccurred += e =>
                 {
-                    Exception = e;
+                    Exception = e; // important that we assign this *before* LifecycleStatus
                     LifecycleStatus = LifecycleEnum.Error;
                 };
             }
+        }
+
+        internal ServiceDescriptorBase(IServiceProvider sp, IService service)
+        {
+            var context = new ServiceContext(sp, this);
+            this.logger = sp.GetService<ILogger<ServiceDescriptorBase>>();
+            this.service = service;
+
+            SetupServiceEvents(context, service);
+        }
+
+
+        internal ServiceDescriptorBase(ServiceContext context, IService service)
+        {
+            var sp = context.ServiceProvider;
+            this.logger = sp.GetService<ILogger<ServiceDescriptorBase>>();
+            this.service = service;
+
+            SetupServiceEvents(context, service);
         }
 
         public IService Service => service;
@@ -140,5 +154,25 @@ namespace Fact.Extensions.Services
         {
             lifecycle.Changed += v => LifecycleStatusUpdated?.Invoke(this);
         }
+
+
+        protected void SetupEvents(object eventSource)
+        {
+            // NOTE: perhaps not best location for this, but we can capture idea here at least
+            if (eventSource is IOnlineEvents oe)
+            {
+                oe.Online += () => LifecycleStatus = LifecycleEnum.Online;
+                oe.Offline += () => LifecycleStatus = LifecycleEnum.Offline;
+            }
+
+            if (eventSource is ISleepableEvents se)
+            {
+                se.Sleeping += () => LifecycleStatus = LifecycleEnum.Sleeping;
+                se.Slept += () => LifecycleStatus = LifecycleEnum.Slept;
+                se.Awake += () => LifecycleStatus = LifecycleEnum.Awake;
+                se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
+            }
+        }
+
     }
 }
