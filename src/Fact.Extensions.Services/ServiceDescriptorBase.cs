@@ -126,11 +126,11 @@ namespace Fact.Extensions.Services
         IServiceDescriptor<TService>
         where TService : IService
     {
-        public ServiceDescriptorBase(ServiceContext context, IService service) :
+        public ServiceDescriptorBase(ServiceContext context, TService service) :
             base(context.ServiceProvider, service)
         { }
 
-        public ServiceDescriptorBase(IServiceProvider sp, IService service) :
+        public ServiceDescriptorBase(IServiceProvider sp, TService service) :
             base(sp, service)
         { }
 
