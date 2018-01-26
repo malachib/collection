@@ -6,6 +6,7 @@
     <TargetFrameworks>netstandard1.1;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DefineConstants>ALPHA</DefineConstants>
     <AssemblyName>Fact.Extensions.Factories</AssemblyName>
     <PackageId>Fact.Extensions.Factories</PackageId>
   </PropertyGroup>

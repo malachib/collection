@@ -5,6 +5,7 @@
     <Authors>Malachi Burke</Authors>
     <TargetFrameworks>netstandard1.1;netstandard2.0;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
+    <DefineConstants>ALPHA</DefineConstants>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Fact.Extensions.Configuration</AssemblyName>
     <PackageId>Fact.Extensions.Configuration</PackageId>
