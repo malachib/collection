@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Fact.Extensions.Services
@@ -43,6 +44,29 @@ namespace Fact.Extensions.Services
                     logger.LogDebug($"Task {name} completed unexceptionally");
                 }
             });
+        }
+
+
+        /// <summary>
+        /// Ensure we await with a cancellationtoken in mind
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="task"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        // follow guidelines here: https://stackoverflow.com/questions/19404199/how-to-to-make-udpclient-receiveasync-cancelable
+        public static async Task<T> WithCancellation<T>(this Task<T> task, CancellationToken cancellationToken)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs))
+            {
+                if (task != await Task.WhenAny(task, tcs.Task))
+                {
+                    throw new OperationCanceledException(cancellationToken);
+                }
+            }
+
+            return task.Result;
         }
     }
 }
