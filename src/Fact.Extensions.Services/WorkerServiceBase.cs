@@ -157,6 +157,18 @@ namespace Fact.Extensions.Services
                 {
                     logger.LogDebug($"Worker: ({Name}) cancelled forcefully");
                 }
+                catch (AggregateException aex)
+                {
+                    if(aex.InnerException is OperationCanceledException)
+                    {
+                        logger.LogDebug($"Worker: ({Name}) cancelled normally (via aggregate exception)");
+                    }
+                    else
+                    {
+                        ExceptionOccurred?.Invoke(aex);
+                        logger.LogWarning(0, aex, $"Worker: ({Name}) has error");
+                    }
+                }
                 catch (Exception ex)
                 {
                     ExceptionOccurred?.Invoke(ex);
