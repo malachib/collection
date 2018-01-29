@@ -80,6 +80,9 @@ namespace Fact.Extensions.Experimental.Tests
                 }
 
             }).Wait(2000);
+
+            Assert.IsTrue(result1, "Timed out 1");
+            Assert.IsTrue(result2, "Timed out 2");
         }
     }
 }
