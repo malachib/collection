@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection", "Fact.Extensions.Collection\Fact.Extensions.Collection.csproj", "{8EBB3E70-9F01-46A6-AC53-285CAF1F1BE1}"
 EndProject
@@ -60,7 +60,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Services.Te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "useful-scripts", "useful-scripts", "{76284774-D227-44D5-97AA-7D81DC228900}"
 	ProjectSection(SolutionItems) = preProject
+		..\ext\myget\setenv-nuget-alpha.sh = ..\ext\myget\setenv-nuget-alpha.sh
 		..\ext\useful-scripts\scm\setenv-version.sh = ..\ext\useful-scripts\scm\setenv-version.sh
+		..\ext\useful-scripts\setenv.sh = ..\ext\useful-scripts\setenv.sh
+		..\ext\myget\setenv_nuget.sh = ..\ext\myget\setenv_nuget.sh
 		..\ext\useful-scripts\nuget\upload_project_v4_4 = ..\ext\useful-scripts\nuget\upload_project_v4_4
 	EndProjectSection
 EndProject
