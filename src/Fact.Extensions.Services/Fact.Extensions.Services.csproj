@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.1</TargetFramework>
     <NoWarn>1591;1571;1572;1573;1574;1587</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DefineConstants>ALPHA</DefineConstants>
+    <DefineConstants>BETA</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
