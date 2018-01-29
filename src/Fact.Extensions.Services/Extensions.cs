@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Fact.Extensions.Collection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -151,6 +153,70 @@ namespace Fact.Extensions.Services
                     logger.LogDebug($"Task {name} completed unexceptionally");
                 }
             });
+        }
+    }
+
+
+    public static class ServiceManagerExtensions
+    {
+        public static IServiceDescriptor AddService(this 
+            IChildCollection<IServiceDescriptor> serviceManager, IService service, IServiceProvider sp)
+        {
+            var sd = new ServiceDescriptorBase(sp, service);
+
+            serviceManager.AddChild(sd);
+
+            return sd;
+        }
+
+
+        public static IServiceDescriptor<TService> AddService<TService>(
+            this IChildCollection<IServiceDescriptor> serviceManager, TService service, IServiceProvider sp)
+            where TService : IService
+        {
+            var sd = new ServiceDescriptorBase<TService>(sp, service);
+
+            serviceManager.AddChild(sd);
+
+            return sd;
+        }
+
+
+        /// <summary>
+        /// Wrap a service with a descriptor and add it to the child collection
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="serviceManager"></param>
+        /// <param name="service"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static IServiceDescriptor<TService> AddService<TService>(this 
+            IChildCollection<IServiceDescriptor> serviceManager, TService service, ServiceContext context)
+            where TService : IService
+        {
+            var sd = new ServiceDescriptorBase<TService>(context, service);
+
+            serviceManager.AddChild(sd);
+
+            return sd;
+        }
+
+
+        /// <summary>
+        /// Acquire the service descriptor associated with a particular service type who is
+        /// added to the specified serviceManager.  Also typecasts it to strong
+        /// IServiceDescriptor of TService for convenience
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="serviceManager"></param>
+        /// <returns></returns>
+        public static IServiceDescriptor<TService> GetChild<TService>(
+            this IChildProvider<IServiceDescriptor> serviceManager)
+            where TService: IService
+        {
+            IServiceDescriptor sd = serviceManager.Children.Single(x => x.Service is TService);
+
+            return (IServiceDescriptor<TService>)sd;
         }
     }
 }

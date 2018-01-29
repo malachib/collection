@@ -13,7 +13,7 @@ namespace Fact.Extensions.Services
 {
     public abstract class WorkerServiceBase : 
         IService,
-        IExceptionProvider
+        IExceptionEventProvider
     {
         readonly ILogger logger;
 
@@ -149,6 +149,26 @@ namespace Fact.Extensions.Services
                 {
                     await RunWorker(context);
                 }
+                catch (TaskCanceledException)
+                {
+                    logger.LogDebug($"Worker: ({Name}) cancelled normally");
+                }
+                catch (OperationCanceledException)
+                {
+                    logger.LogDebug($"Worker: ({Name}) cancelled forcefully");
+                }
+                catch (AggregateException aex)
+                {
+                    if(aex.InnerException is OperationCanceledException)
+                    {
+                        logger.LogDebug($"Worker: ({Name}) cancelled normally (via aggregate exception)");
+                    }
+                    else
+                    {
+                        ExceptionOccurred?.Invoke(aex);
+                        logger.LogWarning(0, aex, $"Worker: ({Name}) has error");
+                    }
+                }
                 catch (Exception ex)
                 {
                     ExceptionOccurred?.Invoke(ex);
@@ -162,7 +182,7 @@ namespace Fact.Extensions.Services
         /// </summary>
         public bool IsWorkerCreated => worker != null;
 
-        public async virtual Task Shutdown()
+        public async virtual Task Shutdown(ServiceContext context)
         {
             // TODO: Do threadsafe stuff
             if (IsWorkerCreated)
@@ -187,13 +207,6 @@ namespace Fact.Extensions.Services
                 logger.LogWarning($"Shutdown: No worker was created before shutdown was called ({Name})");
         }
 
-        public virtual Task Startup(IServiceProvider serviceProvider)
-        {
-            var context = new ServiceContext(serviceProvider);
-
-            return Startup(context);
-        }
-
         // FIX: would use "completedTask" but it doesn't seem to be available for netstandard1.1?
         public virtual async Task Startup(ServiceContext context)
         {
@@ -210,11 +223,6 @@ namespace Fact.Extensions.Services
 
             // TODO: have mini-awaiter which only waits for runworker to start
             context.Progress?.Report(100);
-        }
-
-        public virtual Task Shutdown(ServiceContext context)
-        {
-            return Shutdown();
         }
     }
 }

@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using Fact.Extensions.Experimental;
 using Fact.Extensions.Collection;
 
 // TODO: Make a Fact.Extensions.Experimental.Tests project discrete from Fact.Extensions.Collection.Tests
-namespace Fact.Extensions.Experimental.Tests
+namespace Fact.Extensions.Collection.Tests
 {
     [TestClass]
     public class TaxonomyTests

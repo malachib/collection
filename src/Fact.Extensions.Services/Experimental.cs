@@ -260,3 +260,20 @@ namespace Fact.Extensions.Experimental
         }
     }
 }
+
+
+namespace Fact.Extensions.Services
+{
+    public static class ExperimentalExtensions
+    {
+        public static void AddServiceMangement(this IServiceCollection sc)
+        {
+            var descriptor = new ServiceDescriptor(
+                typeof(IServiceDescriptor<>), 
+                typeof(ServiceDescriptorBase<>), 
+                ServiceLifetime.Singleton);
+
+            sc.Add(descriptor);
+        }
+    }
+}

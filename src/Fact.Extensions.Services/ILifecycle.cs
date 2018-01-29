@@ -90,6 +90,20 @@ namespace Fact.Extensions.Services
 
 
     /// <summary>
+    /// TODO: A better name would be nice.  I would prefer IExceptionEvent but that
+    /// is a bit too much like a delegate name
+    /// </summary>
+    public interface IExceptionEventProvider
+    {
+        /// <summary>
+        /// Fire this when exceptions occur *outside* of the lifecycle event calls
+        /// (i.e. durring running, sleeping, etc)
+        /// </summary>
+        event Action<Exception> ExceptionOccurred;
+    }
+
+
+    /// <summary>
     /// Optional online/offline events for services which can initiate these states
     /// </summary>
     public interface IOnlineEvents

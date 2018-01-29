@@ -9,6 +9,8 @@
 # We must depend on setenv_windows or setenv_unix to set this
 #export NUGET='dotnet nuget'
 
+export FACT_EXTENSIONS_COLLECTION_VERSIONPATH=$PWD/..
+
 . ./setenv-version.sh
 
 #export branch_name

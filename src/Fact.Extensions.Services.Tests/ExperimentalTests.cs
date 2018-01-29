@@ -1,4 +1,5 @@
 ﻿using Fact.Extensions.Experimental;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,19 @@ namespace Fact.Extensions.Services.Tests
 
             Assert.IsTrue(task.Wait(1000));
 
+        }
+
+
+        [TestMethod]
+        public void ExperimentalServiceManagementTest()
+        {
+            var sc = new ServiceCollection();
+            sc.AddServiceMangement();
+            sc.AddSingleton<DummyService>();
+            var sp = sc.BuildServiceProvider();
+            var sd = sp.GetService<IServiceDescriptor<DummyService>>();
+            var context = new ServiceContext(sp, sd);
+            sd.Startup(context);
         }
     }
 }

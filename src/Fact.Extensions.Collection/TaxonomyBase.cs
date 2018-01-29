@@ -1,9 +1,8 @@
-﻿using Fact.Extensions.Collection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Fact.Extensions.Experimental
+namespace Fact.Extensions.Collection
 {
     /// <summary>
     /// Consider changing to a better name

@@ -18,24 +18,9 @@ namespace Fact.Extensions.Services
     }
 
 
-    /// <summary>
-    /// TODO: Migrate this into IService itself, combining with ILifecycle
-    /// </summary>
-    public interface IServiceExtended : IService
-    {
-    }
-
-
-    /// <summary>
-    /// TODO: Integrate this into IServiceExtended
-    /// </summary>
     public interface IExceptionProvider
     {
-        /// <summary>
-        /// Fire this when exceptions occur *outside* of the lifecycle event calls
-        /// (i.e. durring running, sleeping, etc)
-        /// </summary>
-        event Action<Exception> ExceptionOccurred;
+        Exception Exception { get; }
     }
 
 
@@ -55,12 +40,14 @@ namespace Fact.Extensions.Services
     /// Furthermore, we implement IService interface itself as a light facade around our service
     /// mainly to assist in the aforementioned, tracking service state
     /// </summary>
+    /// <remarks>
+    /// I think of IServiceDescriptor as the noun and IService as the verb
+    /// </remarks>
     public interface IServiceDescriptor : 
         IServiceDescriptorBase, 
-        IService
+        IService,
+        IExceptionProvider
     {
-        Exception Exception { get; }
-
         /// <summary>
         /// List of services which depend on this one - specifically,
         /// when it's time for this service to shut down, it has to wait

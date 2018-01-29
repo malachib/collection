@@ -60,5 +60,52 @@ namespace Fact.Extensions.Collection
 
             return node;
         }
+
+
+        /// <summary>
+        /// Implements visitor pattern over the specified node/child provider
+        /// Specifically will dig through entire chain, activating visitor callback for each node
+        /// Also carries a simplistic context which is created new for each node so that
+        /// sibling nodes may share information
+        /// </summary>
+        /// <typeparam name="TNode"></typeparam>
+        /// <typeparam name="TContext"></typeparam>
+        /// <param name="node"></param>
+        /// <param name="visitor"></param>
+        /// <param name="context"></param>
+        /// <param name="level"></param>
+        public static void Visit<TNode, TContext>(this TNode node, Action<TNode, TContext> visitor, TContext context, int level = 0)
+            where TNode : IChildProvider<TNode>
+            where TContext : new()
+        {
+            visitor(node, context);
+
+            foreach (TNode childNode in node.Children)
+            {
+                context = new TContext();
+
+                Visit(childNode, visitor, context, level + 1);
+            }
+        }
+
+
+        /// <summary>
+        /// Implements visitor pattern over the specified node/child provider
+        /// Specifically will dig through entire chain, activating visitor callback for each node
+        /// </summary>
+        /// <typeparam name="TNode"></typeparam>
+        /// <param name="node"></param>
+        /// <param name="visitor"></param>
+        /// <param name="level"></param>
+        public static void Visit<TNode>(this TNode node, Action<TNode> visitor, int level = 0)
+            where TNode : IChildProvider<TNode>
+        {
+            visitor(node);
+
+            foreach (TNode childNode in node.Children)
+            {
+                Visit(childNode, visitor, level + 1);
+            }
+        }
     }
 }
