@@ -224,4 +224,42 @@ namespace Fact.Extensions.Services
             lifecycle.Value = AscertainCompositeState();
         }
     }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// Conditions which need attention:
+    /// 
+    /// * If a child is added while ServiceManager is still starting, this is a race condition - solve this
+    ///   by mutexing out and either the child startup will get picked up by regular ServiceManager startup,
+    ///   or after its mutex is released it will startup on its own.
+    /// * If a child is removed while ServiceManager is shutting down, this is a race condition - solve this
+    ///   by waiting for shutdown to complete, then removing child *without* an explicit shutdown since
+    ///   it was already handled
+    /// </remarks>
+    public class ServiceManagerConfiguration
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// TODO: Augment this with IPolicy
+        /// </remarks>
+        public static readonly ServiceManagerConfiguration Default = new ServiceManagerConfiguration();
+
+        /// <summary>
+        /// When true (default) any child services added to this service manager *after* it has
+        /// started (while it is running) will autostart immediately upon add.  
+        /// When false, a manual start of any added child services will be required
+        /// </summary>
+        public bool InFlightStartup { get; set; } = true;
+
+        /// <summary>
+        /// When true (default) any child services removed from this service manager while it is
+        /// running will auto shutdown upon removal.  When false, a manual shutdown is required
+        /// </summary>
+        public bool InFlightShutdown { get; set; } = true;
+    }
 }
