@@ -59,8 +59,7 @@ namespace Fact.Extensions.Services
         /// </summary>
         PartialRunning,
         /// <summary>
-        /// For composite services where subservices have error states, we report it
-        /// this way
+        /// For composite service manager where we are running, but subservices have error states
         /// </summary>
         Degraded,
         /// <summary>

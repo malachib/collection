@@ -21,6 +21,7 @@ namespace Fact.Extensions.Services
         IServiceDescriptor
     {
         readonly ILogger logger;
+        readonly ServiceManagerConfiguration configuration = ServiceManagerConfiguration.Default;
 
         /// <summary>
         /// ServiceManager doesn't use this just yet, merely because haven't decided what
@@ -39,6 +40,83 @@ namespace Fact.Extensions.Services
             {
                 this.self = new ServiceDescriptorBase(sp, self);
             }
+            if(configuration.InFlightStartup)
+            {
+                // FIX: Many race conditions exist here, so this is experimental code
+                ChildAdded += async (o, c) =>
+                {
+                    var context = sp.GetService<ServiceContext>();
+                    await InFightStartupHandler(context, c);
+                };
+
+                ChildRemoved += async (o, c) =>
+                {
+                    var context = sp.GetService<ServiceContext>();
+                    await InFlightShutdownHandler(context, c);
+                };
+            }
+        }
+
+
+        async Task InFightStartupHandler(ServiceContext context, IServiceDescriptor child)
+        {
+            switch (LifecycleStatus)
+            {
+                // FIX: Beware, implicit race condition here on all states
+                case LifecycleEnum.Unstarted:
+                {
+                    // No further action needed - not truly in flight, as child startup will get picked 
+                    // up by System Manager startup
+                    return;
+                }
+                case LifecycleEnum.Starting:
+                {
+                    // FIX: Handle explicit race condition here.  We get ChildAdded event
+                    // potentially during Starting procedure, making us unsure whether
+                    // this new child was picked up or not.  Defaulting to YES it is picked up
+                    return;
+                }
+                case LifecycleEnum.Running:
+                case LifecycleEnum.Degraded:
+                case LifecycleEnum.PartialRunning:
+                    break;
+
+                default:
+                    // FIX: Really we should be looking for running/degraded/partial running here
+                    await this.WaitFor(state => state == LifecycleEnum.Running, context.CancellationToken);
+                    break;
+            }
+
+            // FIX: It's conceivable we will exit running state before c.Startup runs
+            await child.Startup(context);
+        }
+
+        /// <summary>
+        /// More or less inverse of InflightStartupHandler with all the same race condition concerns
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="child"></param>
+        /// <returns></returns>
+        async Task InFlightShutdownHandler(ServiceContext context, IServiceDescriptor child)
+        {
+            switch(LifecycleStatus)
+            {
+                case LifecycleEnum.Stopping:
+                    return;
+
+                case LifecycleEnum.Stopped:
+                    return;
+
+                case LifecycleEnum.Running:
+                case LifecycleEnum.Degraded:
+                case LifecycleEnum.PartialRunning:
+                    break;
+
+                default:
+                    await this.WaitFor(state => state == LifecycleEnum.Running, context.CancellationToken);
+                    break;
+            }
+            await child.Shutdown(context);
         }
 
 
@@ -250,6 +328,7 @@ namespace Fact.Extensions.Services
         public static readonly ServiceManagerConfiguration Default = new ServiceManagerConfiguration();
 
         /// <summary>
+        /// EXPERIMENTAL
         /// When true (default) any child services added to this service manager *after* it has
         /// started (while it is running) will autostart immediately upon add.  
         /// When false, a manual start of any added child services will be required
@@ -257,6 +336,7 @@ namespace Fact.Extensions.Services
         public bool InFlightStartup { get; set; } = true;
 
         /// <summary>
+        /// EXPERIMENTAL
         /// When true (default) any child services removed from this service manager while it is
         /// running will auto shutdown upon removal.  When false, a manual shutdown is required
         /// </summary>
