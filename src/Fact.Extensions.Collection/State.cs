@@ -28,6 +28,13 @@ namespace Fact.Extensions.Collection
         /// </remarks>
         public event Action<T> Changed;
 
+        /// <summary>
+        /// Fired after state has evaluated assignment, regardless of whether
+        /// the value has changed or not
+        /// </summary>
+        /// <remarks>Parameter is incoming assigning value, already evaluated by this point</remarks>
+        public event Action<T> Touched;
+
         public T Value
         {
             get => value;
@@ -39,6 +46,8 @@ namespace Fact.Extensions.Collection
                     this.value = value;
                     Changed?.Invoke(value);
                 }
+
+                Touched?.Invoke(value);
             }
         }
 
