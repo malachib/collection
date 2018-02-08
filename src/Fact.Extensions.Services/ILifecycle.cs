@@ -68,6 +68,11 @@ namespace Fact.Extensions.Services
         Error
     }
 
+
+    /// <summary>
+    /// Reveals the fundamentals of an IService: Startup and Shutdown tasks
+    /// </summary>
+    /// <typeparam name="TContext"></typeparam>
     public interface ILifecycle<TContext>
     {
         Task Startup(TContext context);

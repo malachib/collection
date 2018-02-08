@@ -12,6 +12,7 @@ using Fact.Extensions.Experimental;
 namespace Fact.Extensions.Services
 {
     public abstract class WorkerServiceBase : 
+        Experimental.Cancellable,
         IService,
         IExceptionEventProvider
     {
@@ -33,22 +34,17 @@ namespace Fact.Extensions.Services
         protected virtual async Task Configure(ServiceContext context) { }
 
 
-        WorkerServiceBase(IServiceProvider sp)
-        {
-            logger = sp.GetService<ILogger<WorkerServiceBase>>();
-        }
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="oneShot">FIX: Not active yet</param>
+        /// <param name="oneShot">Do not loop, run worker only once</param>
         protected WorkerServiceBase(ServiceContext context, bool oneShot = false)
-            : this(context.ServiceProvider)
+            : base(context.CancellationToken)
         {
+            logger = context.GetService<ILogger<WorkerServiceBase>>();
             this.ct = context.CancellationToken;
             this.oneShot = oneShot;
-            localCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             // TODO: Wrap up configure with proper error event firing mechanism instead
             // (using IExceptionProvider)
             configure = Configure(context).ContinueWithErrorLogger(logger);
@@ -58,16 +54,15 @@ namespace Fact.Extensions.Services
         /// 
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="oneShot">FIX: Not active yet</param>
-        protected WorkerServiceBase(IServiceProvider sp, bool oneShot = false) : this(sp)
+        /// <param name="oneShot">Do not loop, run worker only once</param>
+        protected WorkerServiceBase(IServiceProvider sp, bool oneShot = false)
         {
+            logger = sp.GetService<ILogger<WorkerServiceBase>>();
             this.oneShot = oneShot;
-            localCts = new CancellationTokenSource();
         }
 
         Task worker;
 
-        protected readonly CancellationTokenSource localCts;
         readonly CancellationToken ct;
 
         public event Action<Exception> ExceptionOccurred;
@@ -90,14 +85,6 @@ namespace Fact.Extensions.Services
 
 
         /// <summary>
-        /// Utilizing our own local cancellation token, initiate a Task cancel operation
-        /// </summary>
-        protected void Cancel()
-        {
-            localCts.Cancel();
-        }
-
-        /// <summary>
         /// Runs the custom worker process
         /// Note that inbound context will have its cancellation token augmented with this
         /// worker service local CTS
@@ -109,7 +96,7 @@ namespace Fact.Extensions.Services
             logger.LogTrace($"Worker starting ({Name})");
 
             context = new ServiceContext(context, context.Descriptor);
-            context.CancellationToken = localCts.Token;
+            context.CancellationToken = Token;
 
             do
             {
@@ -118,7 +105,7 @@ namespace Fact.Extensions.Services
                 worker = Worker(context);
                 await worker;
             }
-            while (!oneShot && !localCts.IsCancellationRequested);
+            while (!oneShot && !Token.IsCancellationRequested);
 
             // If not oneshot, then it was a cancellation request
             // NOTE: Untested, might just blast right by it with an exception
@@ -200,7 +187,7 @@ namespace Fact.Extensions.Services
                     worker.Status != TaskStatus.WaitingForActivation)
                     logger.LogWarning($"Shutdown: No worker was running ({Name}).  Cancel initiated anyway.  Status = {worker.Status}");
 
-                localCts.Cancel();
+                Cancel();
                 await worker;
             }
             else
