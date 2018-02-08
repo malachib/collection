@@ -18,21 +18,26 @@ namespace Fact.Extensions.Services.Experimental
     {
         protected Fact.Extensions.Experimental.AsyncLock mutex = new Fact.Extensions.Experimental.AsyncLock();
 
+        readonly int shutdownTimeoutMilliseconds;
+
         public virtual string Name => GetType().Name;
 
         /// <summary>
-        /// EXPERIMENTAL
         /// Fired when item actually sends
         /// </summary>
         public event Action<T> Sent;
 
-        protected BlockingSenderServiceBase(ServiceContext context) : 
+        protected BlockingSenderServiceBase(ServiceContext context, 
+            int shutdownTimeoutMilliseconds = 50) : 
             base(context.CancellationToken)
         {
-
+            this.shutdownTimeoutMilliseconds = shutdownTimeoutMilliseconds;
         }
 
-        protected BlockingSenderServiceBase() { }
+        protected BlockingSenderServiceBase(int shutdownTimeoutMilliseconds = 50)
+        {
+            this.shutdownTimeoutMilliseconds = shutdownTimeoutMilliseconds;
+        }
 
         /// <summary>
         /// Send which has no async-await capabilities but in fact does block
@@ -78,8 +83,7 @@ namespace Fact.Extensions.Services.Experimental
 
         public virtual async Task Shutdown(ServiceContext context)
         {
-            // allow it 50 ms to send that last packet
-            CancelAfter(50);
+            CancelAfter(shutdownTimeoutMilliseconds);
             // acquire our final lock only to wait for that last packet send and grab this instance
             // for ourselves
             await mutex.LockAsync(Combine(context.CancellationToken));
