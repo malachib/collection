@@ -101,6 +101,7 @@ namespace Fact.Extensions.Services
     {
         /// <summary>
         /// Fire this when exceptions occur *outside* of the lifecycle event calls
+        /// but within the scoped perview of this class
         /// (i.e. durring running, sleeping, etc)
         /// </summary>
         event Action<Exception> ExceptionOccurred;

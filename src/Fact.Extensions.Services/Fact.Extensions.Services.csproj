@@ -16,5 +16,9 @@
     <ProjectReference Include="..\Fact.Extensions.Collection\Fact.Extensions.Collection.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="$(DefineConstants.Contains(ALPHA))">
+    <ProjectReference Include="..\Fact.Extensions.Experimental\Fact.Extensions.Experimental.csproj" />
+  </ItemGroup>
+
 
 </Project>

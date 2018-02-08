@@ -40,6 +40,14 @@ namespace Fact.Extensions.Services.Experimental
 
 
         /// <summary>
+        /// Combine our local cancel source with the specified one
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        protected CancellationToken Combine(CancellationToken ct) => 
+            CancellationTokenSource.CreateLinkedTokenSource(localCts.Token, ct).Token;
+
+        /// <summary>
         /// Utilizing our own local cancellation token, initiate a Task cancel operation
         /// </summary>
         protected void CancelAfter(int millisecondDelay) =>
