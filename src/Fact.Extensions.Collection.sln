@@ -11,12 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{00900FD9-475E-47E0-B728-AC3F3A474456}"
 	ProjectSection(SolutionItems) = preProject
-		bump.sh = bump.sh
 		setenv-version.sh = setenv-version.sh
 		setenv.sh = setenv.sh
 		setenv_windows.sh = setenv_windows.sh
 		upload_all.sh = upload_all.sh
 		upload_project.sh = upload_project.sh
+		version-bump.sh = version-bump.sh
 		VersionGetter.targets = VersionGetter.targets
 	EndProjectSection
 EndProject
@@ -61,6 +61,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "useful-scripts", "useful-scripts", "{76284774-D227-44D5-97AA-7D81DC228900}"
 	ProjectSection(SolutionItems) = preProject
 		..\ext\myget\setenv-nuget-alpha.sh = ..\ext\myget\setenv-nuget-alpha.sh
+		..\ext\useful-scripts\scm\bump.sh = ..\ext\useful-scripts\scm\bump.sh
 		..\ext\useful-scripts\scm\setenv-version.sh = ..\ext\useful-scripts\scm\setenv-version.sh
 		..\ext\useful-scripts\setenv.sh = ..\ext\useful-scripts\setenv.sh
 		..\ext\myget\setenv_nuget.sh = ..\ext\myget\setenv_nuget.sh

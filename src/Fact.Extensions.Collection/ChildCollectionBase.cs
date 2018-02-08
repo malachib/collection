@@ -11,6 +11,8 @@ namespace Fact.Extensions.Collection
     /// All the IChildProvider stuff is very Dictionary-like, but the paradigm of it being 
     /// children making it look and feel slightly different - even if the functionality is nearly 
     /// identical.  Utilize the ITaxonomy stuff to treat more dictionary like (using IAccessor)
+    /// 
+    /// TODO: Make a async/awaitable and/or MT-safe set of calls for this
     /// </remarks>
     /// <typeparam name="TNode"></typeparam>
     /// <typeparam name="TKey"></typeparam>
@@ -23,10 +25,22 @@ namespace Fact.Extensions.Collection
         public IEnumerable<TNode> Children => children.Values;
 
         /// <summary>
+        /// Fired when a child is adding to the node child collection, but before it is added
+        /// First parameter is sender (this node), second paramter is child being added
+        /// </summary>
+        public event Action<object, TNode> ChildAdding;
+
+        /// <summary>
         /// Fired when a child is added to the node child collection.  First parameter is sender
         /// (this node), second paramter is child being added
         /// </summary>
         public event Action<object, TNode> ChildAdded;
+
+        /// <summary>
+        /// Fired when a child is about to be removed from collection
+        /// First parameter is sender (this node), second paramter is child being added
+        /// </summary>
+        public event Action<object, TNode> ChildRemoving;
 
         /// <summary>
         /// Fired when a child is removed from this child collection.  First parameter is sender
@@ -47,6 +61,7 @@ namespace Fact.Extensions.Collection
 
         public void AddChild(TNode node)
         {
+            ChildAdding?.Invoke(this, node);
             children.Add(GetKey(node), node);
             ChildAdded?.Invoke(this, node);
         }
@@ -54,6 +69,7 @@ namespace Fact.Extensions.Collection
 
         public void RemoveChild(TNode node)
         {
+            ChildRemoving?.Invoke(this, node);
             children.Remove(GetKey(node));
             ChildRemoved?.Invoke(this, node);
         }

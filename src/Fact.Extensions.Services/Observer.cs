@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace Fact.Extensions.Services
 {
+    /// <summary>
+    /// Implements the observer pattern in a manner friendly to async-await
+    /// paradigm
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IAsyncObserver<T>
     {
         /// <summary>

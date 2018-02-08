@@ -5,6 +5,8 @@
     <Authors>Malachi Burke</Authors>
     <TargetFramework>netstandard1.3</TargetFramework>
     <PackageId>Fact.Extensions.Serialization.Matrix</PackageId>
+    <DefineConstants>ALPHA</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

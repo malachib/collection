@@ -6,6 +6,8 @@
     <TargetFrameworks>netstandard1.1;netstandard1.6;net46</TargetFrameworks>
     <AssemblyName>Fact.Extensions.Serialization</AssemblyName>
     <PackageId>Fact.Extensions.Serialization</PackageId>
+    <DefineConstants>ALPHA</DefineConstants>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

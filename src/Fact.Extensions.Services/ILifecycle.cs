@@ -59,8 +59,7 @@ namespace Fact.Extensions.Services
         /// </summary>
         PartialRunning,
         /// <summary>
-        /// For composite services where subservices have error states, we report it
-        /// this way
+        /// For composite service manager where we are running, but subservices have error states
         /// </summary>
         Degraded,
         /// <summary>
@@ -69,6 +68,11 @@ namespace Fact.Extensions.Services
         Error
     }
 
+
+    /// <summary>
+    /// Reveals the fundamentals of an IService: Startup and Shutdown tasks
+    /// </summary>
+    /// <typeparam name="TContext"></typeparam>
     public interface ILifecycle<TContext>
     {
         Task Startup(TContext context);
