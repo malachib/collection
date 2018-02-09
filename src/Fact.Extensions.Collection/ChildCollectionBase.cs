@@ -4,6 +4,33 @@ using System.Text;
 
 namespace Fact.Extensions.Collection
 {
+    public abstract class ChildCollectionBase<TNode> : IChildCollection<TNode>
+    {
+        /// <summary>
+        /// Fired when a child is adding to the node child collection, but before it is added
+        /// First parameter is sender (this node), second paramter is child being added
+        /// </summary>
+        public event Action<object, TNode> ChildAdding;
+
+        /// <summary>
+        /// Fired when a child is added to the node child collection.  First parameter is sender
+        /// (this node), second paramter is child being added
+        /// </summary>
+        public event Action<object, TNode> ChildAdded;
+
+        protected abstract void AddChildInternal(TNode node);
+
+
+        public void AddChild(TNode node)
+        {
+            ChildAdding?.Invoke(this, node);
+            AddChildInternal(node);
+            ChildAdded?.Invoke(this, node);
+        }
+
+        public abstract IEnumerable<TNode> Children { get; }
+    }
+
     /// <summary>
     /// Reference implementation of IChildCollection
     /// </summary>
@@ -16,25 +43,15 @@ namespace Fact.Extensions.Collection
     /// </remarks>
     /// <typeparam name="TNode"></typeparam>
     /// <typeparam name="TKey"></typeparam>
-    public abstract class KeyedChildCollectionBase<TKey, TNode> : IChildCollection<TNode>
+    public abstract class KeyedChildCollectionBase<TKey, TNode> : 
+        ChildCollectionBase<TNode>,
+        IChildCollection<TKey, TNode>
     {
         protected abstract TKey GetKey(TNode node);
 
         SparseDictionary<TKey, TNode> children;
 
-        public IEnumerable<TNode> Children => children.Values;
-
-        /// <summary>
-        /// Fired when a child is adding to the node child collection, but before it is added
-        /// First parameter is sender (this node), second paramter is child being added
-        /// </summary>
-        public event Action<object, TNode> ChildAdding;
-
-        /// <summary>
-        /// Fired when a child is added to the node child collection.  First parameter is sender
-        /// (this node), second paramter is child being added
-        /// </summary>
-        public event Action<object, TNode> ChildAdded;
+        public override IEnumerable<TNode> Children => children.Values;
 
         /// <summary>
         /// Fired when a child is about to be removed from collection
@@ -59,11 +76,9 @@ namespace Fact.Extensions.Collection
             return value;
         }
 
-        public void AddChild(TNode node)
+        protected override void AddChildInternal(TNode node)
         {
-            ChildAdding?.Invoke(this, node);
             children.Add(GetKey(node), node);
-            ChildAdded?.Invoke(this, node);
         }
 
 

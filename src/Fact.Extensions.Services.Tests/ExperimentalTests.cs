@@ -1,4 +1,6 @@
 ﻿using Fact.Extensions.Experimental;
+using Fact.Extensions.Services.Experimental;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -61,6 +63,29 @@ namespace Fact.Extensions.Services.Tests
             var sd = sp.GetService<IServiceDescriptor<DummyService>>();
             var context = new ServiceContext(sp, sd);
             sd.Startup(context);
+        }
+
+
+        [TestMethod]
+        public void TenantServiceProviderTest()
+        {
+            var sc1 = new ServiceCollection();
+            sc1.AddSingleton("test 1");
+            var sc2 = new ServiceCollection();
+            sc2.AddSingleton("test 2");
+            var sctop = new ServiceCollection();
+            //sctop.AddSingleton("top");
+
+            var ssp = new TenantServiceProvider("toplevel", sctop.BuildServiceProvider());
+
+            // NOTE! build service provider has a scopes ability... 
+            // but that's more of an instance-lifetyime thing after you discover it
+            ssp.Add("test1-provider", sc1.BuildServiceProvider());
+            ssp.Add("test2-provider", sc2.BuildServiceProvider());
+
+            string test1 = ssp.GetService<string>();
+
+            Assert.AreEqual("test 1", test1);
         }
     }
 }
