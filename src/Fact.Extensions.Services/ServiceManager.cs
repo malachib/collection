@@ -18,6 +18,7 @@ namespace Fact.Extensions.Services
     /// </summary>
     public class ServiceManager :
         NamedChildCollection<IServiceDescriptor>,
+        Experimental.ITenantServiceProvider,
         IServiceDescriptor
     {
         readonly ILogger logger;
@@ -300,6 +301,11 @@ namespace Fact.Extensions.Services
 
             lifecycle.Value = LifecycleEnum.Started;
             lifecycle.Value = AscertainCompositeState();
+        }
+
+        object IServiceProvider.GetService(Type serviceType)
+        {
+            throw new NotImplementedException();
         }
     }
 
