@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Fact.Extensions.Experimental.Tests
@@ -83,6 +84,54 @@ namespace Fact.Extensions.Experimental.Tests
 
             Assert.IsTrue(result1, "Timed out 1");
             Assert.IsTrue(result2, "Timed out 2");
+        }
+
+
+        class TestConditionProvider
+        {
+            public event Action<int> ConditionChanged;
+
+            public void FireConditionChanged()
+            {
+                ConditionChanged?.Invoke(5);
+            }
+        }
+
+        [TestMethod]
+        public void AsyncConditionTest()
+        {
+            int x = 1;
+            TestConditionProvider cp = new TestConditionProvider();
+            CancellationTokenSource cts = new CancellationTokenSource();
+
+            var t1 = Task.Run(async () =>
+            {
+                await AsyncConditionExtensions.WaitFor(() => x == 2, cp, nameof(cp.ConditionChanged), cts.Token);
+                Assert.AreEqual(2, x);
+            });
+
+
+            var t2 = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(1000);
+                    cp.FireConditionChanged();
+                    await Task.Delay(1000);
+                    x = 2;
+                    cp.FireConditionChanged();
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
+            });
+
+            cts.CancelAfter(10000); // failsafe
+
+            Task.WaitAll(t1, t2);
+
+
         }
     }
 }
