@@ -106,7 +106,8 @@ namespace Fact.Extensions.Experimental.Tests
 
             var t1 = Task.Run(async () =>
             {
-                await AsyncConditionExtensions.WaitFor(() => x == 2, cp, nameof(cp.ConditionChanged), cts.Token);
+                await cts.Token.WaitUntil(() => x == 2, cp, nameof(cp.ConditionChanged));
+                //await AsyncConditionExtensions.WaitFor(() => x == 2, cp, nameof(cp.ConditionChanged), cts.Token);
                 Assert.AreEqual(2, x);
             });
 

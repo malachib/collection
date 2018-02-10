@@ -39,6 +39,11 @@ namespace Fact.Extensions.Experimental
 
         }
 
+        public static async Task WaitUntil(this CancellationToken token, Func<bool> condition, object eventInstance, string eventProperty)
+        {
+            await WaitFor(condition, eventInstance, eventProperty, token);
+        }
+
         public static async Task WaitFor(Func<bool> condition, object eventInstance, string eventProperty, CancellationToken ct)
         {
             var ac = new AsyncCondition() { condition = condition };
