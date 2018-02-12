@@ -76,11 +76,11 @@ namespace Fact.Extensions.Services
             CancellationToken = cancellationToken;
         }
 
-        public ServiceContext(ServiceContext copyFrom, IServiceDescriptor descriptor) : base(copyFrom)
+        public ServiceContext(ServiceContext copyFrom, IServiceDescriptor descriptor = null) : base(copyFrom)
         {
             ServiceProvider = copyFrom.ServiceProvider;
 
-            Descriptor = descriptor;
+            Descriptor = descriptor ?? copyFrom.Descriptor;
 
             if (copyFrom.Progress == null && descriptor is IProgress<float> descriptorWithProgress)
             {

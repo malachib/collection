@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 using Fact.Extensions.Experimental;
+using Fact.Extensions.Collection;
 
 namespace Fact.Extensions.Services
 {
@@ -18,7 +19,40 @@ namespace Fact.Extensions.Services
     {
         readonly ILogger logger;
 
+        /// <summary>
+        /// Reflects WorkerService-specific states
+        /// </summary>
+        public enum StateEnum
+        {
+            /// <summary>
+            /// Beginning one iteration of a worker cycle
+            /// </summary>
+            Starting,
+            /// <summary>
+            /// In flight running of the worker cycle
+            /// </summary>
+            Running,
+            /// <summary>
+            /// Completed worker cycle, state represents
+            /// end of a worker cycle regardless of it
+            /// being due to error, one shot, etc.
+            /// does NOT represent end of worker daemon
+            /// overall
+            /// </summary>
+            Ended
+        }
+
+        /// <summary>
+        /// Worker Service specific states, all happen within the context
+        /// of "Running" lifecycle
+        /// </summary>
+        protected State<StateEnum> state = new State<StateEnum>();
+
         public abstract string Name { get; }
+
+        /// <summary>
+        /// Indicates whether we intend to loop this worker
+        /// </summary>
         readonly bool oneShot;
 
         // this is for asynchronous pre-startup initialization, manually assigned from
@@ -43,7 +77,6 @@ namespace Fact.Extensions.Services
             : base(context.CancellationToken)
         {
             logger = context.GetService<ILogger<WorkerServiceBase>>();
-            this.ct = context.CancellationToken;
             this.oneShot = oneShot;
             // TODO: Wrap up configure with proper error event firing mechanism instead
             // (using IExceptionProvider)
@@ -61,27 +94,26 @@ namespace Fact.Extensions.Services
             this.oneShot = oneShot;
         }
 
+        /// <summary>
+        /// Refers to to ever-changing worker task handling per-loop
+        /// iterative work.  Does not represent unchanging daemon task itself
+        /// </summary>
         Task worker;
 
-        readonly CancellationToken ct;
+        /// <summary>
+        /// Refers to the non-changing server/daemon task which kicks
+        /// off workers one by one
+        /// </summary>
+        Task daemon;
 
+        /// <summary>
+        /// Exception occurred within worker process itself
+        /// </summary>
         public event Action<Exception> ExceptionOccurred;
 
         // TODO: Decide if we want to keep passing IServiceProvider in, thinking probably
         // yes but let's see how it goes
         protected abstract Task Worker(ServiceContext context);
-
-
-        /// <summary>
-        /// Combine incoming cancellation token with our local shutdown-oriented one
-        /// </summary>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /*
-        protected CancellationToken Combine(CancellationToken ct)
-        {
-            return CancellationTokenSource.CreateLinkedTokenSource(localCts.Token, ct).Token;
-        } */
 
 
         /// <summary>
@@ -95,15 +127,52 @@ namespace Fact.Extensions.Services
         {
             logger.LogTrace($"Worker starting ({Name})");
 
-            context = new ServiceContext(context, context.Descriptor);
+            // replace incoming context (from Startup) with our own
+            // local context
+            context = new ServiceContext(context);
+            // Our local context is changed only in that we have our own cancellation
+            // token
             context.CancellationToken = Token;
 
             do
             {
-                // TODO: Work out how progress.report is gonna work with repeating/non one
-                // shot services, if any
-                worker = Worker(context);
-                await worker;
+                state.Value = StateEnum.Starting;
+
+                try
+                {
+                    // TODO: Work out how progress.report is gonna work with repeating/non one
+                    // shot services, if any
+                    worker = Worker(context);
+
+                    state.Value = StateEnum.Running;
+
+                    await worker;
+                }
+                catch (TaskCanceledException)
+                {
+                    // We fully expect to encounter this exception due to external shutdown
+                    // and/or Cancel() calls
+                    logger.LogDebug($"Worker: ({Name}) cancelling normally");
+                }
+                catch (OperationCanceledException)
+                {
+                    // We fully expect to encounter this exception due to external shutdown
+                    // and/or Cancel() calls
+                    logger.LogDebug($"Worker: ({Name}) cancelling forcefully");
+                }
+                catch (AggregateException aex)
+                {
+                    if (aex.InnerException is OperationCanceledException)
+                    {
+                        logger.LogDebug($"Worker: ({Name}) cancelling normally (via aggregate exception)");
+                    }
+                    else
+                        throw;
+                }
+                finally
+                {
+                    state.Value = StateEnum.Ended;
+                }
             }
             while (!oneShot && !Token.IsCancellationRequested);
 
@@ -113,7 +182,7 @@ namespace Fact.Extensions.Services
             {
                 // if our outsider cancellation token was NOT the instigator,
                 // then we expect localCts itself generated it
-                if(!ct.IsCancellationRequested)
+                if(Token.IsCancellationRequested)
                 {
                     logger.LogTrace($"Worker has finished: ({Name}) Shutdown normally");
                 }
@@ -127,39 +196,22 @@ namespace Fact.Extensions.Services
         }
 
 
-        void RunWorkerHelper(ServiceContext context)
+        Task RunWorkerDaemon(ServiceContext context)
         {
             // we specifically *do not* await here, we are starting up a worker thread
-            Task.Run(async () =>
+            return Task.Run(async () =>
             {
                 try
                 {
                     await RunWorker(context);
                 }
-                catch (TaskCanceledException)
-                {
-                    logger.LogDebug($"Worker: ({Name}) cancelled normally");
-                }
-                catch (OperationCanceledException)
-                {
-                    logger.LogDebug($"Worker: ({Name}) cancelled forcefully");
-                }
-                catch (AggregateException aex)
-                {
-                    if(aex.InnerException is OperationCanceledException)
-                    {
-                        logger.LogDebug($"Worker: ({Name}) cancelled normally (via aggregate exception)");
-                    }
-                    else
-                    {
-                        ExceptionOccurred?.Invoke(aex);
-                        logger.LogWarning(0, aex, $"Worker: ({Name}) has error");
-                    }
-                }
+                // Standalone exception handler, primarily for servicing exceptions which occur that:
+                // a) aren't cancel-inspired exceptions
+                // b) (mostly) occur between (exclusively) the space of a startup and shutdown
                 catch (Exception ex)
                 {
                     ExceptionOccurred?.Invoke(ex);
-                    logger.LogWarning(0, ex, $"Worker: ({Name}) has error");
+                    logger.LogWarning(0, ex, $"Worker: ({Name}) has error and is aborting");
                 }
             });
         }
@@ -188,7 +240,8 @@ namespace Fact.Extensions.Services
                     logger.LogWarning($"Shutdown: No worker was running ({Name}).  Cancel initiated anyway.  Status = {worker.Status}");
 
                 Cancel();
-                await worker;
+                context.Progress?.Report(50);
+                await daemon;
             }
             else
                 logger.LogWarning($"Shutdown: No worker was created before shutdown was called ({Name})");
@@ -206,7 +259,7 @@ namespace Fact.Extensions.Services
 
             context.Progress?.Report(50);
 
-            RunWorkerHelper(context);
+            daemon = RunWorkerDaemon(context);
 
             // TODO: have mini-awaiter which only waits for runworker to start
             context.Progress?.Report(100);
