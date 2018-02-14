@@ -14,7 +14,8 @@ namespace Fact.Extensions.Services
     public interface IItemAcquirer<T>
     {
         /// <summary>
-        /// Fired when item of interest has appeared on the transport
+        /// Fired when item of interest appeared on the transport.
+        /// This likely fires on a time-sensitive worker thread
         /// </summary>
         event Action<T> ItemAcquired;
     }
