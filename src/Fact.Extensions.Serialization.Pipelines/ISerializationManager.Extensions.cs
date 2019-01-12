@@ -23,7 +23,7 @@ namespace Fact.Extensions.Serialization
         }
 
 
-        public static async Task<object> DeserializeAsync(this IDeserializerAsync<IPipelineReader> serializationManager, byte[] inputValue, Type type)
+        public static async Task<object> DeserializeAsync(this IDeserializerAsync<PipeReader> serializationManager, byte[] inputValue, Type type)
         {
             var reader = inputValue.AsPipelineReader();
 
@@ -38,19 +38,22 @@ namespace Fact.Extensions.Serialization
 
     public static class ByteArray_Extensions
     {
-        public static UnownedBufferReader AsPipelineReader(this byte[] value, out Task awaiter)
+        public static PipeReader AsPipelineReader(this byte[] value, out Task awaiter)
         {
-            var reader = new UnownedBufferReader();
-            awaiter = reader.WriteAsync(value, CancellationToken.None);
-            return reader;
+            var pipe  = new Pipe();
+            var writer = pipe.Writer;
+            var _awaiter = writer.WriteAsync(value, CancellationToken.None);
+            awaiter = _awaiter.AsTask();
+            return pipe.Reader;
         }
 
 
-        public static UnownedBufferReader AsPipelineReader(this byte[] value)
+        public static PipeReader AsPipelineReader(this byte[] value)
         {
-            var reader = new UnownedBufferReader();
-            reader.WriteAsync(value, CancellationToken.None);
-            return reader;
+            var pipe = new Pipe();
+            var writer = pipe.Writer;
+            writer.WriteAsync(value, CancellationToken.None);
+            return pipe.Reader;
         }
     }
 }

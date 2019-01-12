@@ -9,7 +9,7 @@ namespace Fact.Extensions.Serialization.Pipelines
     public class ByteArrayToPipelineSerializationManagerAsync : 
         IByteArraySerializationManagerAsync
     {
-        ISerializationManagerAsync<IPipelineReader, IPipelineWriter> serializer;
+        ISerializationManagerAsync<PipeReader, PipeWriter> serializer;
 
         public async Task<object> DeserializeAsync(byte[] input, Type type)
         {

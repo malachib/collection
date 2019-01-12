@@ -15,7 +15,7 @@ namespace Fact.Extensions.Serialization.Pipelines
     /// Probably shouldn't use this, instead should make a TextReader/TextWriter wrapper for pipeline serialization
     /// </summary>
     public class JsonSerializationManagerAsync : 
-        ISerializationManagerAsync<IPipelineReader, IPipelineWriter>,
+        ISerializationManagerAsync<PipeReader, PipeWriter>,
         ISerializationManager_TextEncoding
     {
         //readonly JsonSerializerSettings settings;
@@ -23,7 +23,7 @@ namespace Fact.Extensions.Serialization.Pipelines
 
         public Encoding Encoding => Encoding.UTF8;
 
-        public async Task<object> DeserializeAsync(IPipelineReader input, Type type)
+        public async Task<object> DeserializeAsync(PipeReader input, Type type)
         {
             // TODO: Works, but seems ReadAsync may be creating more of an intermediate buffer than we actually need
             var readResult = await input.ReadAsync();
@@ -41,7 +41,7 @@ namespace Fact.Extensions.Serialization.Pipelines
         }
 
 
-        public async Task SerializeAsync(IPipelineWriter output, object inputValue, Type type = null)
+        public async Task SerializeAsync(PipeWriter output, object inputValue, Type type = null)
         {
             var writeBuffer = output.Alloc();
             var stream = new WriteableBufferStream(writeBuffer);

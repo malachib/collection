@@ -10,9 +10,9 @@ namespace Fact.Extensions.Serialization.Pipelines
 {
     public class ReadableBufferStream : Stream
     {
-        readonly ReadableBuffer readableBuffer;
+        readonly ReadResult readableBuffer;
 
-        public ReadableBufferStream(ReadableBuffer readableBuffer)
+        public ReadableBufferStream(ReadResult readableBuffer)
         {
             this.readableBuffer = readableBuffer;
         }
@@ -51,9 +51,11 @@ namespace Fact.Extensions.Serialization.Pipelines
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            readableBuffer.CopyTo(new Span<byte>(buffer, offset, count));
-            if (count > readableBuffer.Length)
-                return readableBuffer.Length;
+            // FIX: Not ready yet
+            throw new NotImplementedException();
+            //readableBuffer.CopyTo(new Span<byte>(buffer, offset, count));
+            if (count > readableBuffer.Buffer.Length)
+                return (int)readableBuffer.Buffer.Length;
             else
                 return count;
         }
@@ -79,21 +81,21 @@ namespace Fact.Extensions.Serialization.Pipelines
     /// UNTESTED
     /// </summary>
     public class TextSerializationManagerWrapperAsync :
-        ISerializationManagerAsync<IPipelineReader, IPipelineWriter>,
+        ISerializationManagerAsync<PipeReader, PipeWriter>,
         ISerializationManager_TextEncoding
     {
         readonly ISerializationManager<Stream, Stream> serializationManager;
 
         public Encoding Encoding => ((ISerializationManager_TextEncoding)serializationManager).Encoding;
 
-        public async Task<object> DeserializeAsync(IPipelineReader input, Type type)
+        public async Task<object> DeserializeAsync(PipeReader input, Type type)
         {
             var readResult = await input.ReadAsync();
             var stream = new ReadableBufferStream(readResult.Buffer);
             return serializationManager.Deserialize(stream, type);
         }
 
-        public async Task SerializeAsync(IPipelineWriter output, object inputValue, Type type = null)
+        public async Task SerializeAsync(PipeWriter output, object inputValue, Type type = null)
         {
             var writeBuffer = output.Alloc();
             var stream = new WriteableBufferStream(writeBuffer);
