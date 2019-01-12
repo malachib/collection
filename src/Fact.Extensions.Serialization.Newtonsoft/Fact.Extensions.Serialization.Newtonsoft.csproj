@@ -3,10 +3,18 @@
   <PropertyGroup>
     <Description>ISerializationManager specific implementation for Newtonsoft JSON serialization</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
     <AssemblyName>Fact.Extensions.Serialization.Newtonsoft</AssemblyName>
     <PackageId>Fact.Extensions.Serialization.Newtonsoft</PackageId>
   </PropertyGroup>
+    
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+    <TargetFrameworks>netstandard1.6;net46</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
+    <TargetFrameworks>netstandard1.6</TargetFrameworks>
+  </PropertyGroup>
+    
 
   <ItemGroup>
     <ProjectReference Include="..\Fact.Extensions.Serialization\Fact.Extensions.Serialization.csproj" />
