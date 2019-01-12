@@ -27,7 +27,7 @@ namespace Fact.Extensions.Serialization.Pipelines
         {
             // TODO: Works, but seems ReadAsync may be creating more of an intermediate buffer than we actually need
             var readResult = await input.ReadAsync();
-            var stream = new ReadableBufferStream(readResult.Buffer);
+            var stream = new ReadableBufferStream(readResult);
             var reader = new StreamReader(stream, Encoding);
             return serializer.Deserialize(reader, type);
 
@@ -43,6 +43,7 @@ namespace Fact.Extensions.Serialization.Pipelines
 
         public async Task SerializeAsync(PipeWriter output, object inputValue, Type type = null)
         {
+            /* FIX: need to totally redo this
             var writeBuffer = output.Alloc();
             var stream = new WriteableBufferStream(writeBuffer);
             var writer = new StreamWriter(stream, Encoding);
@@ -51,6 +52,7 @@ namespace Fact.Extensions.Serialization.Pipelines
             //await writer.FlushAsync();
             //await writeBuffer.FlushAsync();
             output.Complete();
+            */           
         }
     }
 }

@@ -9,16 +9,18 @@ namespace Fact.Extensions.Serialization
 {
     public static class ISerializationManager_Extensions
     {
-        public static async Task<byte[]> SerializeToByteArrayAsync(this ISerializerAsync<IPipelineWriter> serializationManager, object input, Type type = null)
+        public static async Task<byte[]> SerializeToByteArrayAsync(this ISerializerAsync<PipeWriter> serializationManager, object input, Type type = null)
         {
             // See below comment in DeserializeAsync regarding kludginess of this
-            var pipeline = new PipelineFactory().Create();
-            var writerTask = serializationManager.SerializeAsync(pipeline, input);
+            var pipe = new Pipe();
+            var writerTask = serializationManager.SerializeAsync(pipe.Writer, input);
             // Happens inside SerializeAsync, but do we always really want to totally end pipeline communication
             // from INSIDE a utility function?
             //pipeline.CompleteWriter(); 
-            var readableBuffer = await pipeline.ReadToEndAsync();
-            var returnValue = readableBuffer.ToArray();
+            var result = await pipe.Reader.ReadAsync();
+            var buffer = result.Buffer;
+            // FIX: This is only converting the FIRST potion, clearly not adequate for long term use
+            var returnValue = buffer.First.ToArray();
             return returnValue;
         }
 

@@ -91,18 +91,20 @@ namespace Fact.Extensions.Serialization.Pipelines
         public async Task<object> DeserializeAsync(PipeReader input, Type type)
         {
             var readResult = await input.ReadAsync();
-            var stream = new ReadableBufferStream(readResult.Buffer);
+            var stream = new ReadableBufferStream(readResult);
             return serializationManager.Deserialize(stream, type);
         }
 
         public async Task SerializeAsync(PipeWriter output, object inputValue, Type type = null)
         {
+            /* totally different now, and old code probably didnt even work right
             var writeBuffer = output.Alloc();
             var stream = new WriteableBufferStream(writeBuffer);
             serializationManager.Serialize(stream, inputValue, type);
             // FIX: following line needs to somehow work for this code to be viable
             //await writer.FlushAsync();
             output.Complete();
+            */           
         }
     }
 }
