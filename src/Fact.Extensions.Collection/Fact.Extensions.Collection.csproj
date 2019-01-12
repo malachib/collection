@@ -3,12 +3,22 @@
   <PropertyGroup>
     <Description>Utility interfaces to consolidate different bag-like targets in .NET Core, such as caching</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFrameworks>netstandard1.1;netstandard1.6;net40;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Fact.Extensions.Collection</AssemblyName>
     <PackageId>Fact.Extensions.Collection</PackageId>
     <DefineConstants>ALPHA</DefineConstants>
+  </PropertyGroup>
+    
+  <!-- so that we can still develop (partially) via non-Windows
+       as per https://weblog.west-wind.com/posts/2017/Sep/18/Conditional-TargetFrameworks-for-MultiTargeted-NET-SDK-Projects-on-CrossPlatform-Builds
+    -->
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+    <TargetFrameworks>netstandard1.1;netstandard1.6;net40;net46</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
+    <TargetFrameworks>netstandard1.1;netstandard1.6</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">

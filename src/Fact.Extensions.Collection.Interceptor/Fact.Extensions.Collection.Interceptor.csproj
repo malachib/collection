@@ -3,7 +3,6 @@
   <PropertyGroup>
     <Description>Castle interceptors for IBag and Caching</Description>
     <Authors>Malachi Burke</Authors>
-    <TargetFrameworks>netstandard1.3;netstandard1.6;net46</TargetFrameworks>
     <NoWarn>$(NoWarn);1591;1571;1572;1573;1574;1587</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DefineConstants>ALPHA</DefineConstants>
@@ -13,7 +12,15 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+    <TargetFrameworks>netstandard1.3;netstandard1.6;net46</TargetFrameworks>
+  </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
+    <TargetFrameworks>netstandard1.3;netstandard1.6</TargetFrameworks>
+  </PropertyGroup>
+    
   <ItemGroup>
     <ProjectReference Include="..\Fact.Extensions.Caching\Fact.Extensions.Caching.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Collection\Fact.Extensions.Collection.csproj" />
