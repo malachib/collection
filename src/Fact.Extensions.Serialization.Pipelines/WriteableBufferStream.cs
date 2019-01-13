@@ -25,7 +25,7 @@ namespace Fact.Extensions.Serialization.Pipelines
 
         public override void Flush()
         {
-            throw new NotImplementedException();
+            pipeWriter.FlushAsync().AsTask().Wait();
         }
 
         public override int Read(byte[] buffer, int offset, int count)

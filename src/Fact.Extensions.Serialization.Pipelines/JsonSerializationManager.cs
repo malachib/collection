@@ -43,16 +43,13 @@ namespace Fact.Extensions.Serialization.Pipelines
 
         public async Task SerializeAsync(PipeWriter output, object inputValue, Type type = null)
         {
-            /* FIX: need to totally redo this
-            var writeBuffer = output.Alloc();
-            var stream = new WriteableBufferStream(writeBuffer);
+            var stream = new WriteableBufferStream(output);
             var writer = new StreamWriter(stream, Encoding);
             serializer.Serialize(writer, inputValue, type);
             await writer.FlushAsync();
             //await writer.FlushAsync();
             //await writeBuffer.FlushAsync();
             output.Complete();
-            */           
         }
     }
 }
