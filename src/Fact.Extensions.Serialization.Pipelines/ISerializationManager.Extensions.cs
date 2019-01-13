@@ -14,8 +14,10 @@ namespace Fact.Extensions.Serialization
             // See below comment in DeserializeAsync regarding kludginess of this
             var pipe = new Pipe();
             var writerTask = serializationManager.SerializeAsync(pipe.Writer, input);
+            await writerTask;
             // Happens inside SerializeAsync, but do we always really want to totally end pipeline communication
             // from INSIDE a utility function?
+            pipe.Writer.Complete();
             //pipeline.CompleteWriter(); 
             var result = await pipe.Reader.ReadAsync();
             var buffer = result.Buffer;
@@ -54,7 +56,7 @@ namespace Fact.Extensions.Serialization
         {
             var pipe = new Pipe();
             var writer = pipe.Writer;
-            writer.WriteAsync(value, CancellationToken.None);
+            writer.WriteAsync(value, CancellationToken.None).AsTask().Wait();
             return pipe.Reader;
         }
     }

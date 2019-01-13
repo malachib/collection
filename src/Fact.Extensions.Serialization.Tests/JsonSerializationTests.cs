@@ -1,4 +1,6 @@
-﻿using Fact.Extensions.Serialization.Newtonsoft;
+﻿#define FEATURE_ENABLED_PIPELINES
+
+using Fact.Extensions.Serialization.Newtonsoft;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
