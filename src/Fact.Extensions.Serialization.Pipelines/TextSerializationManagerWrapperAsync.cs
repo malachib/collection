@@ -51,9 +51,9 @@ namespace Fact.Extensions.Serialization.Pipelines
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            // FIX: Not ready yet
-            throw new NotImplementedException();
-            //readableBuffer.CopyTo(new Span<byte>(buffer, offset, count));
+            var rom = new Memory<byte>(buffer, offset, count);
+            // FIX: we'll need to interact with more than just 'First'
+            readableBuffer.Buffer.First.CopyTo(buffer);
             if (count > readableBuffer.Buffer.Length)
                 return (int)readableBuffer.Buffer.Length;
             else
