@@ -17,13 +17,12 @@ namespace Fact.Extensions.Experimental.Tests
         [TestMethod]
         public void ByteArrayFileProviderTest()
         {
-            var d = new Dictionary<string, byte[]>();
-            var indexer = d.ToIndexer();
-            var p = new ByteArrayFileProvider(indexer);
+            var d = new SparseDictionary<string, byte[]>();
+            var p = new ByteArrayFileProvider(d);
 
             d.Add("file", Encoding.UTF8.GetBytes("test"));
 
-            IFileInfo fi = p.GetFileInfo("test");
+            IFileInfo fi = p.GetFileInfo("file");
 
             var r = new StreamReader(fi.CreateReadStream());
 

@@ -9,7 +9,7 @@ namespace Fact.Extensions.Experimental
     public abstract class AccessorFileProvider<TValue> : 
         IFileProvider
     {
-        readonly INamedAccessor<TValue> files;
+        readonly IAccessor<string, TValue> files;
 
         protected class FileInfoBase
         {
@@ -29,7 +29,7 @@ namespace Fact.Extensions.Experimental
             public bool IsDirectory => false;
         }
 
-        protected AccessorFileProvider(INamedAccessor<TValue> files)
+        protected AccessorFileProvider(IAccessor<string, TValue> files)
         {
             this.files = files;
         }
@@ -74,7 +74,7 @@ namespace Fact.Extensions.Experimental
             public Stream CreateReadStream() => new MemoryStream(value);
         }
 
-        public ByteArrayFileProvider(INamedAccessor<byte[]> files) : base(files)
+        public ByteArrayFileProvider(IAccessor<string, byte[]> files) : base(files)
         {
         }
 

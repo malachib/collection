@@ -14,7 +14,8 @@ namespace Fact.Extensions.Collection
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     public struct SparseDictionary<TKey, TValue> :
-        IDictionary<TKey, TValue>
+        IDictionary<TKey, TValue>,
+        IIndexer<TKey, TValue>, IKeys<TKey>, IContainsKey<TKey>
     {
         LazyLoader<Dictionary<TKey, TValue>> value;
 
@@ -44,6 +45,9 @@ namespace Fact.Extensions.Collection
                 return new TKey[0];
             }
         }
+
+        IEnumerable<TKey> IKeys<TKey>.Keys => this.Keys;
+
 
         public ICollection<TValue> Values
         {
