@@ -13,6 +13,10 @@ namespace Fact.Extensions.Collection
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
+    /// <remarks>Be careful with this struct, one basically cannot utilize it as 
+    /// an interface as it ends up making a copy.  Probably would be better to turn
+    /// this into a proper class, as the opportunity for incorrect usage is high
+    /// and at the end of the day the underlying Dictinary is still a ref type</remarks>
     public struct SparseDictionary<TKey, TValue> :
         IDictionary<TKey, TValue>,
         IIndexer<TKey, TValue>, IKeys<TKey>, IContainsKey<TKey>
