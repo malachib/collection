@@ -29,7 +29,7 @@ namespace Fact.Extensions.Experimental
             public bool IsDirectory => false;
         }
 
-        public AccessorFileProvider(INamedAccessor<TValue> files)
+        protected AccessorFileProvider(INamedAccessor<TValue> files)
         {
             this.files = files;
         }
