@@ -36,7 +36,7 @@ namespace Fact.Extensions.Experimental
             this.files = files;
         }
 
-        public IDirectoryContents GetDirectoryContents(string subpath)
+        public virtual IDirectoryContents GetDirectoryContents(string subpath)
         {
             throw new NotImplementedException();
         }
@@ -47,6 +47,15 @@ namespace Fact.Extensions.Experimental
         {
             TValue value = files[subpath];
             return CreateFileInfo(subpath, value);
+        }
+
+        public class DisposableAction : IDisposable
+        {
+            readonly Action action;
+
+            public DisposableAction(Action action) => this.action = action;
+
+            public void Dispose() => action();
         }
 
         internal class ChangeToken : IChangeToken
@@ -67,22 +76,21 @@ namespace Fact.Extensions.Experimental
                 this.filter = filter;
             }
 
-            public bool HasChanged
+            public bool HasChanged => hasChanged;
+
+            public void OnChanged()
             {
-                get => hasChanged;
-                internal set
-                {
-                    hasChanged = true;
-                    foreach (var i in callbacks) i.callback(i.state);
-                }
+                hasChanged = true;
+                foreach (var i in callbacks) i.callback(i.state);
             }
 
-            public bool ActiveChangeCallbacks => callbacks.Count > 0;
+            public bool ActiveChangeCallbacks => true;
 
             public IDisposable RegisterChangeCallback(Action<object> callback, object state)
             {
-                callbacks.Add(new Item { callback=callback, state=state });
-                return null;
+                var item = new Item { callback = callback, state = state };
+                callbacks.Add(item);
+                return new DisposableAction(() => callbacks.Remove(item));
             }
         }
 
@@ -95,7 +103,7 @@ namespace Fact.Extensions.Experimental
                 // TODO: Optimize this to be one wholistic notifier
                 notifier.PropertyChanged += (o, e) =>
                 {
-                    if (e.PropertyName == filter) token.HasChanged = true;
+                    if (e.PropertyName == filter) token.OnChanged();
                 };
                 return token;
             }
