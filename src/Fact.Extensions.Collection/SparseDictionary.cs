@@ -10,13 +10,14 @@ namespace Fact.Extensions.Collection
     /// <summary>
     /// Flavor of IDictionary which is very lazy-loaded
     /// Has undergone light testing
+    /// Be *very* careful passing this around via its interfaces (see remarks)
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    /// <remarks>Be careful with this struct, one basically cannot utilize it as 
-    /// an interface as it ends up making a copy.  Probably would be better to turn
-    /// this into a proper class, as the opportunity for incorrect usage is high
-    /// and at the end of the day the underlying Dictinary is still a ref type</remarks>
+    /// <remarks>Be careful with this struct, because when passing it around via
+    /// interfaces it ends up making a copy.  Specifically it will be a copy of
+    /// 'value' which, once set to non null, will remain the same.
+    /// </remarks>
     public struct SparseDictionary<TKey, TValue> :
         IDictionary<TKey, TValue>,
         IIndexer<TKey, TValue>, IKeys<TKey>, IContainsKey<TKey>
@@ -50,7 +51,7 @@ namespace Fact.Extensions.Collection
             }
         }
 
-        IEnumerable<TKey> IKeys<TKey>.Keys => this.Keys;
+        IEnumerable<TKey> IKeys<TKey>.Keys => Keys;
 
 
         public ICollection<TValue> Values

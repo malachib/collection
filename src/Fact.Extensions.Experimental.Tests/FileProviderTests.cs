@@ -18,9 +18,12 @@ namespace Fact.Extensions.Experimental.Tests
         public void ByteArrayFileProviderTest()
         {
             var d = new SparseDictionary<string, byte[]>();
-            var p = new ByteArrayFileProvider(d);
 
+            // 'primes the pump' so that our struct-SparseDictionary allocates a lazy loaded value
+            // which itself is a reference that does not change, thereby making this struct semi-ref'able
             d.Add("file", Encoding.UTF8.GetBytes("test"));
+
+            var p = new ByteArrayFileProvider(d);
 
             IFileInfo fi = p.GetFileInfo("file");
 
@@ -29,5 +32,10 @@ namespace Fact.Extensions.Experimental.Tests
             Assert.AreEqual("test", r.ReadLine());
         }
         
+
+        [TestMethod]
+        public void Cached_ByteArrayFileProviderTest()
+        {
+        }
     }
 }
