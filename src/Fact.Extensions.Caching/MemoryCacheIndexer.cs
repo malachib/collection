@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using Fact.Extensions.Collection;
 using Fact.Extensions.Serialization;
+using System.ComponentModel;
 
 namespace Fact.Extensions.Caching
 {
@@ -14,11 +15,13 @@ namespace Fact.Extensions.Caching
     public class MemoryCacheIndexer : 
         ITryGetter<object>, 
         IIndexer<object, object>,
-        IRemover<object>
+        IRemover<object>,
+        INotifyPropertyChanged
     {
         readonly IMemoryCache cache;
 
         public event Action<ICacheEntry> CreatingEntry;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public MemoryCacheIndexer(IMemoryCache cache)
         {
@@ -34,6 +37,7 @@ namespace Fact.Extensions.Caching
                 using (var cacheEntry = cache.CreateEntry(key))
                 {
                     CreatingEntry?.Invoke(cacheEntry);
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(key.ToString()));
                     cacheEntry.SetSlidingExpiration(TimeSpan.FromSeconds(120));
                     cacheEntry.SetValue(value);
                 }

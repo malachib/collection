@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using Fact.Extensions.Collection;
 using Microsoft.Extensions.FileProviders;
@@ -47,8 +49,57 @@ namespace Fact.Extensions.Experimental
             return CreateFileInfo(subpath, value);
         }
 
+        internal class ChangeToken : IChangeToken
+        {
+            readonly string filter;
+            readonly AccessorFileProvider<TValue> parent;
+            bool hasChanged = false;
+            internal class Item
+            {
+                internal Action<object> callback;
+                internal object state;
+            }
+            List<Item> callbacks = new List<Item>();
+
+            internal ChangeToken(AccessorFileProvider<TValue> parent, string filter)
+            {
+                this.parent = parent;
+                this.filter = filter;
+            }
+
+            public bool HasChanged
+            {
+                get => hasChanged;
+                internal set
+                {
+                    hasChanged = true;
+                    foreach (var i in callbacks) i.callback(i.state);
+                }
+            }
+
+            public bool ActiveChangeCallbacks => callbacks.Count > 0;
+
+            public IDisposable RegisterChangeCallback(Action<object> callback, object state)
+            {
+                callbacks.Add(new Item { callback=callback, state=state });
+                return null;
+            }
+        }
+
+
         public IChangeToken Watch(string filter)
         {
+            if (files is INotifyPropertyChanged notifier)
+            {
+                var token = new ChangeToken(this, filter);
+                // TODO: Optimize this to be one wholistic notifier
+                notifier.PropertyChanged += (o, e) =>
+                {
+                    if (e.PropertyName == filter) token.HasChanged = true;
+                };
+                return token;
+            }
+
             throw new NotImplementedException();
         }
     }

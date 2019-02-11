@@ -56,5 +56,12 @@ namespace Fact.Extensions.Experimental.Tests
 
             ByteArrayFileProviderTest(i);
         }
+
+
+        [TestMethod]
+        public void Watching_ByteArrayFileProviderTest()
+        {
+
+        }
     }
 }
