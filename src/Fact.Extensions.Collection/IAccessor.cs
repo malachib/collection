@@ -25,4 +25,15 @@ namespace Fact.Extensions.Collection
     /// together
     /// </remarks>
     public interface INamedAccessor<TValue> : IAccessor<string, TValue> { }
+
+    namespace Experimental
+    {
+        public interface IAccessorAsync<TKey, TValue>
+        {
+            Task<TValue> GetAsync(TKey key);
+        }
+
+
+        public interface INamedAccessorAsync<TValue> : IAccessorAsync<string, TValue> { } 
+    }
 }

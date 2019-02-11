@@ -23,4 +23,12 @@ namespace Fact.Extensions.Collection
     public interface INamedIndexer<TValue> : INamedAccessor<TValue>, IIndexer<string, TValue>
     {
     }
+
+    namespace Experimental
+    {
+        public interface IIndexerAsync<TKey, TValue> : IAccessorAsync<TKey, TValue>
+        {
+            Task SetAsync(TKey key, TValue value);
+        }
+    }
 }
