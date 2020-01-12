@@ -1,5 +1,6 @@
 <Project>
     <PropertyGroup>
         <DefineConstants></DefineConstants>
+        <Version>1.0.30</Version>
     </PropertyGroup>
 </Project>
