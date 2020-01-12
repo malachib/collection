@@ -16,7 +16,11 @@
     <ProjectReference Include="..\Fact.Extensions.Serialization.MessagePack\Fact.Extensions.Serialization.MessagePack.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Serialization.Newtonsoft\Fact.Extensions.Serialization.Newtonsoft.csproj" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <PackageReference Include="Appveyor.Testlogger" Version="2.0.0" />
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
