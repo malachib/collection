@@ -13,7 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Fact.Extensions.Configuration\Fact.Extensions.Configuration.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Serialization.Matrix\Fact.Extensions.Serialization.Matrix.csproj" />
-    <ProjectReference Include="..\Fact.Extensions.Serialization.Pipelines\Fact.Extensions.Serialization.Pipelines.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Serialization.MessagePack\Fact.Extensions.Serialization.MessagePack.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Serialization.Newtonsoft\Fact.Extensions.Serialization.Newtonsoft.csproj" />
   </ItemGroup>
