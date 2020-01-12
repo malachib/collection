@@ -8,17 +8,14 @@
     <AssemblyName>Fact.Extensions.Collection</AssemblyName>
     <PackageId>Fact.Extensions.Collection</PackageId>
     <DefineConstants>ALPHA</DefineConstants>
+    <TargetFrameworks>netstandard1.1;netstandard1.6;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
     
   <!-- so that we can still develop (partially) via non-Windows
        as per https://weblog.west-wind.com/posts/2017/Sep/18/Conditional-TargetFrameworks-for-MultiTargeted-NET-SDK-Projects-on-CrossPlatform-Builds
     -->
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
-    <TargetFrameworks>netstandard1.1;netstandard1.6;netstandard2.0;net40;net46</TargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
-    <TargetFrameworks>netstandard1.1;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>$(TargetFrameworks);net40;net46</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
