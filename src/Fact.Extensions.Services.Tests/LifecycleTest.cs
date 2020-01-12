@@ -24,10 +24,16 @@ namespace Fact.Extensions.Services.Tests
         IServiceProvider Setup()
         {
             var sc = new ServiceCollection();
-            sc.AddLogging();
+            sc.AddLogging(builder =>
+                builder.AddConsole(c =>
+                {
+                    c.LogToStandardErrorThreshold = LogLevel.Trace;
+                })
+            );
             var sp = sc.BuildServiceProvider();
-            var lf = sp.GetService<ILoggerFactory>();
-            lf.AddConsole(LogLevel.Trace);
+            //var lf = sp.GetService<ILoggerFactory>();
+            //lf.AddConsole
+            //lf.AddConsole(LogLevel.Trace);
             return sp;
         }
 
