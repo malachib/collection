@@ -10,6 +10,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Fact.Extensions.Experimental;
 
+#if NETSTANDARD1_1
+using Fact.Extensions.Collection.Compat;
+#endif
+
 namespace Fact.Extensions.Services
 {
     /// <summary>

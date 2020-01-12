@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 #if NETSTANDARD2_0
 using System.Linq;
+#else
+using Fact.Extensions.Collection.Compat;
 #endif
 
 using Fact.Extensions.Collection;

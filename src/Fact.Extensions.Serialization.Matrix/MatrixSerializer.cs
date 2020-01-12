@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Data;
 
 using Fact.Extensions.Collection;
+using Fact.Extensions.Collection.Compat;
 using Fact.Extensions.Configuration;
 
 #if TRANSACTIONS_ENABLED

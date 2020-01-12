@@ -1,8 +1,4 @@
-﻿#if !NETSTANDARD2_0
-#define FEATURE_ENUMEXTENSIONS_PREPEND
-#endif
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,9 +21,40 @@ namespace Fact.Extensions.Collection
             else
                 return enumeration.ToArray();
         }
+    }
 
 
-#if FEATURE_ENUMEXTENSIONS_PREPEND
+    // TODO: Put this elsewhere
+    public static class TypeExtensions
+    {
+        /// <summary>
+        /// Return true if underlying type is comparable to null
+        /// Be advised, this includes string types
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsNullable(this Type type)
+        {
+#if NET40
+            if (!type.IsValueType) return true;
+#else
+            if (!type.GetTypeInfo().IsValueType) return true;
+#endif
+
+            return Nullable.GetUnderlyingType(type) != null;
+        }
+    }
+}
+
+namespace Fact.Extensions.Collection.Compat
+{
+    /// <summary>
+    /// Utilize for pre-netstandard2 compatibility
+    /// Not #if'ing because dependencies can break if DLLs depend on this
+    /// and #if removed it for netstandard2 scenarios
+    /// </summary>
+    public static class EnumerationExtensions
+    {
         /// <summary>
         /// Prepend particular value at the head of the enumeration
         /// </summary>
@@ -55,29 +82,6 @@ namespace Fact.Extensions.Collection
             foreach (T item in enumeration) yield return item;
 
             yield return appendedValue;
-        }
-#endif
-    }
-
-
-    // TODO: Put this elsewhere
-    public static class TypeExtensions
-    {
-        /// <summary>
-        /// Return true if underlying type is comparable to null
-        /// Be advised, this includes string types
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static bool IsNullable(this Type type)
-        {
-#if NET40
-            if (!type.IsValueType) return true;
-#else
-            if (!type.GetTypeInfo().IsValueType) return true;
-#endif
-
-            return Nullable.GetUnderlyingType(type) != null;
         }
     }
 }
