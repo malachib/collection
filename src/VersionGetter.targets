@@ -6,7 +6,10 @@
      Flawed but useful autoversioner.  Going to be x.x.x.y where y is branched build #.  branch itself must be derived
      discretely, potentially throwing off redirect-style version greater-than-version comparisons -->
 <Project InitialTargets="VersionGetter">
-  <Target Name="VersionGetter">
+  <!-- Remember, MSBuild is case insensitive
+      https://stackoverflow.com/questions/34067215/case-type-sensitivity-in-msbuild-conditions
+    -->
+  <Target Name="VersionGetter" Condition=" '$(APPVEYOR)' != 'true' ">
     <PropertyGroup>
       <FEBranch>alpha</FEBranch>
     </PropertyGroup>
@@ -25,6 +28,5 @@
     </PropertyGroup>
     <Message Text="Got version: $(ProjectVersion)-$(FEBranch)$(BuildVersion) / FileVersion = $(FETestVersion)" Importance="low">
     </Message>
-    <Message Text="APPVEYOR TESTER: $(TEST_VERSION_PREFIX)" />
   </Target>
 </Project>
