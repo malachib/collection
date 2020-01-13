@@ -9,7 +9,6 @@
   <Target Name="VersionGetter">
     <PropertyGroup>
       <FEBranch>alpha</FEBranch>
-      <VersionSuffix>a-test</VersionSuffix>
     </PropertyGroup>
     <ReadLinesFromFile File="..\..\.version\$(FEBranch)">
       <Output TaskParameter="Lines" PropertyName="BuildVersion" />

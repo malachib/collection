@@ -2,5 +2,6 @@
     <PropertyGroup>
         <DefineConstants></DefineConstants>
         <VersionPrefix>0.0.1</VersionPrefix>
+        <VersionSuffix>a-test-$(VERSION_SUFFIX)</VersionSuffix>
     </PropertyGroup>
 </Project>
