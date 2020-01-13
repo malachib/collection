@@ -10,6 +10,7 @@
       https://stackoverflow.com/questions/34067215/case-type-sensitivity-in-msbuild-conditions
     -->
   <Target Name="VersionGetter" Condition=" '$(APPVEYOR)' != 'true' ">
+    <!-- TODO: Consider using Git MSBuildCommunityTasks extensions to help here -->
     <PropertyGroup>
       <FEBranch>alpha</FEBranch>
     </PropertyGroup>

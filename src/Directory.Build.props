@@ -9,6 +9,7 @@
         <Version>0.0.1.0</Version>
         <VersionPrefix>0.0.1</VersionPrefix>
         <PackageVersion>0.0.1-devtest.0</PackageVersion>
+        <InformationalVersion>$(PackageVersion)</InformationalVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(APPVEYOR)' != 'true'">
         <!-- TODO: Mirate old VersionGetter.targets into here -->
