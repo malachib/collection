@@ -1,7 +1,11 @@
 <Project>
     <PropertyGroup>
         <DefineConstants></DefineConstants>
-        <!-- It is expected AppVeyor (or other CI) picks up and rewrites these values -->
+        <!-- It is expected AppVeyor or other CI does the following:
+             * Scoops up version # prefix from somewhere here in repo
+             * Grabs that for its own purposes, then rewrites/patches that here 
+             * Also rewrite PackageVersion with extra build goodies
+             -->
         <VersionPrefix>0.0.1</VersionPrefix>
         <PackageVersion>0.0.1-devtest.0</PackageVersion>
     </PropertyGroup>
