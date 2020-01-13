@@ -1,4 +1,9 @@
-<!-- Flawed but useful autoversioner.  Going to be x.x.x.y where y is branched build #.  branch itself must be derived
+<!-- 
+      NOTE: Has done its service, is being displaced by AppVeyor.  We might still want to use
+            This approach for non-open-source projects, so leaving this here for that for now.
+            AppVeyor at this time has not quite displaced things, as the build-suffix remains
+            a little elusive
+     Flawed but useful autoversioner.  Going to be x.x.x.y where y is branched build #.  branch itself must be derived
      discretely, potentially throwing off redirect-style version greater-than-version comparisons -->
 <Project InitialTargets="VersionGetter">
   <Target Name="VersionGetter">
