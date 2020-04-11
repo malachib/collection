@@ -11,7 +11,6 @@ namespace Fact.Extensions.Collection.Interceptor
         /// Experimental
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TValue"></typeparam>
         /// <param name="indexer"></param>
         /// <returns></returns>
         public static T ToInterceptor<T>(this IIndexer<string, object> indexer)
