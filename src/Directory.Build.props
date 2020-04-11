@@ -16,7 +16,6 @@
   <PropertyGroup Condition="'$(TEAMCITY_VERSION)' != ''">
     <!-- Always lifting version prefix from .version/prefix file now, makes keeping TC and .NET
          versions in sync easier -->
-    <VersionPrefix>$(ProjectVersion)</VersionPrefix>
     <InformationalVersion>$(PackageVersion)</InformationalVersion>
     <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-teamcity-test CI: $(CIDetected) / $(CITest1)</AssemblyTitle>
   </PropertyGroup>
