@@ -1,6 +1,12 @@
 <!-- Every CSPROJ auto-imports/includes this file -->
-<Project InitialTargets="VersionGetter">
+<Project InitialTargets="VersionGetter;MyBeforeBuild">
   <Import Project="VersionGetter.targets" />
+  <Target Name="MyBeforeBuild" DependsOnTargets="VersionGetter" BeforeTargets="InitializeBuildStatus">
+    <PropertyGroup>
+      <VersionPrefix>0.0.3</VersionPrefix>
+    </PropertyGroup>
+    <Message Text="MyBeforeBuild" Importance="high"></Message>
+  </Target>
   <PropertyGroup Condition=" '$(APPVEYOR)' == 'true'">
     <DefineConstants></DefineConstants>
     <!-- It is expected AppVeyor or other CI does the following:
@@ -21,5 +27,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(CIDetected)' != 'true'">
     <!-- TODO: Mirate old VersionGetter.targets into here -->
+    <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-non-ci [$(VersionPrefix)]</AssemblyTitle>
   </PropertyGroup>
 </Project>
