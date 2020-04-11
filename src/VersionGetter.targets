@@ -22,6 +22,7 @@
     <ReadLinesFromFile File="..\..\.version\prefix.$(FEBranch)">
       <Output TaskParameter="Lines" PropertyName="ProjectVersion" />
     </ReadLinesFromFile>
+    <Message Text="VersionGetterPrereq run" Importance="high"></Message>
   </Target>
   <Target Name="VersionGetter" DependsOnTargets="VersionGetterPrereq" Condition=" '$(CIDetected)' != 'true' ">
     <!-- TODO: Consider using Git MSBuildCommunityTasks extensions to help here -->

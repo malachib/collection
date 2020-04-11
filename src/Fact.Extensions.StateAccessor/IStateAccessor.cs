@@ -10,7 +10,7 @@ namespace Fact.Extensions.Collection
     /// A State Accessor is a more powerful type of session/state bag.  It adds the following abilities:
     /// 
     /// 1) queryable type awareness of contents of bag
-    /// 2) a general repeatability as to the order & type of contents (see IParameterProvider)
+    /// 2) a general repeatability as to the order and type of contents (see IParameterProvider)
     /// 3) serializability for the entire bag
     /// 4) dirty state tracking
     /// </summary>

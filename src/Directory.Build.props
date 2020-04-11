@@ -1,23 +1,25 @@
 <Project InitialTargets="VersionGetter">
-    <Import Project="VersionGetter.targets" />
-    <PropertyGroup Condition=" '$(APPVEYOR)' == 'true'">
-        <DefineConstants></DefineConstants>
-        <!-- It is expected AppVeyor or other CI does the following:
+  <Import Project="VersionGetter.targets" />
+  <PropertyGroup Condition=" '$(APPVEYOR)' == 'true'">
+    <DefineConstants></DefineConstants>
+    <!-- It is expected AppVeyor or other CI does the following:
              * Scoops up version # prefix from somewhere here in repo
              * Grabs that for its own purposes, then rewrites/patches that here 
              * Also rewrite PackageVersion with extra build goodies
              -->
-        <Version>0.0.1.0</Version>
-        <VersionPrefix>0.0.1</VersionPrefix>
-        <PackageVersion>0.0.1-devtest.0</PackageVersion>
-        <InformationalVersion>$(PackageVersion)</InformationalVersion>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(TEAMCITY_VERSION)' != ''">
-        <VersionPrefix>$(ProjectVersion)</VersionPrefix>
-        <InformationalVersion>$(PackageVersion)</InformationalVersion>
-        <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-teamcity-test</AssemblyTitle>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(APPVEYOR)' != 'true'">
-        <!-- TODO: Mirate old VersionGetter.targets into here -->
-    </PropertyGroup>
+    <Version>0.0.1.0</Version>
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <PackageVersion>0.0.1-devtest.0</PackageVersion>
+    <InformationalVersion>$(PackageVersion)</InformationalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TEAMCITY_VERSION)' != ''">
+    <!-- Always lifting version prefix from .version/prefix file now, makes keeping TC and .NET
+         versions in sync easier -->
+    <VersionPrefix>$(ProjectVersion)</VersionPrefix>
+    <InformationalVersion>$(PackageVersion)</InformationalVersion>
+    <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-teamcity-test</AssemblyTitle>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(APPVEYOR)' != 'true'">
+    <!-- TODO: Mirate old VersionGetter.targets into here -->
+  </PropertyGroup>
 </Project>
