@@ -48,4 +48,11 @@
     </PropertyGroup>
     <Message Text="Continuous Integration Detected: $(ProjectVersion)" Importance="Normal"></Message>
   </Target>
+  <Target Name="VersionGetter" DependsOnTargets="VersionGetterPrereq" Condition=" '$(CIDetected)' != 'true'">
+    <PropertyGroup>
+      <!-- Doesn't export -->
+       <VersionPrefix>0.0.2</VersionPrefix>
+    </PropertyGroup>
+    <Message Text="Continuous Integration Not Detected: $(ProjectVersion)" Importance="High"></Message>
+  </Target>
 </Project>

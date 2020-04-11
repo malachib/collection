@@ -19,7 +19,7 @@
     <InformationalVersion>$(PackageVersion)</InformationalVersion>
     <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-teamcity-test CI: $(CIDetected) / $(CITest1)</AssemblyTitle>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(APPVEYOR)' != 'true'">
+  <PropertyGroup Condition=" '$(CIDetected)' != 'true'">
     <!-- TODO: Mirate old VersionGetter.targets into here -->
   </PropertyGroup>
 </Project>
