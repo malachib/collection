@@ -1,4 +1,5 @@
-<Project>
+<Project InitialTargets="VersionGetter">
+    <Import Project="VersionGetter.targets" />
     <PropertyGroup Condition=" '$(APPVEYOR)' == 'true'">
         <DefineConstants></DefineConstants>
         <!-- It is expected AppVeyor or other CI does the following:
@@ -12,8 +13,9 @@
         <InformationalVersion>$(PackageVersion)</InformationalVersion>
     </PropertyGroup>
     <PropertyGroup Condition="'$(TEAMCITY_VERSION)' != ''">
-        <VersionPrefix>0.0.2</VersionPrefix>
+        <VersionPrefix>$(ProjectVersion)</VersionPrefix>
         <InformationalVersion>$(PackageVersion)</InformationalVersion>
+      <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-teamcity-test</AssemblyTitle>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(APPVEYOR)' != 'true'">
         <!-- TODO: Mirate old VersionGetter.targets into here -->
