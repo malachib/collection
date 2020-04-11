@@ -15,6 +15,7 @@ namespace Fact.Extensions.Experimental.Tests
         {
             var amwe = new AsyncManualWaitEvent();
             DateTime timestamp = DateTime.MinValue;
+            var timeout = TimeSpan.FromMilliseconds(500);
 
             bool result1 = Task.Run(async () =>
             {
@@ -30,7 +31,7 @@ namespace Fact.Extensions.Experimental.Tests
                 var elapsed = DateTime.Now.Subtract(timestamp);
 
                 // a little fuzzy, but should be a good test
-                Assert.IsTrue(elapsed.TotalMilliseconds < 100);
+                Assert.IsTrue(elapsed < timeout);
 
             }).Wait(2000);
 
@@ -40,7 +41,7 @@ namespace Fact.Extensions.Experimental.Tests
                 var elapsed = DateTime.Now.Subtract(timestamp);
 
                 // a little fuzzy, but should be a good test
-                Assert.IsTrue(elapsed.TotalMilliseconds < 100);
+                Assert.IsTrue(elapsed < timeout);
 
             }).Wait(2000);
 
