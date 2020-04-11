@@ -22,7 +22,7 @@
     <ReadLinesFromFile File="..\..\.version\prefix.$(FEBranch)">
       <Output TaskParameter="Lines" PropertyName="ProjectVersion" />
     </ReadLinesFromFile>
-    <Message Text="VersionGetterPrereq run" Importance="normal"></Message>
+    <Message Text="VersionGetterPrereq run" Importance="low"></Message>
   </Target>
   <Target Name="VersionGetter" DependsOnTargets="VersionGetterPrereq" Condition=" '$(CIDetected)' != 'true' ">
     <!-- TODO: Consider using Git MSBuildCommunityTasks extensions to help here -->
@@ -37,6 +37,6 @@
     </Message>
   </Target>
   <Target Name="VersionGetter" DependsOnTargets="VersionGetterPrereq" Condition=" '$(CIDetected)' == 'true' ">
-    <Message Text="Continuous Integration Detected" Importance="high"></Message>
+    <Message Text="Continuous Integration Detected: $(ProjectVersion)" Importance="high"></Message>
   </Target>
 </Project>
