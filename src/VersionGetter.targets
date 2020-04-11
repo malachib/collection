@@ -27,13 +27,13 @@
       <FETestVersion>$(ProjectVersion).$(BuildVersion)</FETestVersion>
 	    <ProductVersion>$(FETestVersion)</ProductVersion>
       <ProductName>$(AssemblyName) - $(FEBranch)</ProductName>
+	    <VersionPrefix>$(ProjectVersion)</VersionPrefix>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TEAMCITY_VERSION)' != 'true'">
-	    <FileVersion>$(FETestVersion)</FileVersion>
+      <VersionSuffix>$(BuildVersion)</VersionSuffix>
       <AssemblyTitle>$(AssemblyName): $(ProjectVersion)-$(FEBranch).$(BuildVersion)</AssemblyTitle>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TEAMCITY_VERSION)' == 'true'">
-	    <VersionPrefix>$(BuildVersion)</VersionPrefix>
       <AssemblyTitle>$(AssemblyName): $(ProjectVersion)-$(FEBranch).$(TEAMCITY_BUILD_COUNTER)</AssemblyTitle>
     </PropertyGroup>
     <Message Text="Got version: $(ProjectVersion)-$(FEBranch).$(BuildVersion) / FileVersion = $(FETestVersion) / TC_BC=$(TEAMCITY_BUILD_COUNTER)" Importance="High">
