@@ -38,7 +38,9 @@
   </Target>
   <Target Name="VersionGetter" DependsOnTargets="VersionGetterPrereq" Condition=" '$(CIDetected)' == 'true' ">
     <PropertyGroup>
-      <CITest1>$(ProjectVersion)</CITest1>
+      <PrebuildProperties>
+        <CITest1>$(ProjectVersion)</CITest1>
+      </PrebuildProperties>
     </PropertyGroup>
     <Message Text="Continuous Integration Detected: $(ProjectVersion)" Importance="high"></Message>
   </Target>
