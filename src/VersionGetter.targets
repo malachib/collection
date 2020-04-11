@@ -9,8 +9,10 @@
   <!-- Remember, MSBuild is case insensitive
       https://stackoverflow.com/questions/34067215/case-type-sensitivity-in-msbuild-conditions
     -->
-  <Target Name="VersionGetter" Condition=" '$(APPVEYOR)' != 'true' ">
-    <!-- TODO: Consider using Git MSBuildCommunityTasks extensions to help here -->
+  <PropertyGroup Condition="'$(APPVEYOR)' != '' OR '$(TEAMCITY_VERSION)' != ''">
+    <CIDetected>true</CIDetected>
+  </PropertyGroup>
+  <Target Name="VersionGetterPrereq">
     <PropertyGroup>
       <FEBranch>alpha</FEBranch>
     </PropertyGroup>
@@ -20,6 +22,9 @@
     <ReadLinesFromFile File="..\..\.version\prefix.$(FEBranch)">
       <Output TaskParameter="Lines" PropertyName="ProjectVersion" />
     </ReadLinesFromFile>
+  </Target>
+  <Target Name="VersionGetter" DependsOnTargets="VersionGetterPrereq" Condition=" '$(CIDetected)' != 'true' ">
+    <!-- TODO: Consider using Git MSBuildCommunityTasks extensions to help here -->
     <PropertyGroup>
       <FETestVersion>$(ProjectVersion).$(BuildVersion)</FETestVersion>
 	  <FileVersion>$(FETestVersion)</FileVersion>
@@ -29,5 +34,8 @@
     </PropertyGroup>
     <Message Text="Got version: $(ProjectVersion)-$(FEBranch)$(BuildVersion) / FileVersion = $(FETestVersion)" Importance="low">
     </Message>
+  </Target>
+  <Target Name="VersionGetter" DependsOnTargets="VersionGetterPrereq" Condition=" '$(CIDetected)' == 'true' ">
+    <Message Text="Continuous Integration Detected" Importance="normal"></Message>
   </Target>
 </Project>
