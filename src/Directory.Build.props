@@ -1,3 +1,4 @@
+<!-- Every CSPROJ auto-imports/includes this file -->
 <Project InitialTargets="VersionGetter">
   <Import Project="VersionGetter.targets" />
   <PropertyGroup Condition=" '$(APPVEYOR)' == 'true'">

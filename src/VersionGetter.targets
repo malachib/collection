@@ -41,6 +41,7 @@
       <PrebuildProperties>
         <CITest1>$(ProjectVersion)</CITest1>
       </PrebuildProperties>
+      <VersionPrefix>$(ProjectVersion)</VersionPrefix>
     </PropertyGroup>
     <Message Text="Continuous Integration Detected: $(ProjectVersion)" Importance="high"></Message>
   </Target>
