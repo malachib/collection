@@ -17,7 +17,7 @@
          versions in sync easier -->
     <VersionPrefix>$(ProjectVersion)</VersionPrefix>
     <InformationalVersion>$(PackageVersion)</InformationalVersion>
-    <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-teamcity-test</AssemblyTitle>
+    <AssemblyTitle>$(AssemblyName) - $(ProjectVersion)-teamcity-test CI: $(CIDetected) / $(CITest1)</AssemblyTitle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(APPVEYOR)' != 'true'">
     <!-- TODO: Mirate old VersionGetter.targets into here -->
