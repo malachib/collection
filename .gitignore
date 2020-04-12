@@ -39,5 +39,6 @@ app_messages.svclog
 # seems to be some kind of meta/tempfiles
 **/*.sln.ide/
 src/**/.vs/
+test/**/.vs/
 
 project.lock.json

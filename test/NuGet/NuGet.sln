@@ -13,7 +13,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "TestCode", "TestCode\TestCode.shproj", "{53352F80-966D-472C-9751-60D64C8DDBAD}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		TestCode\TestCode.projitems*{0d701957-d68a-4a82-8076-f693689a069b}*SharedItemsImports = 5
+		TestCode\TestCode.projitems*{53352f80-966d-472c-9751-60d64c8ddbad}*SharedItemsImports = 13
+		TestCode\TestCode.projitems*{58e5d1e3-737d-42f2-b572-f973a5480705}*SharedItemsImports = 5
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
