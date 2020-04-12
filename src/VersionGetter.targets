@@ -29,9 +29,8 @@
       <FETestVersion>$(ProjectVersion).$(BuildVersion)</FETestVersion>
       <ProductName>$(AssemblyName) - $(FEBranch)</ProductName>
 	    <VersionPrefix>$(ProjectVersion)</VersionPrefix>
-      <!--
-      <AssemblyVersion>$(FETestVersion)</AssemblyVersion> -->
-      <!-- No package version because we want it to match Version precisely -->
+      <!-- Strong naming prefers we don't increment this build # on AssemblyVersion -->
+      <AssemblyVersion>$(ProjectVersion)</AssemblyVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TEAMCITY_VERSION)' == ''">
 	    <InformationalVersion>$(ProjectVersion)-$(FEBranch).$(BuildVersion)</InformationalVersion>
@@ -39,7 +38,7 @@
       <AssemblyTitle>$(AssemblyName): $(ProjectVersion)-$(FEBranch).$(BuildVersion)</AssemblyTitle>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TEAMCITY_VERSION)' != ''">
-      <FileVersion>$(FETestVersion)</FileVersion>
+      <FileVersion>$(ProjectVersion).$(TEAMCITY_BUILD_COUNTER)</FileVersion>
       <AssemblyTitle>$(AssemblyName): $(ProjectVersion)-$(FEBranch).$(TEAMCITY_BUILD_COUNTER)</AssemblyTitle>
     </PropertyGroup>
     <Message Text="Got version: $(ProjectVersion)-$(FEBranch).$(BuildVersion) / FileVersion = $(FETestVersion) / TC_BC=$(TEAMCITY_BUILD_COUNTER)" Importance="Normal">
