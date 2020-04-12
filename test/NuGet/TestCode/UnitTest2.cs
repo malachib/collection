@@ -1,4 +1,4 @@
-﻿#if TEST_DIAGNOSTIC
+﻿#if TEST_DIAGNOSTIC || TEST_ALPHA
 #define TEST_ENABLED
 #endif
 
@@ -34,6 +34,10 @@ namespace TestCode
             var children = childCollection.Children;
 
             children.Should().ContainSingle();
+
+            Node foundNode = childCollection.GetChild("Node 1");
+
+            foundNode.Should().NotBeNull();
 #endif
         }
     }
