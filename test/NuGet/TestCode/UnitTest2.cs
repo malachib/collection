@@ -11,6 +11,7 @@ namespace TestCode
 {
 #if TEST_ENABLED
     using Fact.Extensions.Collection;
+    using FluentAssertions;
 #endif
 
     public class UnitTest2
@@ -29,6 +30,10 @@ namespace TestCode
             var childCollection = new NamedChildCollection<Node>("root");
 
             childCollection.AddChild(new Node() { Name = "Node 1" });
+
+            var children = childCollection.Children;
+
+            children.Should().ContainSingle();
 #endif
         }
     }
