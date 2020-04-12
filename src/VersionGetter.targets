@@ -29,7 +29,8 @@
       <FETestVersion>$(ProjectVersion).$(BuildVersion)</FETestVersion>
       <ProductName>$(AssemblyName) - $(FEBranch)</ProductName>
 	    <VersionPrefix>$(ProjectVersion)</VersionPrefix>
-      <AssemblyVersion>$(FETestVersion)</AssemblyVersion>
+      <!--
+      <AssemblyVersion>$(FETestVersion)</AssemblyVersion> -->
       <!-- No package version because we want it to match Version precisely -->
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TEAMCITY_VERSION)' == ''">
