@@ -21,15 +21,18 @@
   </Target>
   <!-- Remember, MSBuild is case insensitive
       https://stackoverflow.com/questions/34067215/case-type-sensitivity-in-msbuild-conditions
+      Good version guidance here
+      https://andrewlock.net/version-vs-versionsuffix-vspackageversion-what-do-they-all-mean/
     -->
   <Target Name="VersionGetter" DependsOnTargets="VersionGetterDep" Condition=" '$(APPVEYOR)' != 'true' ">
     <PropertyGroup>
       <FETestVersion>$(ProjectVersion).$(BuildVersion)</FETestVersion>
-	    <ProductVersion>$(FETestVersion)</ProductVersion>
       <ProductName>$(AssemblyName) - $(FEBranch)</ProductName>
 	    <VersionPrefix>$(ProjectVersion)</VersionPrefix>
+      <AssemblyVersion>$(FETestVersion)</AssemblyVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TEAMCITY_VERSION)' != 'true'">
+	    <InformationalVersion>$(ProjectVersion)-$(FEBranch).$(BuildVersion)</InformationalVersion>
       <VersionSuffix>$(BuildVersion)</VersionSuffix>
       <AssemblyTitle>$(AssemblyName): $(ProjectVersion)-$(FEBranch).$(BuildVersion)</AssemblyTitle>
     </PropertyGroup>
