@@ -30,7 +30,7 @@
       <ProductName>$(AssemblyName) - $(FEBranch)</ProductName>
 	    <VersionPrefix>$(ProjectVersion)</VersionPrefix>
       <AssemblyVersion>$(FETestVersion)</AssemblyVersion>
-      <PackageVersion>$(ProjectVersion)</PackageVersion>
+      <!-- No package version because we want it to match Version precisely -->
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TEAMCITY_VERSION)' == ''">
 	    <InformationalVersion>$(ProjectVersion)-$(FEBranch).$(BuildVersion)</InformationalVersion>
