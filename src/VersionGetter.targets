@@ -39,6 +39,7 @@
       <AssemblyTitle>$(AssemblyName): $(ProjectVersion)-$(FEBranch).$(BuildVersion)</AssemblyTitle>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TEAMCITY_VERSION)' != ''">
+      <FileVersion>$(FETestVersion)</FileVersion>
       <AssemblyTitle>$(AssemblyName): $(ProjectVersion)-$(FEBranch).$(TEAMCITY_BUILD_COUNTER)</AssemblyTitle>
     </PropertyGroup>
     <Message Text="Got version: $(ProjectVersion)-$(FEBranch).$(BuildVersion) / FileVersion = $(FETestVersion) / TC_BC=$(TEAMCITY_BUILD_COUNTER)" Importance="Normal">
