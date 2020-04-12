@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30002.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.Alpha", "NuGet.Alpha\NuGet.Alpha.csproj", "{58E5D1E3-737D-42F2-B572-F973A5480705}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.Diagnostic", "NuGet.Diagnostic\NuGet.Diagnostic.csproj", "{0D701957-D68A-4A82-8076-F693689A069B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{A0D12909-A593-4332-807D-8570ED24386C}"
+	ProjectSection(SolutionItems) = preProject
+		NuGet.config = NuGet.config
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{58E5D1E3-737D-42F2-B572-F973A5480705}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58E5D1E3-737D-42F2-B572-F973A5480705}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58E5D1E3-737D-42F2-B572-F973A5480705}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58E5D1E3-737D-42F2-B572-F973A5480705}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D701957-D68A-4A82-8076-F693689A069B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D701957-D68A-4A82-8076-F693689A069B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D701957-D68A-4A82-8076-F693689A069B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D701957-D68A-4A82-8076-F693689A069B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {795C6C93-60C0-47FB-9342-0EBFA2E89F9F}
+	EndGlobalSection
+EndGlobal
