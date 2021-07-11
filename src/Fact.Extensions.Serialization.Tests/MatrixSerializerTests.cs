@@ -271,7 +271,7 @@ namespace TestProject1
         }
 
         [TestMethod]
-        [DeploymentItem("Data\\minizip.txt")]
+        [DeploymentItem("Data\\minizip.txt", "Data")]
         public void DeserializeFixedLength2Test()
         {
             var baseDirectory = System.AppContext.BaseDirectory;
@@ -354,7 +354,7 @@ namespace TestProject1
 
 
         [TestMethod]
-        [DeploymentItem("Data\\minizip.csv")]
+        [DeploymentItem("Data\\minizip.csv", "Data")]
         public void DeserializeCSV2Test()
         {
             var baseDirectory = System.AppContext.BaseDirectory;
@@ -368,7 +368,7 @@ namespace TestProject1
 
 
         [TestMethod]
-        [DeploymentItem("Data\\empty.csv")]
+        [DeploymentItem("Data\\empty.csv", "Data")]
         public void DeserializeEmptyCSVTest()
         {
             var baseDirectory = System.AppContext.BaseDirectory;

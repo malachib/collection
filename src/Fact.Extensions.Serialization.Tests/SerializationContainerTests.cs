@@ -67,6 +67,8 @@ namespace Fact.Extensions.Serialization.Tests
 
 
         [TestMethod]
+        // DEBT: Actually just cheating and using this to create 'temp' folder
+        [DeploymentItem("Data\\empty.csv", "temp")]
         public void Test3()
         {
             var sc = new SerializationContainer2();
@@ -82,6 +84,8 @@ namespace Fact.Extensions.Serialization.Tests
 
 
         [TestMethod]
+        // DEBT: Actually just cheating and using this to create 'temp' folder
+        [DeploymentItem("Data\\empty.csv", "temp")]
         public void JsonSerializableTest()
         {
             var sc = new SerializationContainer2();
@@ -100,6 +104,8 @@ namespace Fact.Extensions.Serialization.Tests
 
 
         [TestMethod]
+        // DEBT: Actually just cheating and using this to create 'temp' folder
+        [DeploymentItem("Data\\empty.csv", "temp")]
         public void AggregateSerializationContainerTest()
         {
             var sc = new _SerializationContainer();
