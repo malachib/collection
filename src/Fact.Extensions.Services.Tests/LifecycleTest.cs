@@ -24,12 +24,16 @@ namespace Fact.Extensions.Services.Tests
         IServiceProvider Setup()
         {
             var sc = new ServiceCollection();
+#if NETCOREAPP3_1_OR_GREATER
             sc.AddLogging(builder =>
                 builder.AddConsole(c =>
                 {
                     c.LogToStandardErrorThreshold = LogLevel.Trace;
                 })
             );
+#else
+            sc.AddLogging();
+#endif
             var sp = sc.BuildServiceProvider();
             //var lf = sp.GetService<ILoggerFactory>();
             //lf.AddConsole
@@ -38,6 +42,7 @@ namespace Fact.Extensions.Services.Tests
         }
 
 
+#if NETCOREAPP3_1_OR_GREATER
         (ServiceContext context, CancellationTokenSource cts) Setup2()
         {
             var cts = new CancellationTokenSource();
@@ -45,6 +50,7 @@ namespace Fact.Extensions.Services.Tests
 
             return (context, cts);
         }
+#endif
 
         [TestMethod]
         public void BasicServiceManagerTest()
@@ -177,6 +183,7 @@ namespace Fact.Extensions.Services.Tests
                 base(context) {}
         }
 
+#if NETCOREAPP3_1_OR_GREATER
         [TestMethod]
         public void WorkerItemAcquirerServiceTest()
         {
@@ -199,5 +206,6 @@ namespace Fact.Extensions.Services.Tests
             Assert.AreEqual(LifecycleEnum.Stopped, descriptor.LifecycleStatus);
             Assert.IsTrue(completedOnTime, "Did not complete on time");
         }
+#endif
     }
 }

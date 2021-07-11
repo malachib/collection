@@ -57,6 +57,7 @@ namespace Fact.Extensions.Services.Tests
         public void ExperimentalServiceManagementTest()
         {
             var sc = new ServiceCollection();
+            sc.AddLogging();
             sc.AddServiceMangement();
             sc.AddSingleton<DummyService>();
             var sp = sc.BuildServiceProvider();

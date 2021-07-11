@@ -40,4 +40,6 @@ app_messages.svclog
 **/*.sln.ide/
 src/**/.vs/
 
+src/TestResults
+
 project.lock.json

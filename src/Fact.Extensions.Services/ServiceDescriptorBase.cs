@@ -63,7 +63,7 @@ namespace Fact.Extensions.Services
         internal ServiceDescriptorBase(IServiceProvider sp, IService service)
         {
             var context = new ServiceContext(sp, this);
-            this.logger = sp.GetService<ILogger<ServiceDescriptorBase>>();
+            this.logger = sp.GetRequiredService<ILogger<ServiceDescriptorBase>>();
             this.service = service;
 
             SetupServiceEvents(context, service);
@@ -73,7 +73,7 @@ namespace Fact.Extensions.Services
         internal ServiceDescriptorBase(ServiceContext context, IService service)
         {
             var sp = context.ServiceProvider;
-            this.logger = sp.GetService<ILogger<ServiceDescriptorBase>>();
+            this.logger = sp.GetRequiredService<ILogger<ServiceDescriptorBase>>();
             this.service = service;
 
             SetupServiceEvents(context, service);
