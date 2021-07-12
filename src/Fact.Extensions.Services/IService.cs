@@ -10,8 +10,7 @@ using System.Text;
 namespace Fact.Extensions.Services
 {
     public interface IService :
-        ILifecycle<ServiceContext>,
-        INamed
+        ILifecycle<ServiceContext>
     {
     }
 
@@ -44,7 +43,8 @@ namespace Fact.Extensions.Services
     public interface IServiceDescriptor : 
         IServiceDescriptorBase, 
         IService,
-        IExceptionProvider
+        IExceptionProvider,
+        INamed
     {
         /// <summary>
         /// List of services which depend on this one - specifically,

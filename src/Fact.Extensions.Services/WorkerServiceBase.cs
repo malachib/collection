@@ -48,8 +48,6 @@ namespace Fact.Extensions.Services
         /// </summary>
         protected State<StateEnum> state = new State<StateEnum>();
 
-        public abstract string Name { get; }
-
         /// <summary>
         /// Indicates whether we intend to loop this worker
         /// </summary>
@@ -125,7 +123,7 @@ namespace Fact.Extensions.Services
         /// <returns></returns>
         protected async Task RunWorker(ServiceContext context)
         {
-            logger.LogTrace($"Worker starting ({Name})");
+            logger.LogTrace($"Worker starting ({context.Descriptor.Name})");
 
             // replace incoming context (from Startup) with our own
             // local context
@@ -152,19 +150,19 @@ namespace Fact.Extensions.Services
                 {
                     // We fully expect to encounter this exception due to external shutdown
                     // and/or Cancel() calls
-                    logger.LogDebug($"Worker: ({Name}) cancelling normally");
+                    logger.LogDebug($"Worker: ({context.Descriptor.Name}) cancelling normally");
                 }
                 catch (OperationCanceledException)
                 {
                     // We fully expect to encounter this exception due to external shutdown
                     // and/or Cancel() calls
-                    logger.LogDebug($"Worker: ({Name}) cancelling forcefully");
+                    logger.LogDebug($"Worker: ({context.Descriptor.Name}) cancelling forcefully");
                 }
                 catch (AggregateException aex)
                 {
                     if (aex.InnerException is OperationCanceledException)
                     {
-                        logger.LogDebug($"Worker: ({Name}) cancelling normally (via aggregate exception)");
+                        logger.LogDebug($"Worker: ({context.Descriptor.Name}) cancelling normally (via aggregate exception)");
                     }
                     else
                         throw;
@@ -184,15 +182,15 @@ namespace Fact.Extensions.Services
                 // then we expect localCts itself generated it
                 if(Token.IsCancellationRequested)
                 {
-                    logger.LogTrace($"Worker has finished: ({Name}) Shutdown normally");
+                    logger.LogTrace($"Worker has finished: ({context.Descriptor.Name}) Shutdown normally");
                 }
                 else
                 {
-                    logger.LogWarning($"Worker has finished: ({Name}) Shutdown forcefully from system");
+                    logger.LogWarning($"Worker has finished: ({context.Descriptor.Name}) Shutdown forcefully from system");
                 }
             }
             else
-                logger.LogTrace($"Worker has finished: ({Name}) - {worker.Status}");
+                logger.LogTrace($"Worker has finished: ({context.Descriptor.Name}) - {worker.Status}");
         }
 
 
@@ -211,7 +209,7 @@ namespace Fact.Extensions.Services
                 catch (Exception ex)
                 {
                     ExceptionOccurred?.Invoke(ex);
-                    logger.LogWarning(0, ex, $"Worker: ({Name}) has error and is aborting");
+                    logger.LogWarning(0, ex, $"Worker: ({context.Descriptor.Name}) has error and is aborting");
                 }
             });
         }
@@ -237,14 +235,14 @@ namespace Fact.Extensions.Services
                 if (worker.Status != TaskStatus.Created && 
                     worker.Status != TaskStatus.Running &&
                     worker.Status != TaskStatus.WaitingForActivation)
-                    logger.LogWarning($"Shutdown: No worker was running ({Name}).  Cancel initiated anyway.  Status = {worker.Status}");
+                    logger.LogWarning($"Shutdown: No worker was running ({context.Descriptor.Name}).  Cancel initiated anyway.  Status = {worker.Status}");
 
                 Cancel();
                 context.Progress?.Report(50);
                 await daemon;
             }
             else
-                logger.LogWarning($"Shutdown: No worker was created before shutdown was called ({Name})");
+                logger.LogWarning($"Shutdown: No worker was created before shutdown was called ({context.Descriptor.Name})");
         }
 
         // FIX: would use "completedTask" but it doesn't seem to be available for netstandard1.1?

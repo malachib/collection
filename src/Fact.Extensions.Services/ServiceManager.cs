@@ -43,7 +43,7 @@ namespace Fact.Extensions.Services
             lifecycle.Changed += v => LifecycleStatusUpdated?.Invoke(this);
             if(self != null)
             {
-                this.self = new ServiceDescriptorBase(sp, self);
+                this.self = new ServiceDescriptorBase(sp, self, name);
             }
             if(configuration.InFlightStartup)
             {

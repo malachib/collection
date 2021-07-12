@@ -51,13 +51,13 @@ namespace Fact.Extensions.Services
                     }
                     else
                     {
-                        logger.LogWarning(0, ae, $"Unexpected agg-exception during Worker ({Name})");
+                        logger.LogWarning(0, ae, $"Unexpected agg-exception during Worker ({context.Descriptor.Name})");
                         throw;
                     }
                 }
                 catch(Exception e)
                 {
-                    logger.LogWarning(0, e, $"Unexpected exception during Worker ({Name})");
+                    logger.LogWarning(0, e, $"Unexpected exception during Worker ({context.Descriptor.Name})");
                     throw;
                 }
             });

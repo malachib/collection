@@ -62,7 +62,7 @@ namespace Fact.Extensions.Services.Tests
             var dummySem = new SemaphoreSlim(0, 1);
 
             sm.AddChild(childSm);
-            var dummyServiceDescriptor = sm.AddService(dummyService, sp);
+            var dummyServiceDescriptor = sm.AddService(dummyService, sp, "dummy");
 
             dummyServiceDescriptor.LifecycleStatusUpdated += o =>
             {
@@ -117,7 +117,7 @@ namespace Fact.Extensions.Services.Tests
             var dummySem = new SemaphoreSlim(0, 1);
 
             sm.AddChild(childSm);
-            sm.AddService(dummyService, sp);
+            sm.AddService(dummyService, sp, "dummy");
 
             dummyService.Generic += () => dummySem.Release();
 
@@ -134,8 +134,6 @@ namespace Fact.Extensions.Services.Tests
 
         public class DummyService2 : WorkerServiceBase
         {
-            public override string Name => "Dummy Service 2";
-
             public DummyService2(ServiceContext context) : base(context) { }
 
             protected override async Task Worker(ServiceContext context)
@@ -155,7 +153,7 @@ namespace Fact.Extensions.Services.Tests
                 var p = Setup();
                 ServiceContext context = new ServiceContext(p);
                 DummyService2 service = new DummyService2(context);
-                var descriptor = new ServiceDescriptorBase(p, service);
+                var descriptor = new ServiceDescriptorBase(p, service, "dummy");
                 context = new ServiceContext(context, descriptor);
                 context.CancellationToken = cts.Token;
                 await descriptor.Startup(context);
@@ -170,8 +168,6 @@ namespace Fact.Extensions.Services.Tests
         class DummyWorkerItemAcquirerService : WorkerItemAcquirerService<int>
         {
             int counter = 0;
-
-            public override string Name => "Dummy worker item acquirer";
 
             protected override int GetItem(CancellationToken ct)
             {
@@ -190,7 +186,7 @@ namespace Fact.Extensions.Services.Tests
             var result = Setup2();
             var context = result.context;
             var service = new DummyWorkerItemAcquirerService(context);
-            var descriptor = new ServiceDescriptorBase(context.ServiceProvider, service);
+            var descriptor = new ServiceDescriptorBase(context.ServiceProvider, service, "dummy");
 
             bool completedOnTime = Task.Run(async () =>
             {

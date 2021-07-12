@@ -120,9 +120,9 @@ namespace Fact.Extensions.Services
     public static class ServiceManagerExtensions
     {
         public static IServiceDescriptor AddService(this 
-            IChildCollection<IServiceDescriptor> serviceManager, IService service, IServiceProvider sp)
+            IChildCollection<IServiceDescriptor> serviceManager, IService service, IServiceProvider sp, string name)
         {
-            var sd = new ServiceDescriptorBase(sp, service);
+            var sd = new ServiceDescriptorBase(sp, service, name);
 
             serviceManager.AddChild(sd);
 
@@ -131,10 +131,10 @@ namespace Fact.Extensions.Services
 
 
         public static IServiceDescriptor<TService> AddService<TService>(
-            this IChildCollection<IServiceDescriptor> serviceManager, TService service, IServiceProvider sp)
+            this IChildCollection<IServiceDescriptor> serviceManager, TService service, IServiceProvider sp, string name)
             where TService : IService
         {
-            var sd = new ServiceDescriptorBase<TService>(sp, service);
+            var sd = new ServiceDescriptorBase<TService>(sp, service, name);
 
             serviceManager.AddChild(sd);
 
@@ -151,10 +151,10 @@ namespace Fact.Extensions.Services
         /// <param name="context"></param>
         /// <returns></returns>
         public static IServiceDescriptor<TService> AddService<TService>(this 
-            IChildCollection<IServiceDescriptor> serviceManager, TService service, ServiceContext context)
+            IChildCollection<IServiceDescriptor> serviceManager, TService service, ServiceContext context, string name)
             where TService : IService
         {
-            var sd = new ServiceDescriptorBase<TService>(context, service);
+            var sd = new ServiceDescriptorBase<TService>(context, service, name);
 
             serviceManager.AddChild(sd);
 

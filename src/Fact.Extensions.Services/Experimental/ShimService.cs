@@ -54,7 +54,7 @@ namespace Fact.Extensions.Services.Experimental
             Func<ServiceContext, Task> shutdown,
             ServiceContext context)
         {
-            return childCollection.AddService(new ShimService(name, startup, shutdown), context);
+            return childCollection.AddService(new ShimService(name, startup, shutdown), context, name);
         }
     }
 }

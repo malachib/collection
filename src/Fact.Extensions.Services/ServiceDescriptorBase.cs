@@ -60,28 +60,32 @@ namespace Fact.Extensions.Services
             }
         }
 
-        internal ServiceDescriptorBase(IServiceProvider sp, IService service)
+        internal ServiceDescriptorBase(IServiceProvider sp, IService service, string name)
         {
             var context = new ServiceContext(sp, this);
             this.logger = sp.GetRequiredService<ILogger<ServiceDescriptorBase>>();
             this.service = service;
 
             SetupServiceEvents(context, service);
+
+            Name = name;
         }
 
 
-        internal ServiceDescriptorBase(ServiceContext context, IService service)
+        internal ServiceDescriptorBase(ServiceContext context, IService service, string name)
         {
             var sp = context.ServiceProvider;
             this.logger = sp.GetRequiredService<ILogger<ServiceDescriptorBase>>();
             this.service = service;
 
             SetupServiceEvents(context, service);
+
+            Name = name;
         }
 
         public IService Service => service;
 
-        public string Name => service.Name;
+        public string Name { get; }
 
         public virtual async Task Shutdown(ServiceContext context)
         {
@@ -126,12 +130,12 @@ namespace Fact.Extensions.Services
         IServiceDescriptor<TService>
         where TService : IService
     {
-        public ServiceDescriptorBase(ServiceContext context, TService service) :
-            base(context.ServiceProvider, service)
+        public ServiceDescriptorBase(ServiceContext context, TService service, string name) :
+            base(context.ServiceProvider, service, name)
         { }
 
-        public ServiceDescriptorBase(IServiceProvider sp, TService service) :
-            base(sp, service)
+        public ServiceDescriptorBase(IServiceProvider sp, TService service, string name) :
+            base(sp, service, name)
         { }
 
         TService IServiceDescriptor<TService>.Service => (TService)Service;
