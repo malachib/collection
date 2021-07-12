@@ -47,7 +47,7 @@ namespace Fact.Extensions.Serialization
         /// specifically using the IPropertySerializer / IPropertyDeserializer transport
         /// </summary>
         /// <param name="sp"></param>
-        /// <param name="configureTypeSerializerFactory"></param>
+        /// <param name="config"></param>
         public static void UsePropertySerializer(this ISerializationRegistrar sp,
             SerializationProviderPropertySerializerConfig config = null)
         {

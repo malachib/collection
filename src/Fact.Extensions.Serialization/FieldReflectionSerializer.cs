@@ -8,7 +8,7 @@ namespace Fact.Extensions.Serialization
 {
     /// <summary>
     /// Serializes object by reflecting over PersistAttribute-marked fields (not properties, and not public)
-    /// Utilizes IPropertySerializer & IPropertyDeserializer as its transport
+    /// Utilizes IPropertySerializer &amp; IPropertyDeserializer as its transport
     /// </summary>
 #if NETSTANDARD1_6_OR_GREATER || NET46_OR_GREATER
     public class FieldReflectionSerializer :
