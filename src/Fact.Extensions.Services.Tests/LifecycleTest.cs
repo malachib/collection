@@ -188,6 +188,8 @@ namespace Fact.Extensions.Services.Tests
             var service = new DummyWorkerItemAcquirerService(context);
             var descriptor = new ServiceDescriptorBase(context.ServiceProvider, service, "dummy");
 
+            context.Descriptor = descriptor;
+
             bool completedOnTime = Task.Run(async () =>
             {
                 service.ItemAcquired += v => Console.WriteLine($"Got item: {v}");
