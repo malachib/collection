@@ -13,7 +13,4 @@
   <ItemGroup>
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
   </ItemGroup>
-
-  <Import Project="../VersionGetter.targets" />
-
 </Project>
