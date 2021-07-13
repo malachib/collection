@@ -28,6 +28,9 @@ namespace Fact.Extensions.Services
         readonly ILogger logger;
         readonly ServiceManagerConfiguration configuration = ServiceManagerConfiguration.Default;
 
+        // DEBT: Eventually use IServiceProviderProvider to expose this
+        internal IServiceProvider ServiceProvider { get; }
+
         /// <summary>
         /// ServiceManager doesn't use this just yet, merely because haven't decided what
         /// best way to utilize it for this class is
@@ -60,6 +63,7 @@ namespace Fact.Extensions.Services
                     await InFlightShutdownHandler(context, c);
                 };
             }
+            ServiceProvider = sp;
         }
 
 
