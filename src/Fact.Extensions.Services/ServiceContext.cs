@@ -41,9 +41,15 @@ namespace Fact.Extensions.Services
     }
 
 
-    public interface IServiceContext
+    public interface IServiceProviderProvider
     {
         IServiceProvider ServiceProvider { get; }
+    }
+
+
+    public interface IServiceContext : IServiceProviderProvider
+    {
+
     }
 
 
@@ -94,7 +100,7 @@ namespace Fact.Extensions.Services
         /// <summary>
         /// Descriptor which is 1:1 associated with the running service
         /// </summary>
-        public IServiceDescriptor Descriptor { get; set; }
+        public IServiceDescriptor Descriptor { get; }
     }
 
 
@@ -106,7 +112,7 @@ namespace Fact.Extensions.Services
         /// <typeparam name="T"></typeparam>
         /// <param name="serviceContext"></param>
         /// <returns></returns>
-        public static T GetService<T>(this IServiceContext serviceContext)
+        public static T GetService<T>(this IServiceProviderProvider serviceContext)
         {
             return serviceContext.ServiceProvider.GetService<T>();
         }

@@ -42,15 +42,6 @@ namespace Fact.Extensions.Services.Tests
         }
 
 
-#if NETCOREAPP3_1_OR_GREATER
-        (ServiceContext context, CancellationTokenSource cts) Setup2()
-        {
-            var cts = new CancellationTokenSource();
-            var context = new ServiceContext(Setup(), cts.Token);
-
-            return (context, cts);
-        }
-#endif
 
         [TestMethod]
         public void BasicServiceManagerTest()
@@ -179,16 +170,19 @@ namespace Fact.Extensions.Services.Tests
                 base(context) {}
         }
 
-#if NETCOREAPP3_1_OR_GREATER
         [TestMethod]
         public void WorkerItemAcquirerServiceTest()
         {
-            var result = Setup2();
-            var context = result.context;
+            var services = Setup();
+            var cts = new CancellationTokenSource();
+            
+            // 'Global' context, no ServiceDescriptor associated
+            var context = new ServiceContext(services, cts.Token);
             var service = new DummyWorkerItemAcquirerService(context);
-            var descriptor = new ServiceDescriptorBase(context.ServiceProvider, service, "dummy");
+            var descriptor = new ServiceDescriptorBase(services, service, "dummy");
 
-            context.Descriptor = descriptor;
+            // 'Local' context
+            context = new ServiceContext(context, descriptor);
 
             bool completedOnTime = Task.Run(async () =>
             {
@@ -204,6 +198,5 @@ namespace Fact.Extensions.Services.Tests
             Assert.AreEqual(LifecycleEnum.Stopped, descriptor.LifecycleStatus);
             Assert.IsTrue(completedOnTime, "Did not complete on time");
         }
-#endif
     }
 }

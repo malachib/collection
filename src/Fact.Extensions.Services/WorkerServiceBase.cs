@@ -123,7 +123,9 @@ namespace Fact.Extensions.Services
         /// <returns></returns>
         protected async Task RunWorker(ServiceContext context)
         {
-            logger.LogTrace($"Worker starting ({context.Descriptor.Name})");
+            string name = context.Descriptor.Name;
+
+            logger.LogTrace($"Worker starting ({name})");
 
             // replace incoming context (from Startup) with our own
             // local context
@@ -150,19 +152,19 @@ namespace Fact.Extensions.Services
                 {
                     // We fully expect to encounter this exception due to external shutdown
                     // and/or Cancel() calls
-                    logger.LogDebug($"Worker: ({context.Descriptor.Name}) cancelling normally");
+                    logger.LogDebug($"Worker: ({name}) cancelling normally");
                 }
                 catch (OperationCanceledException)
                 {
                     // We fully expect to encounter this exception due to external shutdown
                     // and/or Cancel() calls
-                    logger.LogDebug($"Worker: ({context.Descriptor.Name}) cancelling forcefully");
+                    logger.LogDebug($"Worker: ({name}) cancelling forcefully");
                 }
                 catch (AggregateException aex)
                 {
                     if (aex.InnerException is OperationCanceledException)
                     {
-                        logger.LogDebug($"Worker: ({context.Descriptor.Name}) cancelling normally (via aggregate exception)");
+                        logger.LogDebug($"Worker: ({name}) cancelling normally (via aggregate exception)");
                     }
                     else
                         throw;
@@ -182,15 +184,15 @@ namespace Fact.Extensions.Services
                 // then we expect localCts itself generated it
                 if(Token.IsCancellationRequested)
                 {
-                    logger.LogTrace($"Worker has finished: ({context.Descriptor.Name}) Shutdown normally");
+                    logger.LogTrace($"Worker has finished: ({name}) Shutdown normally");
                 }
                 else
                 {
-                    logger.LogWarning($"Worker has finished: ({context.Descriptor.Name}) Shutdown forcefully from system");
+                    logger.LogWarning($"Worker has finished: ({name}) Shutdown forcefully from system");
                 }
             }
             else
-                logger.LogTrace($"Worker has finished: ({context.Descriptor.Name}) - {worker.Status}");
+                logger.LogTrace($"Worker has finished: ({name}) - {worker.Status}");
         }
 
 
