@@ -143,6 +143,25 @@ namespace Fact.Extensions.Services
 
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="serviceManager"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Uses DI from serviceManager's ServiceProvider
+        /// </remarks>
+        public static IServiceDescriptor<TService> AddService<TService>(this ServiceManager serviceManager)
+            where TService : IService
+        {
+            var sp = serviceManager.ServiceProvider;
+            var service = sp.GetRequiredService<TService>();
+
+            return serviceManager.AddService(service, sp);
+        }
+
+
+        /// <summary>
         /// Wrap a service with a descriptor and add it to the child collection
         /// </summary>
         /// <typeparam name="TService"></typeparam>
