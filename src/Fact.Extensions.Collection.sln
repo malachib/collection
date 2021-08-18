@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31613.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Collection", "Fact.Extensions.Collection\Fact.Extensions.Collection.csproj", "{8EBB3E70-9F01-46A6-AC53-285CAF1F1BE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection", "Fact.Extensions.Collection\Fact.Extensions.Collection.csproj", "{8EBB3E70-9F01-46A6-AC53-285CAF1F1BE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Caching", "Fact.Extensions.Caching\Fact.Extensions.Caching.csproj", "{8AB0D287-F597-4ACC-9DBC-29753BDEB5AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Caching", "Fact.Extensions.Caching\Fact.Extensions.Caching.csproj", "{8AB0D287-F597-4ACC-9DBC-29753BDEB5AC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection.Tests", "Fact.Extensions.Collection.Tests\Fact.Extensions.Collection.Tests.csproj", "{CBA21DBC-1140-4717-968F-7014CE53BD26}"
 EndProject
@@ -28,20 +28,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serializati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8702DCD0-E599-4CE3-8AC3-A5537BBDC3EF}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
 		NuGet.config = NuGet.config
 		..\README.md = ..\README.md
-		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.MessagePack", "Fact.Extensions.Serialization.MessagePack\Fact.Extensions.Serialization.MessagePack.csproj", "{8568AF60-7372-44C0-9203-EE0C08A28996}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Collection.Interceptor", "Fact.Extensions.Collection.Interceptor\Fact.Extensions.Collection.Interceptor.csproj", "{12E69371-571C-4A4A-9F35-47DA507DEF57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection.Interceptor", "Fact.Extensions.Collection.Interceptor\Fact.Extensions.Collection.Interceptor.csproj", "{12E69371-571C-4A4A-9F35-47DA507DEF57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Serialization.Pipelines", "Fact.Extensions.Serialization.Pipelines\Fact.Extensions.Serialization.Pipelines.csproj", "{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.Pipelines", "Fact.Extensions.Serialization.Pipelines\Fact.Extensions.Serialization.Pipelines.csproj", "{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Caching.Tests", "Fact.Extensions.Caching.Tests\Fact.Extensions.Caching.Tests.csproj", "{51A693BB-66F5-444F-875A-73FF9E5A6932}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Configuration", "Fact.Extensions.Configuration\Fact.Extensions.Configuration.csproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Configuration", "Fact.Extensions.Configuration\Fact.Extensions.Configuration.csproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.StateAccessor", "Fact.Extensions.StateAccessor\Fact.Extensions.StateAccessor.csproj", "{3188DAE0-373A-4F93-8094-042A2104BFFA}"
 EndProject
@@ -55,19 +55,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Experimenta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Experimental.Tests", "Fact.Extensions.Experimental.Tests\Fact.Extensions.Experimental.Tests.csproj", "{FDA024A6-8C68-4DD3-BD76-5DF673AC1A7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Services", "Fact.Extensions.Services\Fact.Extensions.Services.csproj", "{16F4A79E-5E8B-44AD-8492-FADE60C11671}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Services", "Fact.Extensions.Services\Fact.Extensions.Services.csproj", "{16F4A79E-5E8B-44AD-8492-FADE60C11671}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Services.Tests", "Fact.Extensions.Services.Tests\Fact.Extensions.Services.Tests.csproj", "{7C1F207E-CA68-4D12-BB0C-1AF6AF146669}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "useful-scripts", "useful-scripts", "{76284774-D227-44D5-97AA-7D81DC228900}"
 	ProjectSection(SolutionItems) = preProject
-		..\ext\myget\setenv-nuget-alpha.sh = ..\ext\myget\setenv-nuget-alpha.sh
 		..\ext\useful-scripts\scm\bump.sh = ..\ext\useful-scripts\scm\bump.sh
+		..\ext\myget\setenv-nuget-alpha.sh = ..\ext\myget\setenv-nuget-alpha.sh
 		..\ext\useful-scripts\scm\setenv-version.sh = ..\ext\useful-scripts\scm\setenv-version.sh
 		..\ext\useful-scripts\setenv.sh = ..\ext\useful-scripts\setenv.sh
 		..\ext\myget\setenv_nuget.sh = ..\ext\myget\setenv_nuget.sh
 		..\ext\useful-scripts\nuget\upload_project_v4_4 = ..\ext\useful-scripts\nuget\upload_project_v4_4
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Services.xUnit", "Fact.Extensions.Services.xUnit\Fact.Extensions.Services.xUnit.csproj", "{26A25C0F-EB6A-4EA0-9ED0-0CB4AECAE5F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -150,6 +152,10 @@ Global
 		{7C1F207E-CA68-4D12-BB0C-1AF6AF146669}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C1F207E-CA68-4D12-BB0C-1AF6AF146669}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C1F207E-CA68-4D12-BB0C-1AF6AF146669}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26A25C0F-EB6A-4EA0-9ED0-0CB4AECAE5F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26A25C0F-EB6A-4EA0-9ED0-0CB4AECAE5F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26A25C0F-EB6A-4EA0-9ED0-0CB4AECAE5F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26A25C0F-EB6A-4EA0-9ED0-0CB4AECAE5F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
