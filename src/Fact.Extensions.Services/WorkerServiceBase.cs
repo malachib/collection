@@ -71,12 +71,12 @@ namespace Fact.Extensions.Services
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="context">global service context</param>
         /// <param name="oneShot">Do not loop, run worker only once</param>
         protected WorkerServiceBase(ServiceContext context, bool oneShot = false)
             : base(context.CancellationToken)
         {
-            logger = context.GetService<ILogger<WorkerServiceBase>>();
+            logger = context.ServiceProvider.GetRequiredService<ILogger<WorkerServiceBase>>();
             this.oneShot = oneShot;
             // TODO: Wrap up configure with proper error event firing mechanism instead
             // (using IExceptionProvider)
@@ -90,7 +90,7 @@ namespace Fact.Extensions.Services
         /// <param name="oneShot">Do not loop, run worker only once</param>
         protected WorkerServiceBase(IServiceProvider sp, bool oneShot = false)
         {
-            logger = sp.GetService<ILogger<WorkerServiceBase>>();
+            logger = sp.GetRequiredService<ILogger<WorkerServiceBase>>();
             this.oneShot = oneShot;
         }
 
@@ -111,8 +111,6 @@ namespace Fact.Extensions.Services
         /// </summary>
         public event Action<Exception> ExceptionOccurred;
 
-        // TODO: Decide if we want to keep passing IServiceProvider in, thinking probably
-        // yes but let's see how it goes
         protected abstract Task Worker(ServiceContext context);
 
 
