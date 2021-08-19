@@ -19,6 +19,7 @@ namespace Fact.Extensions.Services.xUnit
         {
             var sm = new ServiceManager(services, "test1");
             var context = services.GetRequiredService<ServiceContext>();
+            var dummyService = new Synthetic.DummyService(services);
 
             await sm.Startup(context);
             await sm.Shutdown(context);

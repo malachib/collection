@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fact.Extensions.Services.Tests
+namespace Fact.Extensions.Services.Synthetic
 {
     /// <summary>
     /// Dummy service which goes offline then back online
@@ -26,7 +26,9 @@ namespace Fact.Extensions.Services.Tests
             await Task.Delay(500);
             context.Progress?.Report(50);
             Online();
+#if NETSTANDARD2_0_OR_GREATER || NET46_OR_GREATER
             Console.WriteLine("Got here");
+#endif
             // Give parent time to leave degraded state
             await Task.Delay(500);
             context.Progress?.Report(75);

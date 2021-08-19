@@ -58,7 +58,7 @@ namespace Fact.Extensions.Services.Tests
             var sp = Setup();
             var sm = new ServiceManager(sp, "parent");
             var childSm = new ServiceManager(sp, "child");
-            var dummyService = new DummyService(sp);
+            var dummyService = new Synthetic.DummyService(sp);
             var dummySem = new SemaphoreSlim(0, 1);
 
             sm.AddChild(childSm);
@@ -113,7 +113,7 @@ namespace Fact.Extensions.Services.Tests
 
             var sm = new ServiceManager(sp, "parent");
             var childSm = new ServiceManager(sp, "child");
-            var dummyService = new DummyService(sp);
+            var dummyService = new Synthetic.DummyService(sp);
             var dummySem = new SemaphoreSlim(0, 1);
 
             sm.AddChild(childSm);

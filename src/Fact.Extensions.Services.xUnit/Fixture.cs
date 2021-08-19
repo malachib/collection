@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Fact.Extensions.Services.xUnit
 {
-    public class Fixture : Synthetic.xUnit.FixtureBase
+    public class Fixture : Fact.Extensions.Synthetic.xUnit.FixtureBase
     {
         public override void ConfigureServices(IServiceCollection sc)
         {

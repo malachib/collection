@@ -59,9 +59,9 @@ namespace Fact.Extensions.Services.Tests
             var sc = new ServiceCollection();
             sc.AddLogging();
             sc.AddServiceMangement();
-            sc.AddSingleton<DummyService>();
+            sc.AddSingleton<Synthetic.DummyService>();
             var sp = sc.BuildServiceProvider();
-            var sd = sp.GetService<IServiceDescriptor<DummyService>>();
+            var sd = sp.GetService<IServiceDescriptor<Synthetic.DummyService>>();
             var context = new ServiceContext(sp, sd);
             sd.Startup(context);
         }

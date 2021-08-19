@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Fact.Extensions.Services.Synthetic\Fact.Extensions.Services.Synthetic.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Services\Fact.Extensions.Services.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Synthetic\Fact.Extensions.Synthetic.csproj" />
   </ItemGroup>

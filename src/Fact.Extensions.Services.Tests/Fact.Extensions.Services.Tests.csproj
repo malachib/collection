@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fact.Extensions.Services\Fact.Extensions.Services.csproj" />
+    <ProjectReference Include="..\Fact.Extensions.Services.Synthetic\Fact.Extensions.Services.Synthetic.csproj" />
   </ItemGroup>
 
 </Project>
