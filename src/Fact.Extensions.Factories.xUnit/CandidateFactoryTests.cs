@@ -3,12 +3,11 @@ using Xunit;
 
 namespace Fact.Extensions.Factories.xUnit
 {
-    public class UnitTest1
+    public class CandidateFactoryTests
     {
         [Fact]
         public void Test1()
         {
-
         }
     }
 }
