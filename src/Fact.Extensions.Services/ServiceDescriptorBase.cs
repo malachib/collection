@@ -41,13 +41,23 @@ namespace Fact.Extensions.Services
             if (service is IOnlineEvents oe)
             {
                 // Beware, this might not be the SP you are after!
-                oe.Online += async () => await Startup(context);
+                oe.Online += async () =>
+                    // SetupEvents will assign LifecycleStatus = Online before we reach here...
+                    await StartupInternal(context);
             }
 
             if (service is ISleepableEvents se)
             {
                 // Beware, this might not be the SP you are after!
-                se.Awake += async () => await Startup(context);
+                se.Awake += async () =>
+                    // SetupEvents will assign LifecycleStatus = Awake before we reach here
+                    await StartupInternal(context);
+            }
+
+            if (service is IDegradableEvents de)
+            {
+                // We expect LifecycleStatus = Degraded before we reach here, though it might be anything
+                de.Nominal += async () => await StartupInternal(context);
             }
 
             if (service is IExceptionEventProvider ep)
@@ -98,6 +108,29 @@ namespace Fact.Extensions.Services
                 Exception = e;
                 LifecycleStatus = LifecycleEnum.Error;
                 logger.LogError(0, e, $"Shutdown failed: {Name}");
+            }
+        }
+
+
+        /// <summary>
+        /// Used for things like coming online, waking up, etc.
+        /// In these cases we don't go through starting -> started -> running.  Instead, we
+        /// go from initial state (online, awake, etc) straight to running
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        async Task StartupInternal(ServiceContext context)
+        {
+            try
+            {
+                await service.Startup(context);
+                LifecycleStatus = LifecycleEnum.Running;
+            }
+            catch (Exception e)
+            {
+                Exception = e;
+                logger.LogError(0, e, $"Startup failed: {Name}");
+                LifecycleStatus = LifecycleEnum.Error;
             }
         }
 
@@ -171,6 +204,11 @@ namespace Fact.Extensions.Services
                 se.Slept += () => LifecycleStatus = LifecycleEnum.Slept;
                 se.Awake += () => LifecycleStatus = LifecycleEnum.Awake;
                 se.Waking += () => LifecycleStatus = LifecycleEnum.Waking;
+            }
+
+            if (eventSource is IDegradableEvents de)
+            {
+                de.Degraded += () => LifecycleStatus = LifecycleEnum.Degraded;
             }
         }
 

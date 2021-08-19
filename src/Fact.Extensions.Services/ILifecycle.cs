@@ -57,13 +57,20 @@ namespace Fact.Extensions.Services
         /// Note that since the composite service itself quasi-counts as a service,
         /// even if ALL children are not running, a PartialRunning is still reported
         /// </summary>
+        /// <remarks>
+        /// Be sure to read Degraded description, as that's probably what you want,
+        /// not PartialRunning
+        /// </remarks>
         PartialRunning,
         /// <summary>
         /// For composite service manager where we are running, but subservices have error states
+        /// Also for services which are able to continue running even in partial failure
+        /// (redundant connections, RAID 1, etc)
         /// </summary>
         Degraded,
         /// <summary>
         /// Service is an error state.  Like Offline except explicitly due to a malfunction
+        /// Exception property on descriptor SHOULD contain a clue as to what the error is
         /// </summary>
         Error
     }
@@ -136,6 +143,20 @@ namespace Fact.Extensions.Services
         /// </summary>
         event Action Awake;
     }
+
+
+    public interface IDegradableEvents
+    {
+        /// <summary>
+        /// Service has gone into a partially functioning state (see degraded status)
+        /// </summary>
+        event Action Degraded;
+        /// <summary>
+        /// Service has returned to a normal running state
+        /// </summary>
+        event Action Nominal;
+    }
+
 
     /// <summary>
     /// Sleepable means the service is capable of performing tasks necessary
