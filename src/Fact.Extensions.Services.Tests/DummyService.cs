@@ -36,13 +36,13 @@ namespace Fact.Extensions.Services.Tests
             await Task.Delay(500);
         }
 
-        public override Task Startup(ServiceContext context)
+        public override async Task Startup(ServiceContext context)
         {
             // because we have online-able, expect to get startup called again
             // but don't reinitialize worker
-            if (!IsWorkerCreated) RunWorker(context);
-
-            return Task.CompletedTask;
+            // DEBT: Might want to move this into WorkerServiceBase
+            if (context.Descriptor.LifecycleStatus != LifecycleEnum.Online)
+                await base.Startup(context);
         }
     }
 
