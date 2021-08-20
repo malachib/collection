@@ -32,6 +32,12 @@ namespace TestProject1
     [TestClass()]
     public class MatrixSerializerTest
     {
+        readonly char directorySeparatorChar = System.IO.Path.DirectorySeparatorChar;
+
+        string TrimTrailingSlash(string path)
+        {
+            return path.TrimEnd(directorySeparatorChar);
+        }
 
 
         private TestContext testContextInstance;
@@ -242,8 +248,9 @@ namespace TestProject1
         [DeploymentItem("Data\\minizip.csv")]
         public void EntityBuilderTest()
         {
-            var baseDirectory = System.AppContext.BaseDirectory;
-            var filename = baseDirectory + "\\Data\\minizip.csv";
+            var baseDirectory = TrimTrailingSlash(System.AppContext.BaseDirectory);
+            var dsc = directorySeparatorChar;
+            var filename = baseDirectory + $"{dsc}Data{dsc}minizip.csv";
             IMatrixDeserializer input = new CSVMatrixDeserializer(filename, true);
             var eb = new PropertyEntityBuilder(input, typeof(USZipCodeRecord));
 
@@ -274,8 +281,9 @@ namespace TestProject1
         [DeploymentItem("Data\\minizip.txt", "Data")]
         public void DeserializeFixedLength2Test()
         {
-            var baseDirectory = System.AppContext.BaseDirectory;
-            var filename = baseDirectory + "\\Data\\minizip.txt";
+            var baseDirectory = TrimTrailingSlash(System.AppContext.BaseDirectory);
+            var dsc = directorySeparatorChar;
+            var filename = baseDirectory + $"{dsc}Data{dsc}minizip.txt";
             var d = new FixedLengthMatrixDeserializer(filename, true, 6, 13, 3, 11, 12, 4, 1);
             var list = d.List<USZipCodeRecord>("zip", "city", "state");
 
@@ -301,8 +309,9 @@ namespace TestProject1
         [DeploymentItem("Data\\minizip.txt")]
         public void DeserializeFixedLengthTest()
         {
-            var baseDirectory = System.AppContext.BaseDirectory;
-            var filename = baseDirectory + "\\Data\\minizip.txt";
+            var baseDirectory = TrimTrailingSlash(System.AppContext.BaseDirectory);
+            var dsc = directorySeparatorChar;
+            var filename = baseDirectory + $"{dsc}Data{dsc}minizip.txt";
             var d = new FixedLengthMatrixDeserializer(filename, true, 6, 13, 3, 11, 12, 4, 1);
 
             foreach (var row in d.List)
@@ -314,8 +323,9 @@ namespace TestProject1
         [DeploymentItem("Data\\minizip.csv")]
         public void SerializeFixedLengthCopyTest()
         {
-            var baseDirectory = System.AppContext.BaseDirectory;
-            var filename = baseDirectory + "\\Data\\minizip.csv";
+            var baseDirectory = TrimTrailingSlash(System.AppContext.BaseDirectory);
+            var dsc = directorySeparatorChar;
+            var filename = baseDirectory + $"{dsc}Data{dsc}minizip.csv";
             var d = new CSVMatrixDeserializer(filename, true);
             var s = new FixedLengthMatrixSerializer("minizip_test.txt", 20, 20, 20, 20, 20, 20, 20);
 
@@ -340,8 +350,9 @@ namespace TestProject1
         [DeploymentItem("Data\\minizip.csv")]
         public void SerializeFixedLengthCopy2Test()
         {
-            var baseDirectory = System.AppContext.BaseDirectory;
-            var filename = baseDirectory + "\\Data\\minizip.csv";
+            var baseDirectory = TrimTrailingSlash(System.AppContext.BaseDirectory);
+            var dsc = directorySeparatorChar;
+            var filename = baseDirectory + $"{dsc}Data{dsc}minizip.csv";
             var d = new CSVMatrixDeserializer(filename, true);
             var s = new FixedLengthMatrixSerializer("minizip_test.txt");
 
@@ -357,8 +368,9 @@ namespace TestProject1
         [DeploymentItem("Data\\minizip.csv", "Data")]
         public void DeserializeCSV2Test()
         {
-            var baseDirectory = System.AppContext.BaseDirectory;
-            var filename = baseDirectory + "\\Data\\minizip.csv";
+            var baseDirectory = TrimTrailingSlash(System.AppContext.BaseDirectory);
+            var dsc = directorySeparatorChar;
+            var filename = baseDirectory + $"{dsc}Data{dsc}minizip.csv";
             var d = new CSVMatrixDeserializer(filename, true);
 
             foreach (var row in d.List)
@@ -371,8 +383,9 @@ namespace TestProject1
         [DeploymentItem("Data\\empty.csv", "Data")]
         public void DeserializeEmptyCSVTest()
         {
-            var baseDirectory = System.AppContext.BaseDirectory;
-            var filename = baseDirectory + "\\Data\\empty.csv";
+            var baseDirectory = TrimTrailingSlash(System.AppContext.BaseDirectory);
+            var dsc = directorySeparatorChar;
+            var filename = baseDirectory + $"{dsc}Data{dsc}empty.csv";
             var d = new CSVMatrixDeserializer(filename, true);
 
             foreach (var row in d.List)
