@@ -142,6 +142,18 @@ namespace Fact.Extensions.Services
         }
 
 
+        public static IServiceDescriptor<TService> AddService<TService>(this 
+            ServiceManager serviceManager, TService service)
+            where TService: IService
+        {
+            var sd = new ServiceDescriptorBase<TService>(serviceManager.ServiceProvider, service);
+
+            serviceManager.AddChild(sd);
+
+            return sd;
+        }
+
+        
         /// <summary>
         /// 
         /// </summary>

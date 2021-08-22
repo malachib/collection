@@ -20,22 +20,23 @@ namespace Fact.Extensions.Services.Synthetic
 
         protected override async Task Worker(ServiceContext context)
         {
-            await Task.Delay(500);
+            var ct = context.CancellationToken;
+            await Task.Delay(500, ct);
             context.Progress?.Report(25);
             Offline();
-            await Task.Delay(500);
+            await Task.Delay(500, ct);
             context.Progress?.Report(50);
             Online();
 #if NETSTANDARD2_0_OR_GREATER || NET46_OR_GREATER
             Console.WriteLine("Got here");
 #endif
             // Give parent time to leave degraded state
-            await Task.Delay(500);
+            await Task.Delay(500, ct);
             context.Progress?.Report(75);
             // Generic signals test to shut down
             Generic?.Invoke();
             // wait a little longer to see rest of events fire
-            await Task.Delay(500);
+            await Task.Delay(500, ct);
         }
 
         public override async Task Startup(ServiceContext context)
