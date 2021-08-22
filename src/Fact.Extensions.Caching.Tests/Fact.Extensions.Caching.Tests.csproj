@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net46;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <AssemblyName>Fact.Extensions.Caching.Tests</AssemblyName>
     <PackageId>Fact.Extensions.Caching.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -10,6 +10,10 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+    <TargetFrameworks>$(TargetFrameworks);net46</TargetFrameworks>
+  </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Fact.Extensions.Serialization.MessagePack\Fact.Extensions.Serialization.MessagePack.csproj" />
     <ProjectReference Include="..\Fact.Extensions.Serialization.Newtonsoft\Fact.Extensions.Serialization.Newtonsoft.csproj" />
