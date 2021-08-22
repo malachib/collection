@@ -21,6 +21,10 @@ namespace Fact.Extensions.Services.xUnit
             var sm = new ServiceManager(services, "test1");
             var context = services.GetRequiredService<ServiceContext>();
             var dummyService = new Synthetic.DummyService(services);
+            
+            var tcs = new TaskCompletionSource<bool>(context.CancellationToken);
+
+            dummyService.Generic += () => tcs.SetResult(true);
 
             var sd = sm.AddService(dummyService);
 
@@ -68,6 +72,9 @@ namespace Fact.Extensions.Services.xUnit
             };
 
             await sm.Startup(context);
+
+            await tcs.Task;
+            
             await sm.Shutdown(context);
             
             if (sd.Exception != null)
