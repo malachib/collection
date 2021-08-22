@@ -120,11 +120,20 @@ namespace Fact.Extensions.Services
     /// </summary>
     public interface IOnlineEvents
     {
+        /// <summary>
+        /// Indicate to Services system we are offline, and optionally notify
+        /// other listeners are are offline (though they can glean this via status
+        /// as well)
+        /// </summary>
         event Action Offline;
         /// <summary>
-        /// Notify listeners we are back online
-        /// Expect a Startup(null) call from an external party
+        /// Indicate to Services system we are back online, and optionally notify
+        /// other listeners we are back online (though they can glean this via status
+        /// as well)
         /// </summary>
+        /// <remarks>
+        /// Expect a Startup(context) call from Services system
+        /// </remarks>
         event Action Online;
     }
 
