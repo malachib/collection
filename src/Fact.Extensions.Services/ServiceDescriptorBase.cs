@@ -121,6 +121,14 @@ namespace Fact.Extensions.Services
         /// <returns></returns>
         async Task StartupInternal(ServiceContext context)
         {
+            if (LifecycleStatus == LifecycleEnum.Stopping ||
+                LifecycleStatus == LifecycleEnum.Stopped)
+            {
+                logger.LogDebug(nameof(StartupInternal) + 
+                                ": {0} - aborting restart since we are shutting down", Name);
+                return;
+            }
+            
             try
             {
                 await service.Startup(context);

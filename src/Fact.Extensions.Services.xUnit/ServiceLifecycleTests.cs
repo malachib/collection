@@ -32,11 +32,10 @@ namespace Fact.Extensions.Services.xUnit
                 switch (sd.LifecycleStatus)
                 {
                     case LifecycleEnum.Offline:
+                        lastStatus.Should().Be(LifecycleEnum.Running);
                         break;
                     
                     case LifecycleEnum.Online:
-                        // NOTE: I've seen a race condition here where a shutdown set of statuses
-                        // appear here, throwing off the expected Offline status
                         lastStatus.Should().Be(LifecycleEnum.Offline);
                         break;
                     
@@ -48,6 +47,17 @@ namespace Fact.Extensions.Services.xUnit
                         }
                         else
                             lastStatus.Should().Be(LifecycleEnum.Online);
+                        break;
+                    
+                    case LifecycleEnum.Starting:
+                        firstRun.Should().BeTrue();
+                        lastStatus.Should().Be(LifecycleEnum.Unstarted);
+                        break;
+                    
+                    case LifecycleEnum.Started:
+                        // Making sure that online chain doesn't come through here
+                        firstRun.Should().BeTrue();
+                        lastStatus.Should().Be(LifecycleEnum.Starting);
                         break;
                     
                     default:
