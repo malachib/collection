@@ -2,6 +2,7 @@ using System;
 using Xunit;
 using FluentAssertions;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Fact.Extensions.Experimental.xUnit
 {
@@ -15,6 +16,111 @@ namespace Fact.Extensions.Experimental.xUnit
             var entity = new TestEntity1();
 
             node.AddChild(new SyncDataProviderNode("test1", () => entity));
+        }
+
+
+        [Fact]
+        public void TrackerUpdatedTest()
+        {
+            var t = new SyncDataProviderTracker();
+            var node1 = new SyncDataProviderNode("root", null);
+            var node2 = new SyncDataProviderNode("test1", null);
+
+            node1.AddChild(node2);
+
+            t.Update(node1, "updated1.1", "initial");
+            t.Update(node1, "updated1.2", "updated1.1");
+            t.Update(node1, "updated1.3", "updated1.2");
+
+            var dl = t.DiffList.ToArray();
+
+            dl.Should().HaveCount(1);
+            dl[0].Command.Should().Be(SyncDataProviderTracker.Diffs.Updated);
+        }
+
+
+        [Fact]
+        public void TrackerAddedTest()
+        {
+            var t = new SyncDataProviderTracker();
+            var node1 = new SyncDataProviderNode("root", null);
+            var node2 = new SyncDataProviderNode("test1", null);
+
+            node1.AddChild(node2);
+
+            t.Update(node1, "updated1.1", null);
+            t.Update(node1, "updated1.2", "updated1.1");
+            t.Update(node1, "updated1.3", "updated1.2");
+
+            var dl = t.DiffList.ToArray();
+
+            dl.Should().HaveCount(1);
+            dl[0].Command.Should().Be(SyncDataProviderTracker.Diffs.Added);
+        }
+
+
+        [Fact]
+        public void TrackerRemovedTest()
+        {
+            var t = new SyncDataProviderTracker();
+            var node1 = new SyncDataProviderNode("root", null);
+            var node2 = new SyncDataProviderNode("test1", null);
+
+            node1.AddChild(node2);
+
+            t.Update(node1, "updated1.1", "baseline");
+            t.Update(node1, "updated1.2", "updated1.1");
+            t.Update(node1, null, "updated1.2");
+
+            var dl = t.DiffList.ToArray();
+
+            dl.Should().HaveCount(1);
+            dl[0].Command.Should().Be(SyncDataProviderTracker.Diffs.Removed);
+        }
+
+
+        [Fact]
+        public void TrackerUnchangedTest()
+        {
+            var t = new SyncDataProviderTracker();
+            var node1 = new SyncDataProviderNode("root", null);
+            var node2 = new SyncDataProviderNode("test1", null);
+
+            node1.AddChild(node2);
+
+            t.Update(node1, "updated1.1", null);
+            t.Update(node1, "updated1.2", "updated1.1");
+            t.Update(node1, "updated1.3", "updated1.2");
+            t.Update(node1, null, "updated1.3");
+
+            var dl = t.DiffList.ToArray();
+
+            dl.Should().BeEmpty();
+        }
+
+
+        [Fact]
+        public void TrackerMixedTest()
+        {
+            var t = new SyncDataProviderTracker();
+            var node1 = new SyncDataProviderNode("root", null);
+            var node2 = new SyncDataProviderNode("test1", null);
+
+            node1.AddChild(node2);
+
+            t.Update(node1, "updated1.1", null);
+            t.Update(node2, "updated2.1", "baseline2.0");
+
+            var dl = t.DiffList.ToArray();
+
+            dl.Should().HaveCount(2);
+
+            t.Update(node1, null, "updated1.1");
+            t.Update(node2, "updated2.2", "updated2.1");
+
+            dl = t.DiffList.ToArray();
+
+            dl.Should().HaveCount(1);
         }
     }
 
