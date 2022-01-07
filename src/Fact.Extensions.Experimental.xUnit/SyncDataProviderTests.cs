@@ -171,13 +171,22 @@ namespace Fact.Extensions.Experimental.xUnit
 
         public void Changing(object sender, string propertyName) =>
             PropertyChanging(sender, new PropertyChangingEventArgs(propertyName));
+
+        public void Init<T>(ref State<T> s, object sender, string propertyName)
+        {
+            s.Changed += delegate { Changed(sender, propertyName); };
+            s.Changing += delegate { Changing(sender, propertyName); };
+        }
     }
 
     public class TestEntity1 : 
         INotifyPropertyChanged,
         INotifyPropertyChanging
     {
+        ChangeEventHelper ceh = new ChangeEventHelper();
+
         State<string> value1;
+        State<int> value2;
 
         public string Value1
         {
@@ -185,7 +194,11 @@ namespace Fact.Extensions.Experimental.xUnit
             set => value1.Value = value;
         }
 
-        public int Value2 { get; set; }
+        public int Value2
+        {
+            get => value2.Value;
+            set => value2.Value = value;
+        }
 
         public TestEntity1 Nested { get; set; }
 
@@ -194,8 +207,10 @@ namespace Fact.Extensions.Experimental.xUnit
 
         public TestEntity1()
         {
-            value1.Changing += delegate { PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(nameof(Value1))); };
-            value1.Changed += delegate { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value1))); };
+            value1.Changed += delegate { ceh.Changed(this, nameof(Value1)); };
+            value1.Changing += delegate { ceh.Changing(this, nameof(Value1)); };
+
+            ceh.Init(ref value2, this, nameof(Value2));
         }
     }
 }
