@@ -12,12 +12,13 @@ namespace Fact.Extensions.Experimental.xUnit
         [Fact]
         public void Test1()
         {
-            var node = new SyncDataProviderNode("root", null);
-            var sdp = new SyncDataProvider(node);
+            var root = new SyncDataProviderNode("root", null);
+            var sdp = new SyncDataProvider(root);
             var entity = new TestEntity1();
+            var child = new SyncDataProviderNode("test1", () => entity);
             var counter = 0;
 
-            node.AddChild(new SyncDataProviderNode("test1", () => entity));
+            root.AddChild(child);
 
             entity.PropertyChanging += (sender, e) =>
             {
@@ -57,15 +58,29 @@ namespace Fact.Extensions.Experimental.xUnit
             counter.Should().Be(4);
         }
 
+        [Fact]
+        public void Test2()
+        {
+            var root = new SyncDataProviderNode("root", null);
+            var sdp = new SyncDataProvider(root);
+            var entity = new TestEntity1();
+
+            root.AddEntity("test1", entity);
+
+            // DEBT: Might want periods in this context at some point rather than slashes
+            // DEBT: NOT specifying root node name a little confusing
+            //var node = sdp["root/test1/Value1"];
+            var node = sdp["test1/Value1"];
+
+            entity.Value2 = 7;
+        }
+
 
         [Fact]
         public void TrackerUpdatedTest()
         {
             var t = new SyncDataProviderTracker();
-            var node1 = new SyncDataProviderNode("root", null);
-            var node2 = new SyncDataProviderNode("test1", null);
-
-            node1.AddChild(node2);
+            var node1 = "root";
 
             t.Update(node1, "updated1.1", "initial");
             t.Update(node1, "updated1.2", "updated1.1");
@@ -82,10 +97,7 @@ namespace Fact.Extensions.Experimental.xUnit
         public void TrackerAddedTest()
         {
             var t = new SyncDataProviderTracker();
-            var node1 = new SyncDataProviderNode("root", null);
-            var node2 = new SyncDataProviderNode("test1", null);
-
-            node1.AddChild(node2);
+            var node1 = "root";
 
             t.Update(node1, "updated1.1", null);
             t.Update(node1, "updated1.2", "updated1.1");
@@ -114,10 +126,7 @@ namespace Fact.Extensions.Experimental.xUnit
         public void TrackerRemovedTest()
         {
             var t = new SyncDataProviderTracker();
-            var node1 = new SyncDataProviderNode("root", null);
-            var node2 = new SyncDataProviderNode("test1", null);
-
-            node1.AddChild(node2);
+            var node1 = "root";
 
             t.Update(node1, "updated1.1", "baseline");
             t.Update(node1, "updated1.2", "updated1.1");
@@ -144,10 +153,7 @@ namespace Fact.Extensions.Experimental.xUnit
         public void TrackerUnchangedTest()
         {
             var t = new SyncDataProviderTracker();
-            var node1 = new SyncDataProviderNode("root", null);
-            var node2 = new SyncDataProviderNode("test1", null);
-
-            node1.AddChild(node2);
+            var node1 = "root";
 
             t.Update(node1, "updated1.1", null);
             t.Update(node1, "updated1.2", "updated1.1");
@@ -175,10 +181,8 @@ namespace Fact.Extensions.Experimental.xUnit
         public void TrackerMixedTest()
         {
             var t = new SyncDataProviderTracker();
-            var node1 = new SyncDataProviderNode("root", null);
-            var node2 = new SyncDataProviderNode("test1", null);
-
-            node1.AddChild(node2);
+            var node1 = "root";
+            var node2 = "test1";
 
             t.Update(node1, "updated1.1", null);
             t.Update(node2, "updated2.1", "baseline2.0");

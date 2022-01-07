@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Fact.Extensions.Experimental
 {
     using Collection;
-    using System.ComponentModel;
-    using System.Linq;
 
     public class SyncDataProviderTracker : SyncDataProviderTracker<object>
     {
@@ -126,6 +127,14 @@ namespace Fact.Extensions.Experimental
         }
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// DEBT: This is a sparse provider, meaning that Children enumeration only lists
+    /// what you actual tried to acquire already
+    /// </remarks>
     public class SyncDataProviderNode : NamedChildCollection<SyncDataProviderNode>
     {
         /// <summary>
@@ -144,33 +153,89 @@ namespace Fact.Extensions.Experimental
 
         object value;
 
-        void Update()
-        {
-            value = getter?.Invoke();
+        /// <summary>
+        /// Internal call to rewrite 'value' from getter
+        /// </summary>
+        void Update() => value = getter?.Invoke();
 
+
+#if NETSTANDARD1_3_OR_GREATER
+        void Configure()
+        {
             // FIX: Need to do a -= as well
             // DEBT: Likely this can be consolidated with our State object
-            if(value is INotifyPropertyChanged nfc)
+            if (value is INotifyPropertyChanged nfc)
             {
                 nfc.PropertyChanged += Nfc_PropertyChanged;
+                var npc2 = (INotifyPropertyChanging)value;
+                npc2.PropertyChanging += Npc2_PropertyChanging;
             }
+        }
+
+        private void Npc2_PropertyChanging(object sender, PropertyChangingEventArgs e)
+        {
+            SyncDataProviderNode child = GetOrCreateChild(e.PropertyName);
+
+            AddChild(child);
         }
 
         private void Nfc_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             SyncDataProviderNode child = GetChild(e.PropertyName);
 
-            var v = child.value;
+            var oldValue = child.value;
+            child.Update();
+            var newValue = child.value;
 
-            Updated?.Invoke(child, v, child.Value);
+            Updated?.Invoke(child, oldValue, newValue);
         }
+#else
+        void Configure()
+        {
+            throw new InvalidOperationException("netstandard1.3 or higher needed for this feature");
+        }
+#endif
 
         public object Value => value;
+
+        public SyncDataProviderNode GetOrCreateChild(string name)
+        {
+            var child = GetChild(name);
+
+            var entity = value;
+
+            if (entity == null)
+                throw new KeyNotFoundException("No inner value nor children found");
+
+            if (child == null)
+            {
+                var entityType = entity.GetType();
+                var propertyInfo = entityType.GetTypeInfo().GetDeclaredProperty(name);
+
+                Func<object> getter = () => propertyInfo.GetValue(entity);
+
+                child = new SyncDataProviderNode(name, getter);
+            }
+
+            return child;
+        }
 
         public SyncDataProviderNode(string name, Func<object> getter) : base(name)
         {
             this.getter = getter;
+            if(getter != null)
+            {
+                Update();
+                Configure();
+            }
         }
+    }
+
+
+    public static class SyncDataProviderNodeExtensions
+    {
+        public static void AddEntity(this SyncDataProviderNode node, string name, object entity) =>
+            node.AddChild(new SyncDataProviderNode(name, () => entity));
     }
 
     public class SyncDataProvider : TaxonomyBase<SyncDataProviderNode>
@@ -179,11 +244,7 @@ namespace Fact.Extensions.Experimental
 
         public SyncDataProvider(SyncDataProviderNode root) => RootNode = root;
 
-        protected override SyncDataProviderNode CreateNode(SyncDataProviderNode parent, string name)
-        {
-            // Only used when node isn't found -- so for this case, it really will be an exception
-            // DEBT: That could use some cleanup somehow
-            throw new NotImplementedException();
-        }
+        protected override SyncDataProviderNode CreateNode(SyncDataProviderNode parent, string name) =>
+            parent.GetOrCreateChild(name);
     }
 }
