@@ -37,8 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serializati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Collection.Interceptor", "Fact.Extensions.Collection.Interceptor\Fact.Extensions.Collection.Interceptor.csproj", "{12E69371-571C-4A4A-9F35-47DA507DEF57}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Serialization.Pipelines", "Fact.Extensions.Serialization.Pipelines\Fact.Extensions.Serialization.Pipelines.csproj", "{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Caching.Tests", "Fact.Extensions.Caching.Tests\Fact.Extensions.Caching.Tests.csproj", "{51A693BB-66F5-444F-875A-73FF9E5A6932}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Configuration", "Fact.Extensions.Configuration\Fact.Extensions.Configuration.csproj", "{F4E828E3-F7DB-475C-8632-B624CAC2A10B}"
@@ -77,7 +75,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Synthetic",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Services.Synthetic", "Fact.Extensions.Services.Synthetic\Fact.Extensions.Services.Synthetic.csproj", "{9DE34365-35E1-408E-A5DA-4C15E6CD8324}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fact.Extensions.Experimental.xUnit", "Fact.Extensions.Experimental.xUnit\Fact.Extensions.Experimental.xUnit.csproj", "{B97DD38A-BCB9-48CE-9BF8-971AFF85E4D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fact.Extensions.Experimental.xUnit", "Fact.Extensions.Experimental.xUnit\Fact.Extensions.Experimental.xUnit.csproj", "{B97DD38A-BCB9-48CE-9BF8-971AFF85E4D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -117,9 +115,6 @@ Global
 		{12E69371-571C-4A4A-9F35-47DA507DEF57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12E69371-571C-4A4A-9F35-47DA507DEF57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12E69371-571C-4A4A-9F35-47DA507DEF57}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BC6331D9-561D-4191-BAFC-7E0F6E0E0D8B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{51A693BB-66F5-444F-875A-73FF9E5A6932}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{51A693BB-66F5-444F-875A-73FF9E5A6932}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51A693BB-66F5-444F-875A-73FF9E5A6932}.Release|Any CPU.ActiveCfg = Release|Any CPU
