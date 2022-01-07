@@ -56,6 +56,18 @@ namespace Fact.Extensions.Experimental.xUnit
 
             dl.Should().HaveCount(1);
             dl[0].Command.Should().Be(SyncDataProviderTracker.Diffs.Added);
+
+            t.Clear();
+
+            // Test extensions, which we may elect to not use in the future
+            t.Update(node1, "updated1.1");
+            t.Update(node1, "updated1.2");
+            t.Update(node1, "updated1.3");
+
+            dl = t.DiffList.ToArray();
+
+            dl.Should().HaveCount(1);
+            dl[0].Command.Should().Be(SyncDataProviderTracker.Diffs.Added);
         }
 
 
@@ -76,6 +88,16 @@ namespace Fact.Extensions.Experimental.xUnit
 
             dl.Should().HaveCount(1);
             dl[0].Command.Should().Be(SyncDataProviderTracker.Diffs.Removed);
+
+            t.Update(node1, "updated1.1", "baseline");
+            t.Update(node1, "updated1.2");
+            t.Update(node1, null);
+
+            dl = t.DiffList.ToArray();
+
+            dl.Should().HaveCount(1);
+            dl[0].Command.Should().Be(SyncDataProviderTracker.Diffs.Removed);
+
         }
 
 
@@ -94,6 +116,17 @@ namespace Fact.Extensions.Experimental.xUnit
             t.Update(node1, null, "updated1.3");
 
             var dl = t.DiffList.ToArray();
+
+            dl.Should().BeEmpty();
+
+            t.Clear();
+
+            t.Update(node1, "updated1.1");
+            t.Update(node1, "updated1.2");
+            t.Update(node1, "updated1.3");
+            t.Update(node1, null);
+
+            dl = t.DiffList.ToArray();
 
             dl.Should().BeEmpty();
         }
@@ -124,7 +157,9 @@ namespace Fact.Extensions.Experimental.xUnit
         }
     }
 
-    public class TestEntity1 : INotifyPropertyChanged
+    public class TestEntity1 : 
+        INotifyPropertyChanged,
+        INotifyPropertyChanging
     {
         public string Value1 { get; set; }
         public int Value2 { get; set; }
@@ -132,5 +167,6 @@ namespace Fact.Extensions.Experimental.xUnit
         public TestEntity1 Nested { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangingEventHandler PropertyChanging;
     }
 }

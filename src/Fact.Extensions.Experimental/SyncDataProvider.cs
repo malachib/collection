@@ -8,7 +8,12 @@ namespace Fact.Extensions.Experimental
     using System.ComponentModel;
     using System.Linq;
 
-    public class SyncDataProviderTracker
+    public class SyncDataProviderTracker : SyncDataProviderTracker<object>
+    {
+
+    }
+
+    public class SyncDataProviderTracker<TKey>
     {
         public int Version { get; private set; }
 
@@ -21,27 +26,28 @@ namespace Fact.Extensions.Experimental
 
         public class Diff
         {
-            public SyncDataProviderNode Node { get; }
+            public TKey Key { get; }
             public Diffs Command { get; }
             public object Value { get; }
             public object Baseline { get; }
 
-            public Diff(SyncDataProviderNode node, Diffs command, object value, object baseline)
+            public Diff(TKey key, Diffs command, object value, object baseline)
             {
-                Node = node;
+                Key = key;
                 Command = command;
                 Value = value;
                 Baseline = baseline;
             }
         }
 
-        LinkedList<Diff> diffs = new LinkedList<Diff>();
+        //LinkedList<Diff> diffs = new LinkedList<Diff>();
+        Dictionary<TKey, Diff> diffs = new Dictionary<TKey, Diff>();
 
-        public IEnumerable<Diff> DiffList => diffs;
+        public IEnumerable<Diff> DiffList => diffs.Values;
 
         public void Clear() => diffs.Clear();
 
-        void _Update(SyncDataProviderNode node, object value, object baseline)
+        void _Update(TKey key, object value, object baseline)
         {
             if(baseline != value)
             {
@@ -49,43 +55,74 @@ namespace Fact.Extensions.Experimental
 
                 if(value == null)
                 {
-                    d = new Diff(node, Diffs.Removed, value, baseline);
+                    d = new Diff(key, Diffs.Removed, value, baseline);
                 }
                 else if(baseline == null)
                 {
-                    d = new Diff(node, Diffs.Added, value, baseline);
+                    d = new Diff(key, Diffs.Added, value, baseline);
                 }
                 else
                 {
-                    d = new Diff(node, Diffs.Updated, value, baseline);
+                    d = new Diff(key, Diffs.Updated, value, baseline);
                 }
 
-                diffs.AddLast(d);
+                //diffs.AddLast(d);
+                diffs.Add(key, d);
             }
         }
 
-        public void Update(SyncDataProviderNode node, object value, object baseline)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="baseline"></param>
+        /// <remarks>
+        /// FIX: Likely is better to have baseline specified first before value
+        /// </remarks>
+        public void Update(TKey key, object value, object baseline)
         {
             /*
-            var d = diffs.First;
-
-            {
-                d = d.Next;
-            }
-            while (d.Value.Node != node && d.Next != null) ; */
-
             for(var d = diffs.First; d != null; d = d.Next)
             {
-                if(d.Value.Node == node)
+                if(d.Value.Node.Equals(node))
                 {
                     diffs.Remove(d);
                     // Carry forward old baseline, thus retaining it
                     _Update(node, value, d.Value.Baseline);
                     return;
                 }
+            } */
+            if(diffs.TryGetValue(key, out Diff d))
+            {
+                diffs.Remove(key);
+                baseline = d.Baseline;
             }
 
-            _Update(node, value, baseline);
+            _Update(key, value, baseline);
+        }
+    }
+
+
+    public static class SyncDataProviderTrackerExtensions
+    {
+        /// <summary>
+        /// Updates, comparing baseline to what exists (if anything) in existing tracker
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="sdpt"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <remarks>
+        /// Can and should be optimized if this goes into rotation; however, this may be an extreme edge case as
+        /// almost always we really want to have the existing value passed in
+        /// </remarks>
+        public static void Update<TKey>(this SyncDataProviderTracker<TKey> sdpt, TKey key, object value)
+        {
+            var d = sdpt.DiffList.FirstOrDefault(x => x.Key.Equals(key));
+
+            sdpt.Update(key, value, d?.Baseline);
         }
     }
 
@@ -101,7 +138,7 @@ namespace Fact.Extensions.Experimental
         /// 2.  A child was replaced
         /// 3.  Some descendent of the child was replaced
         /// </remarks>
-        public event Action<SyncDataProviderNode> Updated;
+        public event Action<SyncDataProviderNode, object, object> Updated;
 
         readonly Func<object> getter;
 
@@ -122,6 +159,10 @@ namespace Fact.Extensions.Experimental
         private void Nfc_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             SyncDataProviderNode child = GetChild(e.PropertyName);
+
+            var v = child.value;
+
+            Updated?.Invoke(child, v, child.Value);
         }
 
         public object Value => value;
