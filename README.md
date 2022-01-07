@@ -5,6 +5,15 @@
 A set of wrapper classes around various collection and "bag pattern"-related stuff, like caches and serialization, 
 so that consuming code can be more homogeneous
 
+# Fact.Extensions.Experimental
+
+Not ready for consumption experimental / proof of concept code
+
+## SyncDataProvider
+
+A taxonomy source of data specifically designed to serialize out to a particular format (JSON in this instance)
+and ALSO track changes to make PATCH/Diffgram easier
+
 # Fact.Extensions.Services
 
 Similar to OS-style service lifetime management.  Get events from services and manage service
