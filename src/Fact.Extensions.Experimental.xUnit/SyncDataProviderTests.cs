@@ -3,6 +3,7 @@ using Xunit;
 using FluentAssertions;
 using System.ComponentModel;
 using System.Linq;
+using Fact.Extensions.Collection;
 
 namespace Fact.Extensions.Experimental.xUnit
 {
@@ -157,16 +158,44 @@ namespace Fact.Extensions.Experimental.xUnit
         }
     }
 
+
+    public class ChangeEventHelper : 
+        INotifyPropertyChanged,
+        INotifyPropertyChanging
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangingEventHandler PropertyChanging;
+
+        public void Changed(object sender, string propertyName) => 
+            PropertyChanged(sender, new PropertyChangedEventArgs(propertyName));
+
+        public void Changing(object sender, string propertyName) =>
+            PropertyChanging(sender, new PropertyChangingEventArgs(propertyName));
+    }
+
     public class TestEntity1 : 
         INotifyPropertyChanged,
         INotifyPropertyChanging
     {
-        public string Value1 { get; set; }
+        State<string> value1;
+
+        public string Value1
+        {
+            get => value1.Value;
+            set => value1.Value = value;
+        }
+
         public int Value2 { get; set; }
 
         public TestEntity1 Nested { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public event PropertyChangingEventHandler PropertyChanging;
+
+        public TestEntity1()
+        {
+            value1.Changing += delegate { PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(nameof(Value1))); };
+            value1.Changed += delegate { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value1))); };
+        }
     }
 }
