@@ -15,8 +15,46 @@ namespace Fact.Extensions.Experimental.xUnit
             var node = new SyncDataProviderNode("root", null);
             var sdp = new SyncDataProvider(node);
             var entity = new TestEntity1();
+            var counter = 0;
 
             node.AddChild(new SyncDataProviderNode("test1", () => entity));
+
+            entity.PropertyChanging += (sender, e) =>
+            {
+                ++counter;
+
+                switch(e.PropertyName)
+                {
+                    case nameof(TestEntity1.Value1):
+                        entity.Value1.Should().Be(null);
+                        break;
+
+                    case nameof(TestEntity1.Value2):
+                        entity.Value2.Should().Be(0);
+                        break;
+                }
+            };
+
+            entity.PropertyChanged += (sender, e) =>
+            {
+                ++counter;
+
+                switch (e.PropertyName)
+                {
+                    case nameof(TestEntity1.Value1):
+                        entity.Value1.Should().Be("hi2u");
+                        break;
+
+                    case nameof(TestEntity1.Value2):
+                        entity.Value2.Should().Be(5);
+                        break;
+                }
+            };
+
+            entity.Value1 = "hi2u";
+            entity.Value2 = 5;
+
+            counter.Should().Be(4);
         }
 
 
@@ -159,23 +197,44 @@ namespace Fact.Extensions.Experimental.xUnit
     }
 
 
-    public class ChangeEventHelper : 
+    public class ChangeEventHelperBase :
         INotifyPropertyChanged,
         INotifyPropertyChanging
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public event PropertyChangingEventHandler PropertyChanging;
 
-        public void Changed(object sender, string propertyName) => 
+        protected void Changed(object sender, string propertyName) =>
             PropertyChanged(sender, new PropertyChangedEventArgs(propertyName));
 
-        public void Changing(object sender, string propertyName) =>
+        protected void Changing(object sender, string propertyName) =>
             PropertyChanging(sender, new PropertyChangingEventArgs(propertyName));
+    }
+
+    public class ChangeEventHelper : ChangeEventHelperBase
+    {
+        public new void Changed(object sender, string propertyName) =>
+            base.Changed(sender, propertyName);
+
+        public new void Changing(object sender, string propertyName) =>
+            base.Changing(sender, propertyName);
 
         public void Init<T>(ref State<T> s, object sender, string propertyName)
         {
             s.Changed += delegate { Changed(sender, propertyName); };
             s.Changing += delegate { Changing(sender, propertyName); };
+        }
+
+        public void Init(ref PropertyChangingEventHandler changing, ref PropertyChangedEventHandler changed)
+        {
+            //PropertyChanged += (sender, e) => changed?.Invoke(sender, e);
+            //PropertyChanging += (sender, e) => changing?.Invoke(sender, e);
+            PropertyChanged += ChangeEventHelper_PropertyChanged;
+        }
+
+        private void ChangeEventHelper_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            
         }
     }
 
@@ -196,7 +255,7 @@ namespace Fact.Extensions.Experimental.xUnit
 
         public int Value2
         {
-            get => value2.Value;
+            get => value2;
             set => value2.Value = value;
         }
 
@@ -207,6 +266,11 @@ namespace Fact.Extensions.Experimental.xUnit
 
         public TestEntity1()
         {
+            //ceh.Init(PropertyChanging, PropertyChanged);
+
+            ceh.PropertyChanged += (sender, e) => PropertyChanged?.Invoke(sender, e);
+            ceh.PropertyChanging += (sender, e) => PropertyChanging?.Invoke(sender, e);
+
             value1.Changed += delegate { ceh.Changed(this, nameof(Value1)); };
             value1.Changing += delegate { ceh.Changing(this, nameof(Value1)); };
 
