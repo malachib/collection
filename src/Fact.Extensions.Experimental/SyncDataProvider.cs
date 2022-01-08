@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+// FIX: We have an issue where property names will eventually collide with sub-object names.
 namespace Fact.Extensions.Experimental
 {
     using Collection;
@@ -134,9 +135,12 @@ namespace Fact.Extensions.Experimental
     /// <remarks>
     /// DEBT: This is a sparse provider, meaning that Children enumeration only lists
     /// what you actual tried to acquire already
+    /// DEBT: Decouple this into a general purpose reflection node, then extend it into the INotify aware
     /// </remarks>
     public class SyncDataProviderNode : NamedChildCollection<SyncDataProviderNode>
     {
+        readonly IServiceProvider services;
+
         /// <summary>
         /// 
         /// </summary>
@@ -153,17 +157,28 @@ namespace Fact.Extensions.Experimental
 
         object value;
 
+        void Updating()
+        {
+            // TODO: May consider adding an Updating event
+        }
+
         /// <summary>
-        /// Internal call to rewrite 'value' from getter
+        /// Internal call to rewrite 'value' from getter and fire updated event
         /// </summary>
-        void Update() => value = getter?.Invoke();
+        void Update()
+        {
+            object oldValue = value;
+            value = getter?.Invoke();
+            Updated?.Invoke(this, oldValue, value);
+        }
 
 
 #if NETSTANDARD1_3_OR_GREATER
-        void Configure()
+        void AddEvents()
         {
-            // FIX: Need to do a -= as well
             // DEBT: Likely this can be consolidated with our State object
+            // DEBT: Likely we'd prefer some kind of IServiceProvider factory arrangement here so that
+            // other kinds of notifiers can be used
             if (value is INotifyPropertyChanged nfc)
             {
                 nfc.PropertyChanged += Nfc_PropertyChanged;
@@ -172,25 +187,29 @@ namespace Fact.Extensions.Experimental
             }
         }
 
+
+        // DEBT: Not called yet
+        void RemoveEvents()
+        {
+            ((INotifyPropertyChanged)value).PropertyChanged -= Nfc_PropertyChanged;
+            ((INotifyPropertyChanging)value).PropertyChanging -= Npc2_PropertyChanging;
+        }
+
         private void Npc2_PropertyChanging(object sender, PropertyChangingEventArgs e)
         {
-            SyncDataProviderNode child = GetOrCreateChild(e.PropertyName);
+            SyncDataProviderNode child = GetOrAddChild(e.PropertyName);
 
-            AddChild(child);
+            child.Updating();
         }
 
         private void Nfc_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             SyncDataProviderNode child = GetChild(e.PropertyName);
 
-            var oldValue = child.value;
             child.Update();
-            var newValue = child.value;
-
-            Updated?.Invoke(child, oldValue, newValue);
         }
 #else
-        void Configure()
+        void AddEvents()
         {
             throw new InvalidOperationException("netstandard1.3 or higher needed for this feature");
         }
@@ -198,44 +217,62 @@ namespace Fact.Extensions.Experimental
 
         public object Value => value;
 
-        public SyncDataProviderNode GetOrCreateChild(string name)
+
+        /// <summary>
+        /// Create a new node directly associated with a particular property
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public SyncDataProviderNode CreateChild(string name)
         {
-            var child = GetChild(name);
+            if (value == null)
+                throw new InvalidOperationException("No entity from which to create children");
 
             var entity = value;
 
-            if (entity == null)
-                throw new KeyNotFoundException("No inner value nor children found");
+            var entityType = entity.GetType();
+            var propertyInfo = entityType.GetTypeInfo().GetDeclaredProperty(name);
+
+            Func<object> getter = () => propertyInfo.GetValue(entity);
+
+            return new SyncDataProviderNode(name, getter);
+        }
+
+        SyncDataProviderNode GetOrAddChild(string name)
+        {
+            var child = GetChild(name);
 
             if (child == null)
             {
-                var entityType = entity.GetType();
-                var propertyInfo = entityType.GetTypeInfo().GetDeclaredProperty(name);
-
-                Func<object> getter = () => propertyInfo.GetValue(entity);
-
-                child = new SyncDataProviderNode(name, getter);
+                child = CreateChild(name);
+                AddChild(child);
             }
 
             return child;
         }
 
-        public SyncDataProviderNode(string name, Func<object> getter) : base(name)
+        public SyncDataProviderNode(string name, Func<object> getter,
+            IServiceProvider services = null) : base(name)
         {
             this.getter = getter;
             if(getter != null)
             {
-                Update();
-                Configure();
+                value = getter();
+                AddEvents();
             }
+            this.services = services;
         }
     }
 
 
     public static class SyncDataProviderNodeExtensions
     {
-        public static void AddEntity(this SyncDataProviderNode node, string name, object entity) =>
-            node.AddChild(new SyncDataProviderNode(name, () => entity));
+        public static SyncDataProviderNode AddEntity(this SyncDataProviderNode node, string name, object entity)
+        {
+            SyncDataProviderNode child = new SyncDataProviderNode(name, () => entity);
+            node.AddChild(child);
+            return child;
+        }
     }
 
     public class SyncDataProvider : TaxonomyBase<SyncDataProviderNode>
@@ -245,6 +282,6 @@ namespace Fact.Extensions.Experimental
         public SyncDataProvider(SyncDataProviderNode root) => RootNode = root;
 
         protected override SyncDataProviderNode CreateNode(SyncDataProviderNode parent, string name) =>
-            parent.GetOrCreateChild(name);
+            parent.CreateChild(name);
     }
 }

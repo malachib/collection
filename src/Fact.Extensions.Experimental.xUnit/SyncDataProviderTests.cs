@@ -65,14 +65,31 @@ namespace Fact.Extensions.Experimental.xUnit
             var sdp = new SyncDataProvider(root);
             var entity = new TestEntity1();
 
-            root.AddEntity("test1", entity);
+            var entityNode = root.AddEntity("test1", entity);
+
+            int counter = 0;
 
             // DEBT: Might want periods in this context at some point rather than slashes
             // DEBT: NOT specifying root node name a little confusing
             //var node = sdp["root/test1/Value1"];
-            var node = sdp["test1/Value1"];
+            var value2Node = sdp["test1/Value2"];
+
+            entityNode.Updated += (n, oldValue, newValue) =>
+            {
+
+            };
+
+            value2Node.Updated += (n, oldValue, newValue) =>
+            {
+                ++counter;
+
+                oldValue.Should().Be(0);
+                newValue.Should().Be(7);
+            };
 
             entity.Value2 = 7;
+
+            counter.Should().Be(1);
         }
 
 
