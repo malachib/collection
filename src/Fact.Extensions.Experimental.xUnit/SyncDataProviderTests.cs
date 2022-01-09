@@ -4,6 +4,7 @@ using FluentAssertions;
 using System.ComponentModel;
 using System.Linq;
 using Fact.Extensions.Collection;
+using System.Collections.Generic;
 
 namespace Fact.Extensions.Experimental.xUnit
 {
@@ -90,6 +91,47 @@ namespace Fact.Extensions.Experimental.xUnit
             entity.Value2 = 7;
 
             counter.Should().Be(1);
+        }
+
+
+        [Fact]
+        public void MetaDataTest()
+        {
+            var root = new SyncDataProviderNode("root", null);
+            var child = root.AddEntity("child1", new TestEntity1());
+
+            root["attr1"] = "hi2u";
+            child["attr1"] = "hi2u";
+
+            var sdp = new SyncDataProvider(root);
+
+            var childRetrieved = sdp["child1"];
+
+            child.Should().Be(childRetrieved);
+
+            childRetrieved = sdp["child1", ("attr1", "hi2u")];
+        }
+
+
+        [Fact]
+        public void FindChildrenByPathTest()
+        {
+            var root = new SyncDataProviderNode("root", null);
+            var child = root.AddEntity("child1", new TestEntity1());
+            var grandChild1 = child.AddEntity("grandChild1", new TestEntity1());
+            // Base taxonomy gets a name collision so far here
+            //var grandChild2 = child.AddEntity("grandChild1", new TestEntity1());
+            var grandChild3 = child.AddEntity("grandChild3", new TestEntity1());
+
+            root["attr1"] = "hi2u";
+            grandChild1["attr1"] = "hi2u";
+            //grandChild2["attr1"] = "hi2u";
+
+            List<string> path = "root/child1/grandChild1".Split('/').ToList();
+
+            var nodes = (new[] { root }).FindChildrenByPath(path.GetEnumerator(), null, x => x["attr1"] != null);
+
+            var nodes2 = nodes.ToArray();
         }
 
 

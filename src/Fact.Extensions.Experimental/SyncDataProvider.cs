@@ -130,6 +130,18 @@ namespace Fact.Extensions.Experimental
 
 
     /// <summary>
+    /// AKA node attributes
+    /// Think about formalizing this at some level, would be extremely useful for Prometheus
+    /// That said it is not strictly a taxonomy feature and will result in name collisions, since
+    /// we want to differenciate the unique node additionally by attribute
+    /// </summary>
+    public interface INodeAttributes : INamedIndexer<object>
+    {
+
+    }
+
+
+    /// <summary>
     /// 
     /// </summary>
     /// <remarks>
@@ -137,7 +149,8 @@ namespace Fact.Extensions.Experimental
     /// what you actual tried to acquire already
     /// DEBT: Decouple this into a general purpose reflection node, then extend it into the INotify aware
     /// </remarks>
-    public class SyncDataProviderNode : NamedChildCollection<SyncDataProviderNode>
+    public class SyncDataProviderNode : NamedChildCollection<SyncDataProviderNode>,
+        INodeAttributes
     {
         readonly IServiceProvider services;
 
@@ -218,6 +231,19 @@ namespace Fact.Extensions.Experimental
         public object Value => value;
 
 
+        Dictionary<string, object> metaData = new Dictionary<string, object>();
+
+        public object this[string key]
+        {
+            get
+            {
+                metaData.TryGetValue(key, out object value);
+                return value;
+            }
+            set => metaData[key] = value;
+        }
+
+
         /// <summary>
         /// Create a new node directly associated with a particular property
         /// </summary>
@@ -273,6 +299,49 @@ namespace Fact.Extensions.Experimental
             node.AddChild(child);
             return child;
         }
+
+
+        /// <summary>
+        /// Experimental multi child traversal
+        /// </summary>
+        /// <param name="startNode">top of tree to search from.  MUST be convertible to type T directly</param>
+        /// <param name="splitPaths">broken out path components</param>
+        /// <param name="nodeFactory"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <remarks>
+        /// DEBT: Probably we can use 'Visit' helper extension here
+        /// </remarks>
+        public static IEnumerable<T> FindChildrenByPath<T>(this IEnumerable<IChildProvider<T>> startNodes, 
+            IEnumerator<string> splitPaths,
+            Func<T, string, T> nodeFactory, Func<T, bool> predicate)
+            where T : INamed
+        {
+            var atEnd = !splitPaths.MoveNext();
+
+            var currentPath = splitPaths.Current;
+
+            foreach (IChildProvider<T> current in startNodes)
+            {
+                var _current = (T)current;
+
+                if (_current.Name != currentPath) continue;
+
+                var newStartNodes = current.Children;
+
+                if (atEnd)
+                {
+                    return newStartNodes.Where(predicate);
+                }
+                else
+                {
+                    // DEBT: Need a not-bottom-level predicate applied here
+                    return FindChildrenByPath(newStartNodes.OfType<IChildProvider<T>>(), splitPaths, nodeFactory, predicate);
+                }
+            }
+
+            return Enumerable.Empty<T>();
+        }
     }
 
     public class SyncDataProvider : TaxonomyBase<SyncDataProviderNode>
@@ -280,6 +349,19 @@ namespace Fact.Extensions.Experimental
         public override SyncDataProviderNode RootNode { get; }
 
         public SyncDataProvider(SyncDataProviderNode root) => RootNode = root;
+
+
+        public SyncDataProviderNode this[string path, params ValueTuple<string, object>[] attributes]
+        {
+            get
+            {
+                if (attributes.Length == 0) return base[path];
+
+                string[] splitPaths = path.Split('/');
+
+                return RootNode.FindChildByPath(splitPaths, _CreateNode);
+            }
+        }
 
         protected override SyncDataProviderNode CreateNode(SyncDataProviderNode parent, string name) =>
             parent.CreateChild(name);

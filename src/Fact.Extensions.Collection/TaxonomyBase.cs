@@ -38,7 +38,10 @@ namespace Fact.Extensions.Collection
         /// <param name="name"></param>
         /// <param name="parent"></param>
         /// <returns></returns>
-        private TNode _CreateNode(TNode parent, string name)
+        /// <remarks>
+        /// DEBT: Clean up naming to disambiguate from core CreateNode
+        /// </remarks>
+        protected TNode _CreateNode(TNode parent, string name)
         {
             var createdNode = CreateNode(parent, name);
 
