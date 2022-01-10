@@ -17,14 +17,8 @@ namespace Fact.Extensions.Collection
         }
     }
 
-    /// <summary>
-    /// Base wrapper/accessor for nodes, which are expected to be INamedChildProvider
-    /// </summary>
-    /// <typeparam name="TNode"></typeparam>
-    public abstract class TaxonomyBase<TNode> : TaxonomyBase, ITaxonomy<TNode>
-        where TNode :
-            INamedChildProvider<TNode>,
-            INamed
+
+    public abstract class TaxonomyBaseBase<TNode> : TaxonomyBase
     {
         public abstract TNode RootNode { get; }
 
@@ -49,6 +43,26 @@ namespace Fact.Extensions.Collection
 
             return createdNode;
         }
+    }
+
+
+    public abstract class TaxonomyBase<TKey, TNode> : TaxonomyBaseBase<TNode>, 
+        IKeyedTaxonomy<TKey, TNode>
+        where TNode: IKeyed<TKey>, IChildProvider<TNode>
+    {
+        public abstract TNode this[TKey path] { get; set; }
+    }
+
+    /// <summary>
+    /// Base wrapper/accessor for nodes, which are expected to be INamedChildProvider
+    /// </summary>
+    /// <typeparam name="TNode"></typeparam>
+    public abstract class TaxonomyBase<TNode> : TaxonomyBaseBase<TNode>, ITaxonomy<TNode>
+        where TNode :
+            INamedChildProvider<TNode>,
+            INamed
+    {
+
 
         public TNode this[string path]
         {

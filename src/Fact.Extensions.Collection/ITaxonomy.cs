@@ -4,6 +4,16 @@ using System.Text;
 
 namespace Fact.Extensions.Collection
 {
+    public interface ITaxonomyBase<TNode>
+        where TNode: IChildProvider<TNode>
+    {
+        /// <summary>
+        /// Root node under which all other nodes will fall.
+        /// NOTE: Nodes are named, but usually the RootNode name is not seen
+        /// </summary>
+        TNode RootNode { get; }
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -19,14 +29,20 @@ namespace Fact.Extensions.Collection
     /// responsibility
     /// </remarks>
     /// <typeparam name="TNode"></typeparam>
-    public interface ITaxonomy<TNode> : INamedAccessor<TNode>
+    public interface ITaxonomy<TNode> : 
+        ITaxonomyBase<TNode>,
+        INamedAccessor<TNode>
         where TNode: INamed, IChildProvider<TNode>
     {
-        /// <summary>
-        /// Root node under which all other nodes will fall.
-        /// NOTE: Nodes are named, but usually the RootNode name is not seen
-        /// </summary>
-        TNode RootNode { get; }
+    }
+
+
+    public interface IKeyedTaxonomy<TKey, TNode> :
+        ITaxonomyBase<TNode>,
+        IAccessor<TKey, TNode>
+        where TNode: IKeyed<TKey>, IChildProvider<TNode>
+    {
+
     }
 
     /// <summary>
