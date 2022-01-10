@@ -76,16 +76,10 @@ namespace Fact.Extensions.Collection
             INamedChildProvider<TNode>,
             INamed
     {
+        protected virtual IEnumerable<string> Split(string path) =>
+            path.Split('/');
 
-
-        public TNode this[string path]
-        {
-            get
-            {
-                string[] splitPaths = path.Split('/');
-
-                return RootNode.FindChildByPath(splitPaths, _CreateNode);
-            }
-        }
+        public TNode this[string path] => 
+            RootNode.FindChildByPath(Split(path), _CreateNode);
     }
 }
