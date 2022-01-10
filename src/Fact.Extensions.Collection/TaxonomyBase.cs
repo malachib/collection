@@ -59,13 +59,12 @@ namespace Fact.Extensions.Collection
         IKeyedTaxonomy<TKey, TNode>
         where TNode: IKeyed<TKey>, IChildProvider<TKey, TNode>
     {
-        public TNode this[IEnumerable<TKey> keys]
-        {
-            get
-            {
-                return RootNode.FindChildByPath(keys, _CreateNode, (node, _key) => node.Key.Equals(_key));
-            }
-        }
+        TNode Get(IEnumerable<TKey> keys) =>
+            RootNode.FindChildByPath(keys, _CreateNode, (node, _key) => node.Key.Equals(_key));
+
+        public TNode this[IEnumerable<TKey> keys] => Get(keys);
+
+        public TNode this[params TKey[] keys] => Get(keys);
     }
 
     /// <summary>
