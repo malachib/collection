@@ -8,6 +8,7 @@ using Xunit;
 namespace Fact.Extensions.Experimental.xUnit
 {
     using Collection;
+    using System.Linq;
 
     public class TaxonomyTests
     {
@@ -38,12 +39,19 @@ namespace Fact.Extensions.Experimental.xUnit
             var k1 = t.RootNode.Key;
             var k2 = new SyncKey("child1");
             var k3 = new SyncKey("grandChild1");
+            var k4 = new SyncKey("grandChild1", ("name", "Fred"));
+            var k5 = new SyncKey("grandChild1", ("name", "Bob"));
 
             var child1 = new TestNode(k2);
             var grandChild1 = new TestNode(k3);
+            var grandChild2 = new TestNode(k4);
+            var grandChild3 = new TestNode(k5);
 
             t.RootNode.AddChild(child1);
+
             child1.AddChild(grandChild1);
+            child1.AddChild(grandChild2);
+            child1.AddChild(grandChild3);
 
             // DEBT: Sometimes we need root node here and sometimes we don't.  Close
             // the descrepency and/or document why it exists
@@ -52,6 +60,10 @@ namespace Fact.Extensions.Experimental.xUnit
             TestNode node = t[new[] { k2, k3 }];
 
             node.Should().Be(grandChild1);
+
+            var grandChildrenWithName = child1.Children.WithAttributeNames("name").ToArray();
+
+            grandChildrenWithName.Length.Should().Be(2);
         }
     }
 }

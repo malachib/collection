@@ -293,6 +293,18 @@ namespace Fact.Extensions.Experimental
 
     public static class SyncDataProviderNodeExtensions
     {
+        public static IEnumerable<T> MatchAttributes<T>(this IEnumerable<T> nodes, Func<KeyValuePair<string, object>, bool> predicate)
+            where T : IKeyed<SyncKey>
+        {
+            return nodes.Where(x => x.Key.Attributes.Any(predicate));
+        }
+
+        public static IEnumerable<T> WithAttributeNames<T>(this IEnumerable<T> nodes, params string[] attributeNames)
+            where T: IKeyed<SyncKey>
+        {
+            return nodes.MatchAttributes(x => attributeNames.Contains(x.Key));
+        }
+
         public static SyncDataProviderNode AddEntity(this SyncDataProviderNode node, string name, object entity)
         {
             SyncDataProviderNode child = new SyncDataProviderNode(name, () => entity);
@@ -349,16 +361,24 @@ namespace Fact.Extensions.Experimental
         public string Path { get; }
         public KeyValuePair<string, object>[] Attributes { get; }
 
+        /*
         public SyncKey(string path, params KeyValuePair<string, object>[] attributes)
         {
             Path = path;
             Attributes = attributes;
+        } */
+
+
+        public SyncKey(string path, params ValueTuple<string, object>[] attributes)
+        {
+            Path = path;
+            Attributes = attributes.Select(x => new KeyValuePair<string, object>(x.Item1, x.Item2)).ToArray();
         }
 
         public override int GetHashCode()
         {
             var pathHashCode = Path.GetHashCode();
-            var attributeHashCode = Attributes.Aggregate(0, (s, x) => x.Key.GetHashCode() ^ x.Value.GetHashCode());
+            var attributeHashCode = Attributes.Aggregate(0, (s, x) => s ^ x.Key.GetHashCode() ^ x.Value.GetHashCode());
             return pathHashCode ^ attributeHashCode;
         }
 
@@ -379,7 +399,12 @@ namespace Fact.Extensions.Experimental
 
         public override string ToString()
         {
-            return Path;
+            string s = Path;
+
+            if(Attributes.Any())
+                s += " (" + string.Join(", ", Attributes) + ')';
+
+            return s;
         }
     }
 
