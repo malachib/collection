@@ -39,7 +39,7 @@ namespace Fact.Extensions.Collection
 
     public interface IKeyedTaxonomy<TKey, TNode> :
         ITaxonomyBase<TNode>,
-        IAccessor<TKey, TNode>
+        IAccessor<IEnumerable<TKey>, TNode>
         where TNode: IKeyed<TKey>, IChildProvider<TNode>
     {
 

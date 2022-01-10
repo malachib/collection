@@ -39,6 +39,7 @@ namespace Fact.Extensions.Collection.xUnit
 
             public override TestNode RootNode => rootNode;
 
+            // DEFUNCT
             protected override IEnumerable<int> Split(int key)
             {
                 while(key > 0)
@@ -61,9 +62,7 @@ namespace Fact.Extensions.Collection.xUnit
             t.RootNode.AddChild(child);
             child.AddChild(grandChild);
 
-            // For this synthetic scenario, parent is the rightmost
-
-            TestNode _child = t[0x01_00];
+            TestNode _child = t[new[] { 0, 1 }];
 
             _child.Should().Be(grandChild);
         }

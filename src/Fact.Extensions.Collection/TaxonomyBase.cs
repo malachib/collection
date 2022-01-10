@@ -22,7 +22,7 @@ namespace Fact.Extensions.Collection
     {
         public abstract TNode RootNode { get; }
 
-        protected abstract TNode CreateNode(TNode parent, TKey name);
+        protected abstract TNode CreateNode(TNode parent, TKey key);
 
         public event Action<object, TNode> NodeCreated;
 
@@ -61,13 +61,13 @@ namespace Fact.Extensions.Collection
     {
         protected abstract IEnumerable<TKey> Split(TKey key);
 
-        public TNode this[TKey key]
+        public TNode this[IEnumerable<TKey> keys]
         {
             get
             {
-                IEnumerable<TKey> splitKeys = Split(key);
+                //IEnumerable<TKey> splitKeys = Split(key);
 
-                return RootNode.FindChildByPath(splitKeys, _CreateNode, (node, _key) => node.Key.Equals(_key));
+                return RootNode.FindChildByPath(keys, _CreateNode, (node, _key) => node.Key.Equals(_key));
             }
         }
     }

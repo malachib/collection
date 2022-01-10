@@ -344,6 +344,19 @@ namespace Fact.Extensions.Experimental
         }
     }
 
+    public struct SyncKey
+    {
+        public string Path { get; }
+        public KeyValuePair<string, object>[] Attributes { get; }
+
+        public SyncKey(string path, KeyValuePair<string, object>[] attributes)
+        {
+            Path = path;
+            Attributes = attributes;
+        }
+    }
+
+
     public class SyncDataProvider : TaxonomyBase<SyncDataProviderNode>
     {
         public override SyncDataProviderNode RootNode { get; }
