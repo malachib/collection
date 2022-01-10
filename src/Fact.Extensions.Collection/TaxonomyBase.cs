@@ -59,14 +59,10 @@ namespace Fact.Extensions.Collection
         IKeyedTaxonomy<TKey, TNode>
         where TNode: IKeyed<TKey>, IChildProvider<TKey, TNode>
     {
-        protected abstract IEnumerable<TKey> Split(TKey key);
-
         public TNode this[IEnumerable<TKey> keys]
         {
             get
             {
-                //IEnumerable<TKey> splitKeys = Split(key);
-
                 return RootNode.FindChildByPath(keys, _CreateNode, (node, _key) => node.Key.Equals(_key));
             }
         }

@@ -349,10 +349,33 @@ namespace Fact.Extensions.Experimental
         public string Path { get; }
         public KeyValuePair<string, object>[] Attributes { get; }
 
-        public SyncKey(string path, KeyValuePair<string, object>[] attributes)
+        public SyncKey(string path, params KeyValuePair<string, object>[] attributes)
         {
             Path = path;
             Attributes = attributes;
+        }
+
+        public override int GetHashCode()
+        {
+            // FIX: Need to hash attributes too (for Dictionary)
+            var pathHashCode = Path.GetHashCode();
+            return pathHashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(obj is SyncKey sk)
+            {
+                // FIX: Need to compare attributes too
+                return sk.Path.Equals(Path);
+            }
+
+            return base.Equals(obj);
+        }
+
+        public override string ToString()
+        {
+            return Path;
         }
     }
 

@@ -24,21 +24,34 @@ namespace Fact.Extensions.Experimental.xUnit
 
         public class TestAttributedTaxonomy : TaxonomyBase<SyncKey, TestNode>
         {
-            public override TestNode RootNode => throw new NotImplementedException();
+            public override TestNode RootNode { get; } = new TestNode(new SyncKey("root"));
 
             protected override TestNode CreateNode(TestNode parent, SyncKey key) =>
                 new TestNode(key);
-
-            protected override IEnumerable<SyncKey> Split(SyncKey key)
-            {
-                throw new NotImplementedException();
-            }
         }
 
         [Fact]
         public void NodeAttributeTest()
         {
+            var t = new TestAttributedTaxonomy();
 
+            var k1 = t.RootNode.Key;
+            var k2 = new SyncKey("child1");
+            var k3 = new SyncKey("grandChild1");
+
+            var child1 = new TestNode(k2);
+            var grandChild1 = new TestNode(k3);
+
+            t.RootNode.AddChild(child1);
+            child1.AddChild(grandChild1);
+
+            // DEBT: Sometimes we need root node here and sometimes we don't.  Close
+            // the descrepency and/or document why it exists
+            //TestNode node = t[new[] { k1, k2, k3 }];
+
+            TestNode node = t[new[] { k2, k3 }];
+
+            node.Should().Be(grandChild1);
         }
     }
 }

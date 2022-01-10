@@ -38,17 +38,6 @@ namespace Fact.Extensions.Collection.xUnit
             }
 
             public override TestNode RootNode => rootNode;
-
-            // DEFUNCT
-            protected override IEnumerable<int> Split(int key)
-            {
-                while(key > 0)
-                {
-                    int split = key & 0xFF;
-                    key >>= 8;
-                    yield return split;
-                }    
-            }
         }
 
 
