@@ -18,11 +18,11 @@ namespace Fact.Extensions.Collection
     }
 
 
-    public abstract class TaxonomyBaseBase<TNode> : TaxonomyBase
+    public abstract class TaxonomyBaseBase<TKey, TNode> : TaxonomyBase
     {
         public abstract TNode RootNode { get; }
 
-        protected abstract TNode CreateNode(TNode parent, string name);
+        protected abstract TNode CreateNode(TNode parent, TKey name);
 
         public event Action<object, TNode> NodeCreated;
 
@@ -35,7 +35,7 @@ namespace Fact.Extensions.Collection
         /// <remarks>
         /// DEBT: Clean up naming to disambiguate from core CreateNode
         /// </remarks>
-        protected TNode _CreateNode(TNode parent, string name)
+        protected TNode _CreateNode(TNode parent, TKey name)
         {
             var createdNode = CreateNode(parent, name);
 
@@ -46,18 +46,37 @@ namespace Fact.Extensions.Collection
     }
 
 
-    public abstract class TaxonomyBase<TKey, TNode> : TaxonomyBaseBase<TNode>, 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TNode"></typeparam>
+    /// <remarks>
+    /// Different from regular TaxonomyBase[TNode] which presumes string key and named child provider
+    /// </remarks>
+    public abstract class TaxonomyBase<TKey, TNode> : TaxonomyBaseBase<TKey, TNode>, 
         IKeyedTaxonomy<TKey, TNode>
-        where TNode: IKeyed<TKey>, IChildProvider<TNode>
+        where TNode: IKeyed<TKey>, IChildProvider<TKey, TNode>
     {
-        public abstract TNode this[TKey path] { get; set; }
+        protected abstract IEnumerable<TKey> Split(TKey key);
+
+        public TNode this[TKey key]
+        {
+            get
+            {
+                IEnumerable<TKey> splitKeys = Split(key);
+
+                return RootNode.FindChildByPath(splitKeys, _CreateNode, (node, _key) => node.Key.Equals(_key));
+            }
+        }
     }
 
     /// <summary>
     /// Base wrapper/accessor for nodes, which are expected to be INamedChildProvider
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
-    public abstract class TaxonomyBase<TNode> : TaxonomyBaseBase<TNode>, ITaxonomy<TNode>
+    public abstract class TaxonomyBase<TNode> : TaxonomyBaseBase<string, TNode>, ITaxonomy<TNode>
         where TNode :
             INamedChildProvider<TNode>,
             INamed

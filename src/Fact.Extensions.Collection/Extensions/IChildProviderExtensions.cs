@@ -7,35 +7,43 @@ namespace Fact.Extensions.Collection
 {
     public static class IChildProviderExtensions
     {
+        /// <param name="startNode">top of tree to search from.  MUST be convertible to type T directly</param>
+        /// <param name="splitKeys">broken out path/key components</param>
+        public static T FindChildByPath<T>(this IChildProvider<T> startNode, IEnumerable<string> splitPaths,
+            Func<T, string, T> nodeFactory = null)
+            where T: INamed
+        {
+            return startNode.FindChildByPath(splitPaths, nodeFactory, (node, key) => node.Name.Equals(key));
+        }
+
         /// <summary>
         /// Stock standard tree traversal
         /// </summary>
         /// <param name="startNode">top of tree to search from.  MUST be convertible to type T directly</param>
-        /// <param name="splitPaths">broken out path components</param>
+        /// <param name="splitKeys">broken out path/key components</param>
         /// <param name="nodeFactory"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T FindChildByPath<T>(this IChildProvider<T> startNode, IEnumerable<string> splitPaths,
-            Func<T, string, T> nodeFactory = null)
-            where T : INamed
+        public static T FindChildByPath<T, TKey>(this IChildProvider<T> startNode, IEnumerable<TKey> splitKeys,
+            Func<T, TKey, T> nodeFactory, Func<T, TKey, bool> keyPredicate)
         {
             IChildProvider<T> currentNode = startNode;
 
             // The ChildProvider must also be a type of T for this to work
             T node = (T)currentNode;
 
-            foreach (var name in splitPaths)
+            foreach (var key in splitKeys)
             {
                 // We may encounter some nodes which are not child provider nodes
                 if (currentNode == null) continue;
 
-                if (currentNode is IChildProvider<string, T> currentGetChildNode)
+                if (currentNode is IChildProvider<TKey, T> currentGetChildNode)
                 {
-                    node = currentGetChildNode.GetChild(name);
+                    node = currentGetChildNode.GetChild(key);
                 }
                 else
                 {
-                    node = currentNode.Children.SingleOrDefault(x => x.Name.Equals(name));
+                    node = currentNode.Children.SingleOrDefault(x => keyPredicate(x, key));
                 }
 
                 if (node == null)
@@ -48,7 +56,7 @@ namespace Fact.Extensions.Collection
                     {
                         // TODO: have a configuration flag to determine auto add
                         // FIX: typecast to (T) fragile
-                        node = nodeFactory((T)currentNode, name);
+                        node = nodeFactory((T)currentNode, key);
                         currentWritableNode.AddChild(node);
                     }
                     else
