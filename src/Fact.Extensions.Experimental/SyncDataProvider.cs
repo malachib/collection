@@ -357,17 +357,21 @@ namespace Fact.Extensions.Experimental
 
         public override int GetHashCode()
         {
-            // FIX: Need to hash attributes too (for Dictionary)
             var pathHashCode = Path.GetHashCode();
-            return pathHashCode;
+            var attributeHashCode = Attributes.Aggregate(0, (s, x) => x.Key.GetHashCode() ^ x.Value.GetHashCode());
+            return pathHashCode ^ attributeHashCode;
         }
 
         public override bool Equals(object obj)
         {
             if(obj is SyncKey sk)
             {
-                // FIX: Need to compare attributes too
-                return sk.Path.Equals(Path);
+                if (!sk.Path.Equals(Path)) return false;
+
+                // DEBT: Optimize this
+                // FIX: Technically we must only match if no extras on either side
+                foreach (KeyValuePair<string, object> a in Attributes)
+                    if (!sk.Attributes.Contains(a)) return false;
             }
 
             return base.Equals(obj);
