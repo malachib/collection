@@ -47,6 +47,11 @@ namespace Fact.Extensions.Collection
         ChildCollectionBase<TNode>,
         IChildCollection<TKey, TNode>
     {
+        /// <summary>
+        /// Get the key of a particular node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         protected abstract TKey GetKey(TNode node);
 
         SparseDictionary<TKey, TNode> children;

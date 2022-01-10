@@ -1,3 +1,4 @@
+using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -21,12 +22,15 @@ namespace Fact.Extensions.Collection.xUnit
                 Key = key;
             }
 
+            /// <summary>
+            /// Not really used
+            /// </summary>
             public TestNode Parent => parent;
         }
 
         internal class TestKeyedTaxonomy : TaxonomyBase<int, TestNode>
         {
-            readonly TestNode rootNode = new TestNode(null, 0);
+            readonly TestNode rootNode = new TestNode(null, -1);
 
             protected override TestNode CreateNode(TestNode parent, int key)
             {
@@ -40,6 +44,7 @@ namespace Fact.Extensions.Collection.xUnit
                 while(key > 0)
                 {
                     int split = key & 0xFF;
+                    key >>= 8;
                     yield return split;
                 }    
             }
@@ -50,13 +55,17 @@ namespace Fact.Extensions.Collection.xUnit
         public void CreateKeyedTaxonomyNodeTest()
         {
             var t = new TestKeyedTaxonomy();
-            var child = new TestNode(null, 0x1);
+            var child = new TestNode(t.RootNode, 0);
+            var grandChild = new TestNode(child, 1);
 
             t.RootNode.AddChild(child);
+            child.AddChild(grandChild);
 
-            // FIX: This gives us an out of memory error.  The key splitting is kinda wrong, but even if so
-            // I don't think we should be looping back and creating new nodes over and over
-            //TestNode _child = t[0x00_01];
+            // For this synthetic scenario, parent is the rightmost
+
+            TestNode _child = t[0x01_00];
+
+            _child.Should().Be(grandChild);
         }
     }
 }
