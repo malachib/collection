@@ -385,7 +385,7 @@ namespace Fact.Extensions.Experimental
         }
     }
 
-    public class SyncKey : SyncKey<string, object>
+    public class SyncKey : SyncKey<string, string, object>
     {
         public SyncKey(string path, params ValueTuple<string, object>[] attributes) :
             base(path, attributes)
@@ -394,10 +394,21 @@ namespace Fact.Extensions.Experimental
         }
     }
 
-    public class SyncKey<TKey, TObject>
+
+    /// <summary>
+    /// Convenient key used for navigating attribute-augmented taxonomy
+    /// </summary>
+    /// <typeparam name="TPath">Type used to indicate a particular path name.  Usually a string</typeparam>
+    /// <typeparam name="TKey">Type used to indicate a particular attribute name.  Usually a string</typeparam>
+    /// <typeparam name="TValue">Type used to indicate a particular attribute value.  Usually an object or string</typeparam>
+    /// <remarks>
+    /// Pulling back from struct so that we can do inheritance.  
+    /// DEBT: Very mild debt, see if we can conveniently make this a struct again for optimization
+    /// </remarks>
+    public class SyncKey<TPath, TKey, TValue>
     {
-        public string Path { get; }
-        public IEnumerable<KeyValuePair<TKey, TObject>> Attributes { get; }
+        public TPath Path { get; }
+        public IEnumerable<KeyValuePair<TKey, TValue>> Attributes { get; }
 
         /*
         public SyncKey(string path, params KeyValuePair<string, object>[] attributes)
@@ -407,10 +418,31 @@ namespace Fact.Extensions.Experimental
         } */
 
 
-        public SyncKey(string path, params ValueTuple<TKey, TObject>[] attributes)
+        public SyncKey(TPath path, params ValueTuple<TKey, TValue>[] attributes)
         {
             Path = path;
-            Attributes = attributes.Select(x => new KeyValuePair<TKey, TObject>(x.Item1, x.Item2));
+            Attributes = attributes.Select(x => new KeyValuePair<TKey, TValue>(x.Item1, x.Item2));
+        }
+
+
+        public bool TryGet(TKey key, out TValue value)
+        {
+            // FirstOrDefault not quite right here because default(TValue) may
+            // be a valid attribute value under some circumstances, though that's
+            // not quite handled fully yet from the indexer (null is generally
+            // treated as purely uninitialized)
+
+            foreach(KeyValuePair<TKey, TValue> kvp in Attributes)
+            {
+                if(kvp.Key.Equals(key))
+                {
+                    value = kvp.Value;
+                    return true;
+                }
+            }
+
+            value = default(TValue);
+            return false;
         }
 
         public override int GetHashCode()
@@ -422,13 +454,13 @@ namespace Fact.Extensions.Experimental
 
         public override bool Equals(object obj)
         {
-            if(obj is SyncKey<TKey, TObject> sk)
+            if(obj is SyncKey<TPath, TKey, TValue> sk)
             {
                 if (!sk.Path.Equals(Path)) return false;
 
                 // DEBT: Optimize this
                 // FIX: Technically we must only match if no extras on either side
-                foreach (KeyValuePair<TKey, TObject> a in Attributes)
+                foreach (KeyValuePair<TKey, TValue> a in Attributes)
                     if (!sk.Attributes.Contains(a)) return false;
             }
 
@@ -437,10 +469,11 @@ namespace Fact.Extensions.Experimental
 
         public override string ToString()
         {
-            string s = Path;
+            string s = Path.ToString();
+            string attributes = string.Join(", ", Attributes);
 
-            if(Attributes.Any())
-                s += " (" + string.Join(", ", Attributes) + ')';
+            if(attributes != string.Empty)
+                s += " (" + attributes + ')';
 
             return s;
         }
