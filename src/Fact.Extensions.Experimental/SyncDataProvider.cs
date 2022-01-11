@@ -129,13 +129,31 @@ namespace Fact.Extensions.Experimental
     }
 
 
+    public interface INodeAttributes<TKey, TValue> : 
+        IIndexer<TKey, TValue>
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// DEBT: Consolidate with ITryGetter, in doing so document why ITryGetter isn't named
+        /// ITryTypeGetter (i.e. document why ITryGetter must have the Type parameter)
+        /// </remarks>
+        bool TryGet(TKey key, out TValue value);
+    }
+
     /// <summary>
     /// AKA node attributes
     /// Think about formalizing this at some level, would be extremely useful for Prometheus
     /// That said it is not strictly a taxonomy feature and will result in name collisions, since
     /// we want to differenciate the unique node additionally by attribute
     /// </summary>
-    public interface INodeAttributes : INamedIndexer<object>
+    public interface INodeAttributes : 
+        INodeAttributes<string, object>,
+        INamedIndexer<object>
     {
 
     }
@@ -230,6 +248,16 @@ namespace Fact.Extensions.Experimental
 
         public object Value => value;
 
+        #region INodeAttribute
+
+        // NOTE: Likely phasing this out, because:
+        // 1. Rewritable attributes are very nice but only make sense if attributes aren't
+        //    participants in tree navigation
+        // 1.1. Specifically, rewriting attributes creates additional possibilities for tree naming collisions
+        //      and since it's after the fact one then has to ponder things like merging two nodes together. etc
+
+        public bool TryGet(string key, out object value) =>
+            metaData.TryGetValue(key, out value);
 
         Dictionary<string, object> metaData = new Dictionary<string, object>();
 
@@ -237,11 +265,12 @@ namespace Fact.Extensions.Experimental
         {
             get
             {
-                metaData.TryGetValue(key, out object value);
+                TryGet(key, out object value);
                 return value;
             }
             set => metaData[key] = value;
         }
+        #endregion
 
 
         /// <summary>
@@ -356,10 +385,19 @@ namespace Fact.Extensions.Experimental
         }
     }
 
-    public struct SyncKey
+    public class SyncKey : SyncKey<string, object>
+    {
+        public SyncKey(string path, params ValueTuple<string, object>[] attributes) :
+            base(path, attributes)
+        {
+
+        }
+    }
+
+    public class SyncKey<TKey, TObject>
     {
         public string Path { get; }
-        public KeyValuePair<string, object>[] Attributes { get; }
+        public IEnumerable<KeyValuePair<TKey, TObject>> Attributes { get; }
 
         /*
         public SyncKey(string path, params KeyValuePair<string, object>[] attributes)
@@ -369,10 +407,10 @@ namespace Fact.Extensions.Experimental
         } */
 
 
-        public SyncKey(string path, params ValueTuple<string, object>[] attributes)
+        public SyncKey(string path, params ValueTuple<TKey, TObject>[] attributes)
         {
             Path = path;
-            Attributes = attributes.Select(x => new KeyValuePair<string, object>(x.Item1, x.Item2)).ToArray();
+            Attributes = attributes.Select(x => new KeyValuePair<TKey, TObject>(x.Item1, x.Item2));
         }
 
         public override int GetHashCode()
@@ -384,13 +422,13 @@ namespace Fact.Extensions.Experimental
 
         public override bool Equals(object obj)
         {
-            if(obj is SyncKey sk)
+            if(obj is SyncKey<TKey, TObject> sk)
             {
                 if (!sk.Path.Equals(Path)) return false;
 
                 // DEBT: Optimize this
                 // FIX: Technically we must only match if no extras on either side
-                foreach (KeyValuePair<string, object> a in Attributes)
+                foreach (KeyValuePair<TKey, TObject> a in Attributes)
                     if (!sk.Attributes.Contains(a)) return false;
             }
 

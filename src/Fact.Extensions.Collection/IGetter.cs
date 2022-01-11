@@ -16,6 +16,19 @@ namespace Fact.Extensions.Collection
 
     public interface ITryGetter<TKey, TValue>
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// DEBT: Document why we must specify Type here and not infer it from TValue.  I believe it's
+        /// because frequently TValue works out to be object -- and even when it cascades from a strong
+        /// type down to just object the original TValue isn't always as fully down the tree as Type
+        /// can know about
+        /// </remarks>
         bool TryGet(TKey key, Type type, out TValue value);
     }
 
