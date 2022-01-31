@@ -50,7 +50,7 @@ namespace Fact.Extensions.Collection
         ITaxonomyBase<TNode>,
         IAccessor<IEnumerable<TKey>, TNode>
         where TNode: 
-            IKeyed<TKey>, 
+            //IKeyed<TKey>, 
             IChildProvider<TNode>
     {
 

@@ -31,6 +31,35 @@ namespace Fact.Extensions.Experimental.xUnit
                 new TestNode(key);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Specifically a kind of node which DOES NOT track its own key
+        /// </remarks>
+        public class TestKvPNode :
+            KeyedChildCollectionBase<SyncKey, KeyValuePair<SyncKey, TestKvPNode>>
+        {
+            public string Value { get; }
+
+            public TestKvPNode(string value)
+            {
+                Value = value;
+            }
+
+            protected override SyncKey GetKey(KeyValuePair<SyncKey, TestKvPNode> node) => node.Key;
+        }
+
+        public class TestKvPTaxonomy : KeyValueTaxonomy<SyncKey, TestKvPNode>
+        {
+            public override KeyValuePair<SyncKey, TestKvPNode> RootNode { get; } = 
+                new KeyValuePair<SyncKey, TestKvPNode>(null, new TestKvPNode(null));
+
+            protected override KeyValuePair<SyncKey, TestKvPNode> CreateNode(KeyValuePair<SyncKey, TestKvPNode> parent, SyncKey key) =>
+                new KeyValuePair<SyncKey, TestKvPNode>(key, new TestKvPNode("N/A"));
+        }
+
+
         [Fact]
         public void NodeAttributeTest()
         {
@@ -71,6 +100,18 @@ namespace Fact.Extensions.Experimental.xUnit
             node = t[k2, k6];
 
             node.Should().Be(grandChild4);
+        }
+
+        [Fact]
+        public void KeyValueTaxonomyTest()
+        {
+            var kvpt = new TestKvPTaxonomy();
+            var key1 = new SyncKey("path1");
+            var key2 = new SyncKey("path2");
+
+            kvpt.RootNode.Value.AddChild(new KeyValuePair<SyncKey, TestKvPNode>(key1, 
+                new TestKvPNode("path1 value")));
+            kvpt.RootNode.AddChild(key2, new TestKvPNode("path2 value"));
         }
     }
 }
