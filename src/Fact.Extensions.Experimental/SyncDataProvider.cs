@@ -385,7 +385,16 @@ namespace Fact.Extensions.Experimental
         }
     }
 
-    public class SyncKey : SyncKey<string, string, object>
+    public interface IPathKey<TPath>
+    {
+        TPath Path { get; }
+    }
+
+
+    // NOTE: Just playing with interfaces - probably not worth fattening up key for this
+    public interface IPathKey : IPathKey<string> { }
+
+    public class SyncKey : SyncKey<string, string, object>, IPathKey
     {
         public SyncKey(string path, params ValueTuple<string, object>[] attributes) :
             base(path, attributes)
@@ -399,15 +408,31 @@ namespace Fact.Extensions.Experimental
     /// Convenient key used for navigating attribute-augmented taxonomy
     /// </summary>
     /// <typeparam name="TPath">Type used to indicate a particular path name.  Usually a string</typeparam>
+    public class PathKey<TPath> : IPathKey<TPath>
+    {
+        public TPath Path { get; }
+
+        public PathKey(TPath path)
+        {
+            Path = path;
+        }
+
+        public override int GetHashCode() => Path.GetHashCode();
+    }
+
+
+    /// <summary>
+    /// Convenient key used for navigating attribute-augmented taxonomy
+    /// </summary>
+    /// <typeparam name="TPath">Type used to indicate a particular path name.  Usually a string</typeparam>
     /// <typeparam name="TKey">Type used to indicate a particular attribute name.  Usually a string</typeparam>
     /// <typeparam name="TValue">Type used to indicate a particular attribute value.  Usually an object or string</typeparam>
     /// <remarks>
     /// Pulling back from struct so that we can do inheritance.  
     /// DEBT: Very mild debt, see if we can conveniently make this a struct again for optimization
     /// </remarks>
-    public class SyncKey<TPath, TKey, TValue>
+    public class SyncKey<TPath, TKey, TValue> : PathKey<TPath>
     {
-        public TPath Path { get; }
         public IEnumerable<KeyValuePair<TKey, TValue>> Attributes { get; }
 
         /*
@@ -418,13 +443,18 @@ namespace Fact.Extensions.Experimental
         } */
 
 
-        public SyncKey(TPath path, params ValueTuple<TKey, TValue>[] attributes)
+        public SyncKey(TPath path, params ValueTuple<TKey, TValue>[] attributes) : base(path)
         {
-            Path = path;
             Attributes = attributes.Select(x => new KeyValuePair<TKey, TValue>(x.Item1, x.Item2));
         }
 
 
+        /// <summary>
+        /// Look for a particular attribute
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public bool TryGet(TKey key, out TValue value)
         {
             // FirstOrDefault not quite right here because default(TValue) may
@@ -447,9 +477,8 @@ namespace Fact.Extensions.Experimental
 
         public override int GetHashCode()
         {
-            var pathHashCode = Path.GetHashCode();
             var attributeHashCode = Attributes.Aggregate(0, (s, x) => s ^ x.Key.GetHashCode() ^ x.Value.GetHashCode());
-            return pathHashCode ^ attributeHashCode;
+            return base.GetHashCode() ^ attributeHashCode;
         }
 
         public override bool Equals(object obj)
