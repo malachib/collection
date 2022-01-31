@@ -17,12 +17,13 @@ namespace Fact.Extensions.Collection
         }
 
         /// <summary>
-        /// Stock standard tree traversal
+        /// Stock standard tree traversal, adapted to a sequence of keys representing path
         /// </summary>
         /// <param name="startNode">top of tree to search from.  MUST be convertible to type T directly</param>
         /// <param name="splitKeys">broken out path/key components</param>
         /// <param name="nodeFactory"></param>
         /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
         /// <returns></returns>
         public static T FindChildByPath<T, TKey>(this IChildProvider<T> startNode, IEnumerable<TKey> splitKeys,
             Func<T, TKey, T> nodeFactory, Func<T, TKey, bool> keyPredicate)

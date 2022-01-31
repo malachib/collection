@@ -9,7 +9,7 @@ namespace Fact.Extensions.Collection
     {
         /// <summary>
         /// Root node under which all other nodes will fall.
-        /// NOTE: Nodes are named, but usually the RootNode name is not seen
+        /// NOTE: Nodes are named or keyed, but usually the RootNode name is not seen
         /// </summary>
         TNode RootNode { get; }
     }
@@ -37,10 +37,21 @@ namespace Fact.Extensions.Collection
     }
 
 
+    /// <summary>
+    /// This form of taxonomy is more broken out with an explicit 'path'
+    /// provided by a sequence of <typeparamref name="TKey"/> keys
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TNode"></typeparam>
+    /// <remarks>
+    /// DEBT: Broken out from regular named ITaxonomy for legacy reasons, would be nice to combine
+    /// </remarks>
     public interface IKeyedTaxonomy<TKey, TNode> :
         ITaxonomyBase<TNode>,
         IAccessor<IEnumerable<TKey>, TNode>
-        where TNode: IKeyed<TKey>, IChildProvider<TNode>
+        where TNode: 
+            IKeyed<TKey>, 
+            IChildProvider<TNode>
     {
 
     }
@@ -111,5 +122,15 @@ namespace Fact.Extensions.Collection
         where TChild : INamed
     {
 
+    }
+
+
+    namespace Experimental
+    {
+        public interface IKeyValueChildCollection<TKey, TChild> :
+            IChildCollection<TKey, KeyValuePair<TKey, TChild>>
+        {
+            void AddChild(TKey key, TChild value);
+        }
     }
 }

@@ -57,8 +57,17 @@ namespace Fact.Extensions.Collection
     /// </remarks>
     public abstract class TaxonomyBase<TKey, TNode> : TaxonomyBaseBase<TKey, TNode>, 
         IKeyedTaxonomy<TKey, TNode>
-        where TNode: IKeyed<TKey>, IChildProvider<TKey, TNode>
+        where TNode: 
+            IKeyed<TKey>, 
+            IChildProvider<TKey, TNode>
     {
+        /// <summary>
+        /// Get a key at the given 'path', where in this case 'path' is a sequence of keys
+        /// loosely analogous to a traditional string path i.e. 'key1/key2/key3/' pointing to
+        /// an end node
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
         TNode Get(IEnumerable<TKey> keys) =>
             RootNode.FindChildByPath(keys, _CreateNode, (node, _key) => node.Key.Equals(_key));
 
