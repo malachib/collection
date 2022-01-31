@@ -106,12 +106,20 @@ namespace Fact.Extensions.Experimental.xUnit
         public void KeyValueTaxonomyTest()
         {
             var kvpt = new TestKvPTaxonomy();
+
             var key1 = new SyncKey("path1");
             var key2 = new SyncKey("path2");
 
-            kvpt.RootNode.Value.AddChild(new KeyValuePair<SyncKey, TestKvPNode>(key1, 
-                new TestKvPNode("path1 value")));
-            kvpt.RootNode.AddChild(key2, new TestKvPNode("path2 value"));
+            var node1 = new TestKvPNode("path1 value");
+            var node2 = new TestKvPNode("path2 value");
+
+            kvpt.RootNode.Value.AddChild(new KeyValuePair<SyncKey, TestKvPNode>(key1, node1));
+            kvpt.RootNode.AddChild(key2, node2);
+
+            node1.AddChild(key2, node2);
+
+            // FIX: Not ready yet
+            //var n = kvpt[key1, key2];
         }
     }
 }
