@@ -153,7 +153,7 @@ namespace Fact.Extensions.Collection
                             // if so, create brand new node
                             TChild child = nodeFactory(parentNode, key);
 
-                            // add it
+                            // then add it, TChild being one that implicitly does have key
                             currentChildCollection.AddChild(child);
                         }
                         else

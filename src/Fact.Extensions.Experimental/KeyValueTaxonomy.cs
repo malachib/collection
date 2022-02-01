@@ -12,6 +12,13 @@ namespace Fact.Extensions.Experimental
             IChildProvider<TKey, KeyValuePair<TKey, TNode>>
 
     {
+        protected KeyValuePair<TKey, TNode> __CreateNode(TNode parent, TKey name)
+        {
+            var _parent = new KeyValuePair<TKey, TNode>(default(TKey), parent);
+
+            return _CreateNode(_parent, name);
+        }
+
         /// <summary>
         /// Get a key at the given 'path', where in this case 'path' is a sequence of keys
         /// loosely analogous to a traditional string path i.e. 'key1/key2/key3/' pointing to
@@ -19,12 +26,12 @@ namespace Fact.Extensions.Experimental
         /// </summary>
         /// <param name="keys"></param>
         /// <returns></returns>
-        KeyValuePair<TKey, TNode> Get(IEnumerable<TKey> keys) =>
-            IChildProviderExtensions.FindChildByPath(RootNode, keys, _CreateNode, (node, _key) => node.Key.Equals(_key), n => n.Value);
+        TNode Get(IEnumerable<TKey> keys) =>
+            RootNode.FindChildByPath2(keys, __CreateNode);
 
-        public TNode this[IEnumerable<TKey> keys] => Get(keys).Value;
+        public TNode this[IEnumerable<TKey> keys] => Get(keys);
 
-        public TNode this[params TKey[] keys] => Get(keys).Value;
+        public TNode this[params TKey[] keys] => Get(keys);
     }
 
 

@@ -345,7 +345,7 @@ namespace Fact.Extensions.Experimental
         /// <summary>
         /// Experimental multi child traversal
         /// </summary>
-        /// <param name="startNode">top of tree to search from.  MUST be convertible to type T directly</param>
+        /// <param name="startNodes">top of tree to search from.  MUST be convertible to type T directly</param>
         /// <param name="splitPaths">broken out path components</param>
         /// <param name="nodeFactory"></param>
         /// <typeparam name="T"></typeparam>
