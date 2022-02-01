@@ -82,22 +82,22 @@ namespace Fact.Extensions.Collection
         }
 
 
-        /*
-        public static KeyValuePair<TKey, TNode> FindChildByPath3<TKey, TNode>(this KeyValuePair<TKey, TNode> parent, 
+        public static TNode FindChildByPath2<TKey, TNode>(this KeyValuePair<TKey, TNode> parent, 
             IEnumerable<TKey> splitKeys,
             Func<TNode, TKey, KeyValuePair<TKey, TNode>> nodeFactory = null)
         {
-            Func<KeyValuePair<TKey, TNode>, TKey, bool> keyPredicate = (KeyValuePair<TKey, TNode> n, TKey key) => n.Key.Equals(key);
-            Func<TNode, IChildProvider<KeyValuePair<TKey, TNode>>> getChildProviderFromNode = n => n as IChildProvider<KeyValuePair<TKey, TNode>>;
+            Func<KeyValuePair<TKey, TNode>, TKey, bool> keyPredicate = (n, key) => n.Key.Equals(key);
+            Func<TNode, IChildProvider<KeyValuePair<TKey, TNode>>> getChildProviderFromNode = 
+                n => n as IChildProvider<KeyValuePair<TKey, TNode>>;
             Func<KeyValuePair<TKey, TNode>, TNode> getNodeFromChild = kvp => kvp.Value;
 
-            return FindChildByPath2<KeyValuePair<TKey, TNode>, TKey, TNode>(parent.Value, 
+            return FindChildByPath2(parent.Value,
                 splitKeys, 
                 keyPredicate,
                 getChildProviderFromNode,
-                getNodeFromChild);
+                getNodeFromChild,
+                nodeFactory);
         }
-        */
 
         /// <summary>
         /// EXPERIMENTAL
