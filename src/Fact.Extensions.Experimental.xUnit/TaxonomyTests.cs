@@ -135,11 +135,18 @@ namespace Fact.Extensions.Experimental.xUnit
             //rootNode.Value.AddChild(key1, _node1);
             rootNode.Value.AddChild(node1);
 
-            var foundNode = IChildProviderExtensions.FindChildByPath2(rootNode, new[] { key1 }, 
-                (kvp, k) => kvp.Key.Equals(k), n => n.Value, 
+            var foundNode = IChildProviderExtensions.FindChildByPath2<KeyValuePair<SyncKey, TestKvPNode>, SyncKey, TestKvPNode>(
+                rootNode.Value, new[] { key1 }, 
+                (kvp, k) => kvp.Key.Equals(k),
+                n => n, 
+                n => n.Value,
                 (parent, key) => new KeyValuePair<SyncKey, TestKvPNode>(key, new TestKvPNode("auto-created")));
 
-            foundNode.Should().Be(node1);
+            foundNode.Should().Be(_node1);
+
+            //foundNode = rootNode.FindChildByPath2(new[] { key1 });
+
+            //foundNode.Should().Be(node1);
         }
     }
 }

@@ -81,36 +81,64 @@ namespace Fact.Extensions.Collection
             return node;
         }
 
+
+        /*
+        public static KeyValuePair<TKey, TNode> FindChildByPath3<TKey, TNode>(this KeyValuePair<TKey, TNode> parent, 
+            IEnumerable<TKey> splitKeys,
+            Func<TNode, TKey, KeyValuePair<TKey, TNode>> nodeFactory = null)
+        {
+            Func<KeyValuePair<TKey, TNode>, TKey, bool> keyPredicate = (KeyValuePair<TKey, TNode> n, TKey key) => n.Key.Equals(key);
+            Func<TNode, IChildProvider<KeyValuePair<TKey, TNode>>> getChildProviderFromNode = n => n as IChildProvider<KeyValuePair<TKey, TNode>>;
+            Func<KeyValuePair<TKey, TNode>, TNode> getNodeFromChild = kvp => kvp.Value;
+
+            return FindChildByPath2<KeyValuePair<TKey, TNode>, TKey, TNode>(parent.Value, 
+                splitKeys, 
+                keyPredicate,
+                getChildProviderFromNode,
+                getNodeFromChild);
+        }
+        */
+
         /// <summary>
         /// EXPERIMENTAL
         /// </summary>
+        /// <param name="keyPredicate">Compares key of evaluating node against </param>
+        /// <param name="nodeFactory">Create a new node with first parameter being parent, 2nd being key of new node</param>
+        /// <typeparam name="TChild">Top level node/child which reflects key in it</typeparam>
         /// <typeparam name="TKey"></typeparam>
-        /// <typeparam name="TNode"></typeparam>
+        /// <typeparam name="TNode">Low level node/child which may or may not have key in it</typeparam>
         /// <returns></returns>
-        public static TNode FindChildByPath2<TKey, TNode>(TNode node, IEnumerable<TKey> splitKeys,
-            Func<TNode, TKey, bool> keyPredicate,
-            Func<TNode, IChildProvider<TNode>> getChildProviderFromNode,
-            Func<TNode, TKey, TNode> nodeFactory = null)
+        public static TNode FindChildByPath2<TChild, TKey, TNode>(TNode node,
+            IEnumerable<TKey> splitKeys,
+            Func<TChild, TKey, bool> keyPredicate,
+            Func<TNode, IChildProvider<TChild>> getChildProviderFromNode,
+            Func<TChild, TNode> getNodeFromChild,
+            Func<TNode, TKey, TChild> nodeFactory = null)
         {
             // dig through the key navigation
+            
             foreach (var key in splitKeys)
             {
+                TNode parentNode = node;
+
                 // convert to IChildProvider, if necessary and possible
-                IChildProvider<TNode> currentChildProvider = getChildProviderFromNode(node);
+                IChildProvider<TChild> currentChildProvider = getChildProviderFromNode(node);
 
                 // We may encounter some nodes which are not child provider nodes.  In this case,
                 // skip to next one
                 if (currentChildProvider == null) continue;
                 // otherwise, see if we are the key-aware child node provider
-                else if (currentChildProvider is IChildProvider<TKey, TNode> currentGetChildNode)
+                else if (currentChildProvider is IChildProvider<TKey, TChild> currentGetChildNode)
                 {
                     // grab child node
-                    node = currentGetChildNode.GetChild(key);
+                    TChild child = currentGetChildNode.GetChild(key);
+                    node = getNodeFromChild(child);
                 }
                 else
                 {
                     // otherwise, use key predicate to determine if we fit
-                    node = currentChildProvider.Children.SingleOrDefault(x => keyPredicate(x, key));
+                    TChild child = currentChildProvider.Children.SingleOrDefault(x => keyPredicate(x, key));
+                    node = getNodeFromChild(child);
                 }
 
                 // if no version of child acquisition matched, then see if we can create an empty node
@@ -120,13 +148,13 @@ namespace Fact.Extensions.Collection
                     if(nodeFactory != null)
                     {
                         // evalute if we can add a brand new empty node to something
-                        if(currentChildProvider is IChildCollection<TNode> currentChildCollection)
+                        if(currentChildProvider is IChildCollection<TChild> currentChildCollection)
                         {
                             // if so, create brand new node
-                            node = nodeFactory(node, key);
+                            TChild child = nodeFactory(parentNode, key);
 
                             // add it
-                            currentChildCollection.AddChild(node);
+                            currentChildCollection.AddChild(child);
                         }
                         else
                             // currentChildProvider can't support children, so no auto add gonna happen here - we're done
