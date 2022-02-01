@@ -16,6 +16,15 @@ namespace Fact.Extensions.Collection
             return startNode.FindChildByPath(splitPaths, nodeFactory, (node, key) => node.Name.Equals(key));
         }
 
+        public static T FindChildByPath<T, TKey>(T startNode, IEnumerable<TKey> splitKeys,
+            Func<T, TKey, T> nodeFactory, Func<T, TKey, bool> keyPredicate,
+            Func<T, IChildProvider<T>> getChildProverFromNode)
+        {
+            var _startNode = getChildProverFromNode(startNode);
+
+            return _startNode.FindChildByPath(splitKeys, nodeFactory, keyPredicate, startNode, getChildProverFromNode);
+        }
+
         /// <summary>
         /// Stock standard tree traversal, adapted to a sequence of keys representing path
         /// </summary>

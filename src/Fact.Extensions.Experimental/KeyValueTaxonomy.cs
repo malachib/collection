@@ -20,7 +20,7 @@ namespace Fact.Extensions.Experimental
         /// <param name="keys"></param>
         /// <returns></returns>
         KeyValuePair<TKey, TNode> Get(IEnumerable<TKey> keys) =>
-            RootNode.Value.FindChildByPath(keys, _CreateNode, (node, _key) => node.Key.Equals(_key), RootNode, n => n.Value);
+            IChildProviderExtensions.FindChildByPath(RootNode, keys, _CreateNode, (node, _key) => node.Key.Equals(_key), n => n.Value);
 
         public TNode this[IEnumerable<TKey> keys] => Get(keys).Value;
 
