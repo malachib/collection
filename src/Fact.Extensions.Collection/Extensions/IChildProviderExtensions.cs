@@ -26,12 +26,14 @@ namespace Fact.Extensions.Collection
         /// <typeparam name="TKey"></typeparam>
         /// <returns></returns>
         public static T FindChildByPath<T, TKey>(this IChildProvider<T> startNode, IEnumerable<TKey> splitKeys,
-            Func<T, TKey, T> nodeFactory, Func<T, TKey, bool> keyPredicate)
+            Func<T, TKey, T> nodeFactory, Func<T, TKey, bool> keyPredicate, 
+            T node = default(T), Func<T, IChildProvider<T>> getChildProverFromNode = null)
         {
             IChildProvider<T> currentNode = startNode;
 
-            // The ChildProvider must also be a type of T for this to work
-            T node = (T)currentNode;
+            if(node == null)
+                // The ChildProvider must also be a type of T for this to work
+                node = (T)currentNode;
 
             foreach (var key in splitKeys)
             {
@@ -64,7 +66,7 @@ namespace Fact.Extensions.Collection
                         return default(T);
                 }
 
-                currentNode = node as IChildProvider<T>;
+                currentNode = getChildProverFromNode == null ? (node as IChildProvider<T>) : getChildProverFromNode(node);
             }
 
             return node;
