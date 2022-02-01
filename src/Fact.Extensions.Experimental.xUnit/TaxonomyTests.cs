@@ -118,8 +118,9 @@ namespace Fact.Extensions.Experimental.xUnit
 
             node1.AddChild(key2, node2);
 
-            // FIX: Not ready yet
             var n = kvpt[key1, key2];
+
+            n.Should().Be(node2);
         }
 
 
