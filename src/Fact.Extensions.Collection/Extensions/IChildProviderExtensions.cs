@@ -16,13 +16,13 @@ namespace Fact.Extensions.Collection
             return startNode.FindChildByPath(splitPaths, nodeFactory, (node, key) => node.Name.Equals(key));
         }
 
-        public static T FindChildByPath<T, TKey>(T startNode, IEnumerable<TKey> splitKeys,
+        public static T FindChildByPath<T, TKey>(T node, IEnumerable<TKey> splitKeys,
             Func<T, TKey, T> nodeFactory, Func<T, TKey, bool> keyPredicate,
             Func<T, IChildProvider<T>> getChildProverFromNode)
         {
-            var _startNode = getChildProverFromNode(startNode);
+            var _startNode = getChildProverFromNode(node);
 
-            return _startNode.FindChildByPath(splitKeys, nodeFactory, keyPredicate, startNode, getChildProverFromNode);
+            return _startNode.FindChildByPath(splitKeys, nodeFactory, keyPredicate, node, getChildProverFromNode);
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Fact.Extensions.Collection
         /// <returns></returns>
         public static T FindChildByPath<T, TKey>(this IChildProvider<T> startNode, IEnumerable<TKey> splitKeys,
             Func<T, TKey, T> nodeFactory, Func<T, TKey, bool> keyPredicate, 
-            T node = default(T), Func<T, IChildProvider<T>> getChildProverFromNode = null)
+            T node = default(T), Func<T, IChildProvider<T>> getChildProviderFromNode = null)
         {
             IChildProvider<T> currentNode = startNode;
 
@@ -75,7 +75,67 @@ namespace Fact.Extensions.Collection
                         return default(T);
                 }
 
-                currentNode = getChildProverFromNode == null ? (node as IChildProvider<T>) : getChildProverFromNode(node);
+                currentNode = getChildProviderFromNode == null ? (node as IChildProvider<T>) : getChildProviderFromNode(node);
+            }
+
+            return node;
+        }
+
+        /// <summary>
+        /// EXPERIMENTAL
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TNode"></typeparam>
+        /// <returns></returns>
+        public static TNode FindChildByPath2<TKey, TNode>(TNode node, IEnumerable<TKey> splitKeys,
+            Func<TNode, TKey, bool> keyPredicate,
+            Func<TNode, IChildProvider<TNode>> getChildProviderFromNode,
+            Func<TNode, TKey, TNode> nodeFactory = null)
+        {
+            // dig through the key navigation
+            foreach (var key in splitKeys)
+            {
+                // convert to IChildProvider, if necessary and possible
+                IChildProvider<TNode> currentChildProvider = getChildProviderFromNode(node);
+
+                // We may encounter some nodes which are not child provider nodes.  In this case,
+                // skip to next one
+                if (currentChildProvider == null) continue;
+                // otherwise, see if we are the key-aware child node provider
+                else if (currentChildProvider is IChildProvider<TKey, TNode> currentGetChildNode)
+                {
+                    // grab child node
+                    node = currentGetChildNode.GetChild(key);
+                }
+                else
+                {
+                    // otherwise, use key predicate to determine if we fit
+                    node = currentChildProvider.Children.SingleOrDefault(x => keyPredicate(x, key));
+                }
+
+                // if no version of child acquisition matched, then see if we can create an empty node
+                if (node == null)
+                {
+                    // If we can, do so
+                    if(nodeFactory != null)
+                    {
+                        // evalute if we can add a brand new empty node to something
+                        if(currentChildProvider is IChildCollection<TNode> currentChildCollection)
+                        {
+                            // if so, create brand new node
+                            node = nodeFactory(node, key);
+
+                            // add it
+                            currentChildCollection.AddChild(node);
+                        }
+                        else
+                            // currentChildProvider can't support children, so no auto add gonna happen here - we're done
+                            return default(TNode);
+                    }
+                    else
+                        // no child factory, so can't auto add anything - we're done
+                        return default(TNode);
+                }
             }
 
             return node;

@@ -119,7 +119,27 @@ namespace Fact.Extensions.Experimental.xUnit
             node1.AddChild(key2, node2);
 
             // FIX: Not ready yet
-            var n = kvpt[key1, key2];
+            //var n = kvpt[key1, key2];
+        }
+
+
+        [Fact]
+        public void FindChildByPath2Test()
+        {
+            var rootKey = new SyncKey(null);
+            var key1 = new SyncKey("path1");
+            var rootNode = new KeyValuePair<SyncKey, TestKvPNode>(rootKey, new TestKvPNode(null));
+            var _node1 = new TestKvPNode("node1");
+            var node1 = new KeyValuePair<SyncKey, TestKvPNode>(key1, _node1);
+
+            //rootNode.Value.AddChild(key1, _node1);
+            rootNode.Value.AddChild(node1);
+
+            var foundNode = IChildProviderExtensions.FindChildByPath2(rootNode, new[] { key1 }, 
+                (kvp, k) => kvp.Key.Equals(k), n => n.Value, 
+                (parent, key) => new KeyValuePair<SyncKey, TestKvPNode>(key, new TestKvPNode("auto-created")));
+
+            foundNode.Should().Be(node1);
         }
     }
 }
