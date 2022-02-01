@@ -140,9 +140,10 @@ namespace Fact.Extensions.Collection
                     child = currentChildProvider.Children.SingleOrDefault(x => keyPredicate(x, key));
                 }
 
+                // translate a 'full' node with key to just the core TNode
                 node = getNodeFromChild(child);
 
-                // if no version of child acquisition matched, then see if we can create an empty node
+                // if no child matched, then see if we can create an empty node
                 if (node == null)
                 {
                     // If we can create an empty node, do so
