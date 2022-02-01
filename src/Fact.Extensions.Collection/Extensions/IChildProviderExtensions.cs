@@ -120,38 +120,39 @@ namespace Fact.Extensions.Collection
             foreach (var key in splitKeys)
             {
                 TNode parentNode = node;
+                TChild child;
 
                 // convert to IChildProvider, if necessary and possible
                 IChildProvider<TChild> currentChildProvider = getChildProviderFromNode(node);
 
                 // We may encounter some nodes which are not child provider nodes.  In this case,
-                // skip to next one
+                // skip to next one (can't dig in looking for request key if no child nodes)
                 if (currentChildProvider == null) continue;
                 // otherwise, see if we are the key-aware child node provider
                 else if (currentChildProvider is IChildProvider<TKey, TChild> currentGetChildNode)
                 {
                     // grab child node
-                    TChild child = currentGetChildNode.GetChild(key);
-                    node = getNodeFromChild(child);
+                    child = currentGetChildNode.GetChild(key);
                 }
                 else
                 {
                     // otherwise, use key predicate to determine if we fit
-                    TChild child = currentChildProvider.Children.SingleOrDefault(x => keyPredicate(x, key));
-                    node = getNodeFromChild(child);
+                    child = currentChildProvider.Children.SingleOrDefault(x => keyPredicate(x, key));
                 }
+
+                node = getNodeFromChild(child);
 
                 // if no version of child acquisition matched, then see if we can create an empty node
                 if (node == null)
                 {
-                    // If we can, do so
+                    // If we can create an empty node, do so
                     if(nodeFactory != null)
                     {
                         // evalute if we can add a brand new empty node to something
                         if(currentChildProvider is IChildCollection<TChild> currentChildCollection)
                         {
                             // if so, create brand new node
-                            TChild child = nodeFactory(parentNode, key);
+                            child = nodeFactory(parentNode, key);
 
                             // then add it, TChild being one that implicitly does have key
                             currentChildCollection.AddChild(child);
@@ -166,6 +167,7 @@ namespace Fact.Extensions.Collection
                 }
             }
 
+            // after digging as deep as we can, return what we found
             return node;
         }
 
