@@ -52,11 +52,10 @@ namespace Fact.Extensions.Experimental.xUnit
 
         public class TestKvPTaxonomy : KeyValueTaxonomy<SyncKey, TestKvPNode>
         {
-            public override KeyValuePair<SyncKey, TestKvPNode> RootNode { get; } = 
-                new KeyValuePair<SyncKey, TestKvPNode>(null, new TestKvPNode(null));
+            public override TestKvPNode RootNode { get; } = new TestKvPNode(null);
 
-            protected override KeyValuePair<SyncKey, TestKvPNode> CreateNode(KeyValuePair<SyncKey, TestKvPNode> parent, SyncKey key) =>
-                new KeyValuePair<SyncKey, TestKvPNode>(key, new TestKvPNode("N/A"));
+            protected override TestKvPNode CreateNode(TestKvPNode parent, SyncKey key) =>
+                new TestKvPNode("N/A");
         }
 
 
@@ -113,7 +112,8 @@ namespace Fact.Extensions.Experimental.xUnit
             var node1 = new TestKvPNode("path1 value");
             var node2 = new TestKvPNode("path2 value");
 
-            kvpt.RootNode.Value.AddChild(new KeyValuePair<SyncKey, TestKvPNode>(key1, node1));
+            //kvpt.RootNode.Value.AddChild(new KeyValuePair<SyncKey, TestKvPNode>(key1, node1));
+            kvpt.RootNode.AddChild(new KeyValuePair<SyncKey, TestKvPNode>(key1, node1));
             kvpt.RootNode.AddChild(key2, node2);
 
             node1.AddChild(key2, node2);
@@ -146,7 +146,7 @@ namespace Fact.Extensions.Experimental.xUnit
 
             foundNode.Should().Be(_node1);
 
-            foundNode = rootNode.FindChildByPath2(path);
+            foundNode = rootNode.FindChildByPath3(path);
 
             foundNode.Should().Be(_node1);
         }

@@ -82,7 +82,7 @@ namespace Fact.Extensions.Collection
         }
 
 
-        public static TNode FindChildByPath2<TKey, TNode>(this KeyValuePair<TKey, TNode> parent, 
+        public static TNode FindChildByPath3<TKey, TNode>(this KeyValuePair<TKey, TNode> parent, 
             IEnumerable<TKey> splitKeys,
             Func<TNode, TKey, KeyValuePair<TKey, TNode>> nodeFactory = null)
         {

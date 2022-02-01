@@ -7,16 +7,16 @@ namespace Fact.Extensions.Experimental
     using Collection;
 
     public abstract class KeyValueTaxonomy<TKey, TNode> :
-        TaxonomyBaseBase<TKey, KeyValuePair<TKey, TNode>>
+        TaxonomyBaseBase<TKey, TNode>
         where TNode :
             IChildProvider<TKey, KeyValuePair<TKey, TNode>>
 
     {
-        protected KeyValuePair<TKey, TNode> __CreateNode(TNode parent, TKey name)
+        protected KeyValuePair<TKey, TNode> __CreateNode(TNode parent, TKey key)
         {
             var _parent = new KeyValuePair<TKey, TNode>(default(TKey), parent);
 
-            return _CreateNode(_parent, name);
+            return new KeyValuePair<TKey, TNode>(key, _CreateNode(_parent.Value, key));
         }
 
         /// <summary>
@@ -27,7 +27,12 @@ namespace Fact.Extensions.Experimental
         /// <param name="keys"></param>
         /// <returns></returns>
         TNode Get(IEnumerable<TKey> keys) =>
-            RootNode.FindChildByPath2(keys, __CreateNode);
+            IChildProviderExtensions.FindChildByPath2(RootNode, 
+                keys, 
+                (KeyValuePair<TKey, TNode> c, TKey key) => c.Key.Equals(key), 
+                n => n as IChildProvider<KeyValuePair<TKey, TNode>>, 
+                c => c.Value,
+                __CreateNode);
 
         public TNode this[IEnumerable<TKey> keys] => Get(keys);
 
